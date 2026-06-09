@@ -52,6 +52,9 @@ CRM・予約管理・決済・AI連携・外部API連携まで、企画から実
 ## ⭐ 代表的な制作物
 
 ### 1. 士業向けCRM SaaS（`lawyer_crm`）— 最大規模・本番稼働中
+
+![lawyer_crm](screenshots/lawyer_crm.png)
+
 弁護士・税理士・司法書士・行政書士の4業種に対応した顧客管理SaaS。
 
 - **顧客・案件管理**、**見積（quotes）**、**契約書管理（contracts）** を一体化
@@ -66,6 +69,10 @@ CRM・予約管理・決済・AI連携・外部API連携まで、企画から実
 
 - OAuth認証フロー（`gcal/setup.php` → `callback.php`）を自前実装
 - 予約が入ると自動でカレンダーに登録、空き枠管理も実現
+
+> 予約システムの一例（`reservation`）— 空き枠カレンダーから相談予約を受け付ける画面：
+>
+> ![reservation](screenshots/reservation.png)
 
 ### 3. AI寺子屋 予約・決済システム（`fuku_ai_terakoya` / `terakoya_01`）
 講座の**予約受付＋オンライン決済＋自動確認メール**を実装した申込システム。
@@ -82,6 +89,18 @@ CRM・予約管理・決済・AI連携・外部API連携まで、企画から実
 ### 5. 実用ツール群（軽量・単機能を多数）
 `ssl_checker`（SSL証明書 期限監視）, `urlshort`（URL短縮）, `qr_generator`, `password_generator`,
 `bookmark`, `visitor_counter` など、**「あったら便利」をすぐ形にする瞬発力**も実績。
+
+---
+
+## 🖼 画面ギャラリー（本番稼働中のアプリ）
+
+| SSL証明書 期限チェッカー（実データで動作中） | チェス vs Claude |
+|---|---|
+| ![ssl_checker](screenshots/ssl_checker.png) | ![chess_app](screenshots/chess_app.png) |
+
+| フククの作品集ポートフォリオ | フクのAI寺子屋 |
+|---|---|
+| ![fuku_sample_01](screenshots/fuku_sample_01.png) | ![fuku_ai_terakoya](screenshots/fuku_ai_terakoya.png) |
 
 ---
 

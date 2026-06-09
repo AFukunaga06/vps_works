@@ -1,78 +1,79 @@
-# vps_works — 制作物まとめ
+# 🗂 vps_works — Webアプリ制作実績まとめ
 
-xserver-vps (`/var/www/html`) 上で制作した Web アプリ・ツール類のバックアップ／ポートフォリオです。
-PHP / MySQL 中心。各フォルダが1つの制作物です。
+PHP / MySQL を中心に、**実運用される業務Webアプリを約55件**自作・本番公開してきました。
+企画 → 設計 → 実装 → デプロイ → 運用までを一人で担当しています。
 
-> **公開にあたっての注意**
-> - DBパスワード・Gmailアプリパスワード等の秘密情報はすべてダミー値（`REDACTED_FOR_PUBLIC`）に置き換えています。
-> - 設定ファイル（`config.php` 等）・依存フォルダ（`node_modules` / `vendor` / `venv`）・バックアップファイルは含めていません。
-> - 動かす場合は各プロジェクトの設定ファイルを用意し、DB接続情報を設定してください。
+![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux_VPS-FCC624?style=flat&logo=linux&logoColor=black)
+![Stripe](https://img.shields.io/badge/Stripe-635BFF?style=flat&logo=stripe&logoColor=white)
 
-## CRM・業務システム
-| プロジェクト | 内容 |
+> 📄 **採用ご担当者の方へ** → 詳しい実績・技術・自己PRは **[PORTFOLIO.md](PORTFOLIO.md)** をご覧ください。
+
+---
+
+## 📊 実績サマリー
+
+| 指標 | 数値 |
 |---|---|
-| [lawyer_crm](lawyer_crm/) | 弁護士向けCRM（4業種対応SaaS） |
-| [fhouritu_soudann](fhouritu_soudann/) / [fsoudann02](fsoudann02/) | 法律相談CRM |
-| [gyousei_crm](gyousei_crm/) | 行政書士向けCRM |
-| [04_zeirishi_crm](04_zeirishi_crm/) | 税理士CRM |
-| [05_shihoshoshi_crm](05_shihoshoshi_crm/) | 司法書士CRM |
-| [crm](crm/) | 汎用CRM |
+| 制作したWebアプリ | **約 55 件**（本番稼働 / 公開中） |
+| 総コード行数 | **約 159,000 行** |
+| PHPファイル数 | 641 |
+| 主な実装 | CRM・予約・決済・外部API連携・AI連携 |
 
-## 予約・相談・申込
-| プロジェクト | 内容 |
+### 品質へのこだわり（独学でも実務水準を意識）
+| 観点 | 実装ファイル数 |
 |---|---|
-| [reservation](reservation/) | 顧客予約システム |
-| [fuku_soudan](fuku_soudan/) | フクの相談窓口 予約 |
-| [fuku_ai_terakoya](fuku_ai_terakoya/) / [terakoya_01](terakoya_01/) / [terakoya_03](terakoya_03/) | AI寺子屋 予約・講師応募 |
-| [07_clinic_yoyaku](07_clinic_yoyaku/) | クリニック予約 |
-| [contact-form](contact-form/) / [contact_form](contact_form/) / [mail_toiawase](mail_toiawase/) | お問い合わせフォーム |
-| [ch_youbousyo](ch_youbousyo/) | 要望書フォーム |
+| 🛡 SQLインジェクション対策（PDOプリペアド） | **316** |
+| 🛡 CSRF対策（トークン方式） | **119** |
+| 🔑 パスワードのハッシュ化（bcrypt） | **55** |
 
-## 教会・名簿・出欠管理
-| プロジェクト | 内容 |
-|---|---|
-| [sugitach](sugitach/) / [sugitach02](sugitach02/) | 杉田教会 名簿・出欠 |
-| [tubasa_meibo](tubasa_meibo/) | つばさ名簿 出欠管理 |
-| [church_attendance](church_attendance/) / [Church_Pastoral_Support](Church_Pastoral_Support/) | 教会 出席・牧会支援 |
-| [tokyoch01](tokyoch01/) | 教会出席管理 |
-| [attend_system01](attend_system01/) | 出席管理システム |
-| [kojinnjyouho](kojinnjyouho/) | 個人情報 名簿 |
-| [sannbisyuu_01](sannbisyuu_01/) / [sannbisyuu_02](sannbisyuu_02/) | 賛美集 |
-| [bible-reading01-app](bible-reading01-app/) | 聖書通読アプリ |
+---
 
-## 家計簿
-| プロジェクト | 内容 |
-|---|---|
-| [My_kakeibo](My_kakeibo/) / [My_kakeibo_01](My_kakeibo_01/) / [My_kakeibo_02](My_kakeibo_02/) / [My_kakeibo_05](My_kakeibo_05/) | 家計簿アプリ（各バージョン） |
+## ⭐ 代表作
 
-## ツール・ユーティリティ
-| プロジェクト | 内容 |
+| 予約システム（カレンダー） | SSL期限チェッカー（実データ稼働） |
 |---|---|
-| [checklist01](checklist01/) | 持ち物チェックリスト |
-| [ssl_checker](ssl_checker/) | SSL証明書 期限チェッカー |
-| [bookmark](bookmark/) | ブックマーク管理 |
-| [urlshort](urlshort/) | URL短縮ツール |
-| [qr_generator](qr_generator/) | QRコード生成 |
-| [password_generator](password_generator/) | パスワード生成 |
-| [color-palette](color-palette/) | カラーパレット |
-| [visitor_counter](visitor_counter/) | 訪問者カウンター |
-| [calendar](calendar/) / [calendar02](calendar02/) | カレンダー |
-| [line_gcal](line_gcal/) | LINE × Googleカレンダー連携 |
-| [nippo-form](nippo-form/) | 日報フォーム |
+| ![reservation](screenshots/reservation.png) | ![ssl_checker](screenshots/ssl_checker.png) |
 
-## 趣味・エンタメ
-| プロジェクト | 内容 |
-|---|---|
-| [chess_app](chess_app/) / [chess0430](chess0430/) | チェス対戦・成績管理 |
-| [shooting_games](shooting_games/) | シューティングゲーム |
-| [youtube_playlist](youtube_playlist/) | YouTube連続再生プレイリスト |
-| [bbs](bbs/) | 掲示板 |
+### 🏛 lawyer_crm — 士業向けCRM SaaS（最大規模）
+弁護士・税理士・司法書士・行政書士の4業種対応の顧客管理SaaS。
+**Stripe決済**によるサブスク課金、**Claude API**を使った契約書のリスク分析・要約（Pythonマイクロサービス化）、案件・見積・契約書管理、管理画面、DBマイグレーションまで実装。
 
-## ポートフォリオ・その他
-| プロジェクト | 内容 |
+### ⚖️ fhouritu_soudann — 法律相談CRM × Googleカレンダー連携
+**Google Calendar API（OAuth2.0）** を自前実装し、相談予約とスケジュールを双方向同期。
+
+### 📚 fuku_ai_terakoya — 予約・決済・自動メール
+講座の予約受付＋オンライン決済＋**PHPMailerによる確認メール自動送信**。
+
+### ♟ chess_app — Claude AIと対戦するチェス
+**Anthropic Claude API**を対戦相手に。フロント(chessboard.js)×PHPバックエンドで対戦成績も保存。
+
+### 🧰 実用ツール群
+`ssl_checker`（SSL期限監視）/ `urlshort`（URL短縮）/ `qr_generator` / `password_generator` ほか多数。
+
+---
+
+## 📂 全制作物カテゴリ一覧
+
+| カテゴリ | 主なプロジェクト |
 |---|---|
-| [fuku_sample_01](fuku_sample_01/) | フククの作品集 |
-| [sakuhinnsyuu](sakuhinnsyuu/) / [sakuhinnsyuu01](sakuhinnsyuu01/) | 作品集 |
-| [seikanado_01](seikanado_01/) | 制作物 |
-| [Amazon_cyuusyutu](Amazon_cyuusyutu/) | Amazon情報抽出 |
-| [reminder](reminder/) | リマインダー（Web版） |
+| **CRM・業務システム** | lawyer_crm（4業種SaaS）, fhouritu_soudann, fsoudann02, gyousei_crm, 04_zeirishi_crm, 05_shihoshoshi_crm, crm |
+| **予約・申込・相談** | reservation, fuku_soudan, fuku_ai_terakoya, terakoya_01, 07_clinic_yoyaku, contact-form, mail_toiawase, ch_youbousyo |
+| **名簿・出欠管理** | sugitach, sugitach02, tubasa_meibo, church_attendance, Church_Pastoral_Support, tokyoch01, attend_system01, kojinnjyouho |
+| **家計簿** | My_kakeibo, My_kakeibo_01 / _02 / _05 |
+| **ツール・ユーティリティ** | checklist01, ssl_checker, bookmark, urlshort, qr_generator, password_generator, color-palette, visitor_counter, calendar, calendar02, line_gcal, nippo-form |
+| **エンタメ** | chess_app, chess0430, shooting_games, youtube_playlist, bbs |
+| **ポートフォリオ・他** | fuku_sample_01, sakuhinnsyuu, sakuhinnsyuu01, seikanado_01, Amazon_cyuusyutu, reminder |
+
+---
+
+## 🛠 技術スタック
+**言語**: PHP / Python / JavaScript / SQL / HTML / CSS
+**DB**: MySQL（PDO・スキーマ設計・マイグレーション）
+**決済 / API**: Stripe, Google Calendar API(OAuth2.0), Anthropic Claude API, LINE, PHPMailer(SMTP)
+**インフラ**: Linux(Xserver VPS), Apache, Let's Encrypt(SSL), cron自動バックアップ, Composer, Git
+
+> ⚠️ 公開リポジトリのため、DB認証情報・APIキー等の秘密情報はすべてダミー値に置換し、設定/認証ファイルは除外しています。
