@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>パスワード生成ツール | afuku5906.com</title>
+  <meta name="description" content="安全なパスワードをブラウザ内で生成。ランダム・単語ベース・パスフレーズの3モード。強度判定・履歴管理・ダークモード対応。完全無料。">
+  <!-- OGP -->
+  <meta property="og:title" content="パスワード生成ツール">
+  <meta property="og:description" content="安全なパスワードをブラウザ内で生成。完全無料・サーバー送信なし。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pw.afuku5906.com/">
+  <meta property="og:site_name" content="afuku5906.com">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="パスワード生成ツール">
+  <meta name="twitter:description" content="安全なパスワードをブラウザ内で生成。完全無料・サーバー送信なし。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <h1>パスワード生成ツール</h1>
+      <p>ブラウザ内で完結 — 入力・生成データはサーバーに一切送信されません</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <!-- ===== 左カラム: 設定 + 生成 ===== -->
+      <div class="left-col">
+
+        <!-- モードタブ -->
+        <div class="card">
+          <div class="tabs" role="tablist" aria-label="生成モード">
+            <button class="tab active" role="tab" data-tab="random"  aria-selected="true">ランダム</button>
+            <button class="tab"        role="tab" data-tab="word"    aria-selected="false">単語ベース</button>
+            <button class="tab"        role="tab" data-tab="phrase"  aria-selected="false">パスフレーズ</button>
+          </div>
+
+          <!-- ランダムモード -->
+          <div class="tab-content active" id="tab-random" role="tabpanel">
+            <div class="field range-field">
+              <label>
+                文字数
+                <strong id="length-display">16</strong>
+              </label>
+              <input type="range" id="length" min="4" max="64" value="16" step="1">
+              <div class="range-labels"><span>4</span><span>64</span></div>
+            </div>
+
+            <div class="checkboxes">
+              <label class="checkbox-label">
+                <input type="checkbox" id="use-upper" checked> 英大文字 (A-Z)
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="use-lower" checked> 英小文字 (a-z)
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="use-digit" checked> 数字 (0-9)
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="use-symbol" checked> 記号 (!@#$%...)
+              </label>
+            </div>
+
+            <label class="checkbox-label ambiguous">
+              <input type="checkbox" id="exclude-ambig">
+              紛らわしい文字を除外 <span class="chars-example">(0 O 1 l I)</span>
+            </label>
+          </div>
+
+          <!-- 単語ベースモード -->
+          <div class="tab-content" id="tab-word" role="tabpanel">
+            <div class="field">
+              <label for="word-count">単語数</label>
+              <div class="seg-buttons" role="group" aria-label="単語数">
+                <button class="seg active" data-value="3">3語</button>
+                <button class="seg" data-value="4">4語</button>
+                <button class="seg" data-value="5">5語</button>
+              </div>
+            </div>
+            <div class="checkboxes">
+              <label class="checkbox-label">
+                <input type="checkbox" id="word-capitalize"> 各単語の頭文字を大文字にする
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="word-digits" checked> 末尾に2桁の数字を追加
+              </label>
+            </div>
+            <p class="mode-note">例: <code id="word-example">correct-horse-battery-12</code></p>
+          </div>
+
+          <!-- パスフレーズモード -->
+          <div class="tab-content" id="tab-phrase" role="tabpanel">
+            <div class="field">
+              <label for="phrase-count">単語数</label>
+              <div class="seg-buttons" role="group" aria-label="単語数">
+                <button class="seg active" data-value="3">3語</button>
+                <button class="seg" data-value="4">4語</button>
+                <button class="seg" data-value="5">5語</button>
+              </div>
+            </div>
+            <div class="checkboxes">
+              <label class="checkbox-label">
+                <input type="checkbox" id="phrase-digits" checked> 末尾に年号風の4桁数字を追加
+              </label>
+            </div>
+            <p class="mode-note">例: <code id="phrase-example">sakura-yume-tsuki-2047</code></p>
+          </div>
+        </div>
+
+        <!-- 生成ボタン群 -->
+        <div class="card generate-card">
+          <button id="btn-generate" class="btn-primary" type="button">
+            パスワードを生成
+          </button>
+          <div class="bulk-row">
+            <span class="bulk-label">一括生成:</span>
+            <button class="btn-bulk" data-count="5"  type="button">5個</button>
+            <button class="btn-bulk" data-count="10" type="button">10個</button>
+            <button class="btn-bulk" data-count="20" type="button">20個</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== 右カラム: 結果 + 履歴 ===== -->
+      <div class="right-col">
+
+        <!-- メイン結果 -->
+        <div class="card result-card" id="result-card" hidden>
+          <div class="result-row">
+            <div class="password-display" id="password-display" aria-live="polite"></div>
+            <button class="btn-copy" id="btn-copy" type="button" title="コピー">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+          </div>
+          <!-- 強度メーター -->
+          <div class="strength-area">
+            <div class="strength-bar-wrap">
+              <div class="strength-bar" id="strength-bar"></div>
+            </div>
+            <div class="strength-meta">
+              <span class="strength-label" id="strength-label">—</span>
+              <span class="strength-time"  id="strength-time"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 一括結果 -->
+        <div class="card" id="bulk-card" hidden>
+          <div class="bulk-header">
+            <h2>一括生成結果</h2>
+            <button class="btn-sm" id="copy-all" type="button">全てコピー</button>
+          </div>
+          <ul class="bulk-list" id="bulk-list"></ul>
+        </div>
+
+        <!-- 履歴 -->
+        <div class="card history-card">
+          <div class="history-header">
+            <h2>生成履歴 <span class="history-count" id="history-count">(0件)</span></h2>
+            <button class="btn-sm danger" id="clear-history" type="button">全クリア</button>
+          </div>
+          <p class="history-note">
+            履歴はこのブラウザにのみ保存されます。重要なパスワードは別途パスワード管理ツールで管理してください。
+          </p>
+          <ul class="history-list" id="history-list">
+            <li class="history-empty">履歴はまだありません</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Powered by <a href="https://afuku5906.com" target="_blank" rel="noopener noreferrer">afuku5906.com</a></p>
+  </footer>
+
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <!-- zxcvbn: パスワード強度判定ライブラリ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"
+          integrity="sha512-TZlMGFY9xKj38t/5m2FzJ+RM/aD5alMHDe26p0mYUMoCF5G7ibfHUQILq0qQPV3wlsnCwL+TPRNK4vIWGLOA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="words.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

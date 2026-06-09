@@ -1,0 +1,287 @@
+/* ===========================
+   Reset & Base
+=========================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ebf0 100%);
+  color: #333;
+  line-height: 1.7;
+  font-size: 15px;
+  min-height: 100vh;
+}
+
+/* ===========================
+   Header
+=========================== */
+.site-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 24px 0 28px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+.site-header .inner {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.site-header h1 {
+  font-size: 1.7rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 0.92rem;
+  opacity: 0.9;
+}
+
+/* ===========================
+   Container
+=========================== */
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 16px 40px;
+}
+
+/* ===========================
+   Cards
+=========================== */
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #667eea;
+}
+
+/* ===========================
+   Base color area
+=========================== */
+.base-color-area {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.color-preview {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  background: #4a90d9;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  border: 2px solid #fff;
+  outline: 1px solid #ddd;
+  transition: background 0.2s;
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.input-group label {
+  font-size: 0.78rem;
+  font-weight: bold;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input-group input[type="color"] {
+  width: 100%;
+  height: 44px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #fff;
+  padding: 4px;
+}
+
+.input-group input[type="text"],
+.input-group input[type="number"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+  background: #fafafa;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(102,126,234,0.18);
+}
+
+.input-group input[readonly] {
+  background: #f0f2f5;
+  color: #555;
+  cursor: text;
+}
+
+.rgb-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.input-group.small label {
+  text-align: center;
+}
+
+.input-group.small input {
+  text-align: center;
+}
+
+.readonly-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ===========================
+   Palette
+=========================== */
+.palette-block {
+  margin-bottom: 24px;
+}
+
+.palette-block:last-child {
+  margin-bottom: 0;
+}
+
+.palette-title {
+  font-size: 0.92rem;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.swatch {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.swatch:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+}
+
+.swatch-color {
+  height: 80px;
+}
+
+.swatch-info {
+  background: #fff;
+  padding: 8px 10px;
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+  font-size: 0.78rem;
+  border-top: 1px solid #eee;
+}
+
+.swatch-hex {
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.swatch-rgb {
+  color: #888;
+  font-size: 0.72rem;
+  margin-top: 2px;
+}
+
+/* ===========================
+   Hint & Toast
+=========================== */
+.hint {
+  text-align: center;
+  color: #888;
+  font-size: 0.88rem;
+  margin-top: 8px;
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #2c3e50;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 0.92rem;
+  font-weight: bold;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+@media (max-width: 720px) {
+  .base-color-area {
+    grid-template-columns: 1fr;
+  }
+
+  .color-preview {
+    width: 100%;
+    height: 140px;
+  }
+
+  .card {
+    padding: 22px 18px;
+  }
+
+  .site-header h1 {
+    font-size: 1.4rem;
+  }
+}

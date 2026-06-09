@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>料金プラン - LegalDesk | 月額3,300円から始める弁護士CRM</title>
+<meta name="description" content="LegalDeskの料金プラン。Solo（3,300円）/ Standard（9,800円）/ Pro（19,800円）。すべてのプランで14日間無料トライアルが可能です。">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+:root { --lc-navy:#1a3a5c; --lc-navy-dark:#102842; --lc-gold:#c8a94a; --lc-gold-light:#e6cf85; }
+body { font-family:'Hiragino Sans','Meiryo',sans-serif; color:#222; line-height:1.7; }
+.navbar-lp { background:rgba(26,58,92,.95); backdrop-filter:blur(8px); }
+.navbar-lp .navbar-brand { color:var(--lc-gold); font-weight:700; letter-spacing:.05em; }
+.navbar-lp .nav-link { color:rgba(255,255,255,.85); font-size:.92rem; }
+.navbar-lp .nav-link:hover { color:#fff; }
+.btn-gold { background:var(--lc-gold); color:var(--lc-navy); font-weight:700; border:none; }
+.btn-gold:hover { background:var(--lc-gold-light); color:var(--lc-navy); }
+.btn-outline-gold { border:2px solid var(--lc-gold); color:var(--lc-gold); font-weight:700; }
+.btn-outline-gold:hover { background:var(--lc-gold); color:var(--lc-navy); }
+
+.page-hero { background:linear-gradient(135deg,var(--lc-navy) 0%,var(--lc-navy-dark) 100%); color:#fff; padding:7rem 0 4rem; text-align:center; }
+.page-hero h1 { font-size:2.4rem; font-weight:800; margin-bottom:1rem; }
+.page-hero p { opacity:.9; font-size:1.1rem; }
+
+.section { padding:4rem 0; }
+.toggle-wrap { display:flex; justify-content:center; gap:.5rem; margin-bottom:2.5rem; }
+.toggle-btn { background:#fff; border:2px solid var(--lc-navy); color:var(--lc-navy); padding:.6rem 1.5rem; border-radius:2rem;
+  font-weight:700; cursor:pointer; transition:.2s; }
+.toggle-btn.active { background:var(--lc-navy); color:#fff; }
+.save-badge { background:var(--lc-gold); color:var(--lc-navy); font-size:.7rem; padding:.15rem .5rem; border-radius:1rem; margin-left:.4rem; font-weight:700; }
+
+.plan-card { background:#fff; border:2px solid #e9ecef; border-radius:1rem; padding:2.5rem 2rem; height:100%; transition:.2s; }
+.plan-card.featured { border-color:var(--lc-gold); position:relative; }
+.plan-card.featured::before { content:"おすすめ"; position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+  background:var(--lc-gold); color:var(--lc-navy); padding:.3rem 1.2rem; border-radius:1rem; font-weight:700; font-size:.85rem; }
+.plan-name { font-size:1.4rem; font-weight:800; color:var(--lc-navy); }
+.plan-price { font-size:2.6rem; font-weight:800; color:var(--lc-navy); margin:1rem 0 .25rem; line-height:1; }
+.plan-price small { font-size:1rem; color:#666; font-weight:400; }
+.plan-target { color:#666; font-size:.9rem; margin-bottom:1.5rem; }
+.plan-card ul { list-style:none; padding:0; margin-bottom:1.5rem; }
+.plan-card li { padding:.45rem 0; font-size:.92rem; border-bottom:1px solid #f0f0f0; }
+.plan-card li:last-child { border-bottom:none; }
+.plan-card li i { color:#28a745; margin-right:.5rem; }
+
+/* Compare table */
+.compare-table { background:#fff; border-radius:1rem; overflow:hidden; box-shadow:0 2px 12px rgba(26,58,92,.06); }
+.compare-table table { margin-bottom:0; }
+.compare-table th, .compare-table td { padding:1rem 1rem; vertical-align:middle; text-align:center; border-bottom:1px solid #f0f0f0; }
+.compare-table th { background:var(--lc-navy); color:#fff; font-weight:700; }
+.compare-table th:first-child, .compare-table td:first-child { text-align:left; font-weight:600; color:#444; }
+.compare-table th.featured-col { background:var(--lc-gold); color:var(--lc-navy); }
+.compare-table .group-row td { background:#f0f4ff; color:var(--lc-navy); font-weight:700; text-align:left; }
+.bi-check-circle-fill { color:#28a745; }
+.bi-x-circle { color:#ccc; }
+
+footer { background:#0d1f33; color:rgba(255,255,255,.7); padding:3rem 0 1.5rem; font-size:.9rem; }
+footer h6 { color:#fff; font-weight:700; margin-bottom:1rem; }
+footer a { color:rgba(255,255,255,.7); text-decoration:none; display:block; padding:.2rem 0; }
+footer a:hover { color:var(--lc-gold); }
+.footer-bottom { border-top:1px solid rgba(255,255,255,.1); margin-top:2rem; padding-top:1.5rem; text-align:center; font-size:.85rem; }
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-md navbar-dark navbar-lp fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="index.html"><i class="bi bi-briefcase-fill me-2"></i>LegalDesk</a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <i class="bi bi-list fs-4"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-md-center gap-md-2">
+        <li class="nav-item"><a class="nav-link" href="index.html#features">機能</a></li>
+        <li class="nav-item"><a class="nav-link active fw-bold" href="pricing.html">料金</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#faq">FAQ</a></li>
+        <li class="nav-item"><a class="nav-link" href="contact.php">お問合せ</a></li>
+        <li class="nav-item ms-md-2">
+          <a class="btn btn-sm btn-outline-gold" href="/lawyer_crm/login.php">ログイン</a>
+        </li>
+        <li class="nav-item ms-md-1">
+          <a class="btn btn-sm btn-gold" href="contact.php?demo=1">無料デモを試す</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="container">
+    <h1>料金プラン</h1>
+    <p>事務所の規模に合わせて選べる、シンプルで透明性の高い料金体系。<br>初期費用ゼロ・最低契約期間なし。</p>
+  </div>
+</section>
+
+<section class="section" style="background:#f8f9fb;">
+  <div class="container">
+
+    <!-- Toggle -->
+    <div class="toggle-wrap">
+      <button class="toggle-btn active" id="btnMonthly">月払い</button>
+      <button class="toggle-btn" id="btnYearly">年払い<span class="save-badge">2か月分お得</span></button>
+    </div>
+
+    <!-- Plan cards -->
+    <div class="row g-4 align-items-stretch">
+      <div class="col-lg-4">
+        <div class="plan-card">
+          <div class="plan-name">Solo</div>
+          <div class="plan-target">個人開業の弁護士・司法書士</div>
+          <div class="plan-price">
+            <span class="amt" data-month="3,300" data-year="2,750">3,300</span><small>円/月（税込）</small>
+          </div>
+          <p class="small text-muted yearly-note d-none">年額33,000円 → <s>39,600円</s></p>
+          <ul>
+            <li><i class="bi bi-check-circle-fill"></i>ユーザー <strong>1名</strong></li>
+            <li><i class="bi bi-check-circle-fill"></i>依頼者 50件まで</li>
+            <li><i class="bi bi-check-circle-fill"></i>案件 50件まで</li>
+            <li><i class="bi bi-check-circle-fill"></i>ストレージ 5GB</li>
+            <li><i class="bi bi-check-circle-fill"></i>メールサポート</li>
+            <li><i class="bi bi-x-circle"></i>Googleカレンダー連携</li>
+            <li><i class="bi bi-x-circle"></i>API連携</li>
+          </ul>
+          <a class="btn btn-outline-secondary w-100" href="contact.php?plan=solo">14日間無料で試す</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="plan-card featured">
+          <div class="plan-name">Standard</div>
+          <div class="plan-target">小規模事務所（〜3名）</div>
+          <div class="plan-price">
+            <span class="amt" data-month="9,800" data-year="8,170">9,800</span><small>円/月（税込）</small>
+          </div>
+          <p class="small text-muted yearly-note d-none">年額98,000円 → <s>117,600円</s></p>
+          <ul>
+            <li><i class="bi bi-check-circle-fill"></i>ユーザー <strong>3名まで</strong></li>
+            <li><i class="bi bi-check-circle-fill"></i>依頼者 <strong>無制限</strong></li>
+            <li><i class="bi bi-check-circle-fill"></i>案件 <strong>無制限</strong></li>
+            <li><i class="bi bi-check-circle-fill"></i>ストレージ 50GB</li>
+            <li><i class="bi bi-check-circle-fill"></i>優先メールサポート</li>
+            <li><i class="bi bi-check-circle-fill"></i><strong>Googleカレンダー連携</strong></li>
+            <li><i class="bi bi-check-circle-fill"></i>初期データ移行サポート</li>
+          </ul>
+          <a class="btn btn-gold w-100" href="contact.php?plan=standard">14日間無料で試す</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="plan-card">
+          <div class="plan-name">Pro</div>
+          <div class="plan-target">中規模事務所（5名以上）</div>
+          <div class="plan-price">
+            <span class="amt" data-month="19,800" data-year="16,500">19,800</span><small>円/月（税込）</small>
+          </div>
+          <p class="small text-muted yearly-note d-none">年額198,000円 → <s>237,600円</s></p>
+          <ul>
+            <li><i class="bi bi-check-circle-fill"></i>ユーザー <strong>10名まで</strong></li>
+            <li><i class="bi bi-check-circle-fill"></i>すべて <strong>無制限</strong></li>
+            <li><i class="bi bi-check-circle-fill"></i>ストレージ 500GB</li>
+            <li><i class="bi bi-check-circle-fill"></i>電話サポート</li>
+            <li><i class="bi bi-check-circle-fill"></i>Googleカレンダー連携</li>
+            <li><i class="bi bi-check-circle-fill"></i><strong>API連携・カスタマイズ</strong></li>
+            <li><i class="bi bi-check-circle-fill"></i>専任カスタマーサクセス</li>
+          </ul>
+          <a class="btn btn-outline-secondary w-100" href="contact.php?plan=pro">問い合わせる</a>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center mt-4 small text-muted">
+      ※ 11名以上の大規模事務所はEnterpriseプランをご用意しています。
+      <a href="contact.php?plan=enterprise">お問合せください</a>
+    </p>
+  </div>
+</section>
+
+<!-- Compare table -->
+<section class="section">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-4" style="color:var(--lc-navy);">機能比較表</h2>
+    <div class="compare-table table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th style="width:34%;">機能</th>
+            <th>Solo</th>
+            <th class="featured-col">Standard</th>
+            <th>Pro</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group-row"><td colspan="4">利用枠</td></tr>
+          <tr><td>ユーザー数</td><td>1名</td><td>3名</td><td>10名</td></tr>
+          <tr><td>依頼者登録数</td><td>50件</td><td>無制限</td><td>無制限</td></tr>
+          <tr><td>案件登録数</td><td>50件</td><td>無制限</td><td>無制限</td></tr>
+          <tr><td>ストレージ</td><td>5GB</td><td>50GB</td><td>500GB</td></tr>
+
+          <tr class="group-row"><td colspan="4">基本機能</td></tr>
+          <tr><td>依頼者管理</td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>案件管理</td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>期日管理</td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>活動記録</td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>請求管理</td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>書類アップロード</td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>権限管理（弁護士/スタッフ）</td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+
+          <tr class="group-row"><td colspan="4">連携・拡張</td></tr>
+          <tr><td>Googleカレンダー連携</td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>CSVインポート/エクスポート</td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>API連携</td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>カスタマイズ対応</td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+
+          <tr class="group-row"><td colspan="4">セキュリティ・運用</td></tr>
+          <tr><td>SSL常時化</td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>日次バックアップ</td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>監査ログ</td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-check-circle-fill"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>IP制限</td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+
+          <tr class="group-row"><td colspan="4">サポート</td></tr>
+          <tr><td>メールサポート</td><td><i class="bi bi-check-circle-fill"></i></td><td>優先</td><td>優先</td></tr>
+          <tr><td>電話サポート</td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+          <tr><td>初期データ移行サポート</td><td>有償</td><td>無料</td><td>無料</td></tr>
+          <tr><td>専任カスタマーサクセス</td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-x-circle"></i></td><td><i class="bi bi-check-circle-fill"></i></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:linear-gradient(135deg,var(--lc-navy) 0%,var(--lc-navy-dark) 100%); color:#fff; text-align:center;">
+  <div class="container">
+    <h2 class="fw-bold mb-3">迷ったら、まずは無料トライアル</h2>
+    <p class="opacity-75 mb-4">14日間、全機能を無料でお試しいただけます。クレジットカード登録不要。</p>
+    <a class="btn btn-gold btn-lg px-5" href="contact.php?demo=1">
+      <i class="bi bi-play-circle me-1"></i>無料デモを申し込む
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h6><i class="bi bi-briefcase-fill me-1" style="color:var(--lc-gold);"></i>LegalDesk</h6>
+        <p class="small mb-0">個人・小規模事務所のための弁護士CRM。<br>紙とExcelからクラウドへ、案件管理を進化させます。</p>
+      </div>
+      <div class="col-6 col-md-2">
+        <h6>サービス</h6>
+        <a href="index.html#features">機能</a>
+        <a href="pricing.html">料金プラン</a>
+        <a href="index.html#faq">FAQ</a>
+      </div>
+      <div class="col-6 col-md-2">
+        <h6>サポート</h6>
+        <a href="contact.php">お問合せ</a>
+        <a href="contact.php?demo=1">デモ申込</a>
+        <a href="/lawyer_crm/login.php">ログイン</a>
+      </div>
+      <div class="col-md-4">
+        <h6>規約・運営</h6>
+        <a href="terms.html">利用規約</a>
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="tokushoho.html">特定商取引法に基づく表記</a>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 LegalDesk. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const btnM = document.getElementById('btnMonthly');
+const btnY = document.getElementById('btnYearly');
+const amounts = document.querySelectorAll('.amt');
+const yearlyNotes = document.querySelectorAll('.yearly-note');
+btnM.addEventListener('click', () => {
+  btnM.classList.add('active'); btnY.classList.remove('active');
+  amounts.forEach(el => el.textContent = el.dataset.month);
+  yearlyNotes.forEach(el => el.classList.add('d-none'));
+});
+btnY.addEventListener('click', () => {
+  btnY.classList.add('active'); btnM.classList.remove('active');
+  amounts.forEach(el => el.textContent = el.dataset.year);
+  yearlyNotes.forEach(el => el.classList.remove('d-none'));
+});
+</script>
+</body>
+</html>

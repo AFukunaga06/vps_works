@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カラーパレットジェネレーター</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <h1>🎨 カラーパレットジェネレーター</h1>
+    <p class="subtitle">HEX ⇄ RGB 変換 ・ 配色パレット自動生成</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ベースカラー入力 -->
+  <section class="card">
+    <h2 class="card-title">ベースカラー</h2>
+
+    <div class="base-color-area">
+      <div class="color-preview" id="preview"></div>
+
+      <div class="inputs">
+        <div class="input-group">
+          <label for="picker">カラーピッカー</label>
+          <input type="color" id="picker" value="#4a90d9">
+        </div>
+
+        <div class="input-group">
+          <label for="hex">HEX</label>
+          <input type="text" id="hex" value="#4a90d9" maxlength="7" placeholder="#000000">
+        </div>
+
+        <div class="rgb-row">
+          <div class="input-group small">
+            <label for="r">R</label>
+            <input type="number" id="r" min="0" max="255" value="74">
+          </div>
+          <div class="input-group small">
+            <label for="g">G</label>
+            <input type="number" id="g" min="0" max="255" value="144">
+          </div>
+          <div class="input-group small">
+            <label for="b">B</label>
+            <input type="number" id="b" min="0" max="255" value="217">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>RGB / HSL</label>
+          <div class="readonly-row">
+            <input type="text" id="rgb-string" readonly>
+            <input type="text" id="hsl-string" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 配色パレット -->
+  <section class="card">
+    <h2 class="card-title">配色パレット</h2>
+
+    <div class="palette-block">
+      <h3 class="palette-title">モノクロマティック（明度バリエーション）</h3>
+      <div class="swatches" id="palette-mono"></div>
+    </div>
+
+    <div class="palette-block">
+      <h3 class="palette-title">類似色（Analogous）</h3>
+      <div class="swatches" id="palette-analog"></div>
+    </div>
+
+    <div class="palette-block">
+      <h3 class="palette-title">補色（Complementary）</h3>
+      <div class="swatches" id="palette-comp"></div>
+    </div>
+
+    <div class="palette-block">
+      <h3 class="palette-title">三色配色（Triadic）</h3>
+      <div class="swatches" id="palette-triad"></div>
+    </div>
+
+    <div class="palette-block">
+      <h3 class="palette-title">四色配色（Tetradic）</h3>
+      <div class="swatches" id="palette-tetra"></div>
+    </div>
+  </section>
+
+  <p class="hint">💡 色をクリックするとHEXがコピーされます</p>
+
+</div>
+
+<!-- コピー通知 -->
+<div class="toast" id="toast"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

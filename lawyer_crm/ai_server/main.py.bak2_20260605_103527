@@ -1,0 +1,244 @@
+"""ai_server: 契約書AIレビュー FastAPI エンドポイント
+
+起動: uvicorn main:app --host 0.0.0.0 --port 8000
+
+POST /analyze
+  body: { contract_id:int, file_path:str, contract_type:str, party_side:str }
+  処理: PDF→テキスト→条項分割→Claude分析→lc_contract_clauses に保存
+       lc_contracts.status='done'/analyzed_at/サマリ/リスクカウントを更新
+       失敗時: status='error', error_message を設定
+"""
+from __future__ import annotations
+
+import logging
+import os
+from datetime import datetime
+from pathlib import Path
+
+import mysql.connector
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+
+# 環境変数の読み込み（同階層の .env）
+load_dotenv(Path(__file__).parent / ".env")
+
+from claude_analyzer import analyze_clause, summarize_contract  # noqa: E402
+from clause_splitter import split_clauses                       # noqa: E402
+from pdf_parser import extract_text                              # noqa: E402
+
+logging.basicConfig(
+    level=os.environ.get("AI_LOG_LEVEL", "INFO"),
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+)
+log = logging.getLogger("ai_server")
+
+
+DB_CONFIG = {
+    "host":     os.environ.get("DB_HOST", "localhost"),
+    "database": os.environ.get("DB_NAME", "lawyer_crm"),
+    "user":     os.environ.get("DB_USER", "lawyer_user"),
+    "password": os.environ.get("DB_PASS", ""),
+    "charset":  "utf8mb4",
+    "use_unicode": True,
+}
+
+# 条項本文が短すぎる場合は分析対象から除外
+MIN_CLAUSE_CHARS = 20
+# サマリ生成に渡す本文先頭の最大文字数
+SUMMARY_INPUT_CHARS = 8000
+
+app = FastAPI(title="lawyer_crm AI contract review")
+
+
+class AnalyzeReq(BaseModel):
+    contract_id:   int  = Field(..., ge=1)
+    file_path:     str
+    contract_type: str  = ""
+    party_side:    str  = "甲"
+
+
+# -----------------------------------------------------------------
+# DB ヘルパー
+# -----------------------------------------------------------------
+def _conn():
+    return mysql.connector.connect(**DB_CONFIG)
+
+
+def _get_tenant_id(contract_id: int) -> int:
+    with _conn() as c:
+        cur = c.cursor()
+        cur.execute("SELECT tenant_id FROM lc_contracts WHERE id=%s", (contract_id,))
+        row = cur.fetchone()
+        cur.close()
+        if not row:
+            raise HTTPException(status_code=404, detail="contract not found")
+        return int(row[0])
+
+
+def _set_status(contract_id: int, status: str) -> None:
+    with _conn() as c:
+        cur = c.cursor()
+        cur.execute(
+            "UPDATE lc_contracts SET status=%s WHERE id=%s",
+            (status, contract_id),
+        )
+        c.commit()
+        cur.close()
+
+
+def _set_error(contract_id: int, message: str) -> None:
+    try:
+        with _conn() as c:
+            cur = c.cursor()
+            cur.execute(
+                "UPDATE lc_contracts SET status='error', error_message=%s WHERE id=%s",
+                (message[:500], contract_id),
+            )
+            c.commit()
+            cur.close()
+    except Exception:
+        log.exception("failed to set error status for contract_id=%s", contract_id)
+
+
+# -----------------------------------------------------------------
+# エンドポイント
+# -----------------------------------------------------------------
+@app.get("/health")
+def health() -> dict:
+    return {"ok": True, "ts": datetime.now().isoformat(timespec="seconds")}
+
+
+@app.post("/analyze")
+def analyze(req: AnalyzeReq) -> dict:
+    cid = req.contract_id
+    fp  = req.file_path
+    log.info("analyze start: contract_id=%s file=%s type=%s side=%s",
+             cid, fp, req.contract_type, req.party_side)
+
+    if not os.path.isfile(fp):
+        _set_error(cid, f"ファイルが見つかりません: {fp}")
+        raise HTTPException(status_code=400, detail="file not found")
+
+    try:
+        tenant_id = _get_tenant_id(cid)
+        _set_status(cid, "analyzing")
+
+        # 1) ファイル(PDF/Word/テキスト) → テキスト
+        text = extract_text(fp)
+        if not text or len(text.strip()) < 50:
+            _set_error(cid, "ファイルから本文が抽出できませんでした（画像PDFまたは空ファイルの可能性）")
+            raise HTTPException(status_code=422, detail="empty text")
+
+        # 2) 条項分割
+        clauses = split_clauses(text)
+        clauses = [c for c in clauses if len(c["text"]) >= MIN_CLAUSE_CHARS]
+        if not clauses:
+            _set_error(cid, "条項を抽出できませんでした")
+            raise HTTPException(status_code=422, detail="no clauses")
+        log.info("contract %s: %d clauses extracted", cid, len(clauses))
+
+        # 3) 条項ごとに分析 → DB保存
+        risk_counts = {"高": 0, "中": 0, "低": 0, "なし": 0}
+
+        with _conn() as conn:
+            cur = conn.cursor()
+            # 再解析対応: 既存条項をクリアしてから差し替え
+            cur.execute(
+                "DELETE FROM lc_contract_clauses WHERE contract_id=%s", (cid,)
+            )
+            conn.commit()
+
+            for idx, c in enumerate(clauses, start=1):
+                try:
+                    result = analyze_clause(
+                        clause_text=c["text"],
+                        contract_type=req.contract_type,
+                        party_side=req.party_side,
+                        clause_number=c["number"],
+                        clause_title=c["title"],
+                    )
+                except Exception as e:
+                    log.exception("clause %s analysis failed", c["number"])
+                    result = {
+                        "risk_level":  "なし",
+                        "risk_type":   "",
+                        "issue":       f"分析中のエラー: {e}",
+                        "suggestion":  "",
+                        "related_law": "",
+                    }
+
+                rl = result["risk_level"]
+                if rl not in risk_counts:
+                    rl = "なし"
+                risk_counts[rl] += 1
+
+                cur.execute(
+                    """
+                    INSERT INTO lc_contract_clauses
+                      (tenant_id, contract_id, clause_number, clause_title, clause_text,
+                       risk_level, risk_type, issue, suggestion, related_law, sort_order)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    """,
+                    (
+                        tenant_id, cid,
+                        c["number"][:20], c["title"][:255], c["text"],
+                        rl,
+                        result["risk_type"][:100],
+                        result["issue"],
+                        result["suggestion"],
+                        result["related_law"][:255],
+                        idx,
+                    ),
+                )
+            conn.commit()
+            cur.close()
+
+        # 4) 契約全体のサマリ（失敗しても致命的ではない）
+        try:
+            summary = summarize_contract(
+                text[:SUMMARY_INPUT_CHARS], req.contract_type, req.party_side
+            )
+        except Exception:
+            log.exception("summarize failed (continuing without summary)")
+            summary = ""
+
+        # 5) lc_contracts を確定状態に更新
+        with _conn() as c:
+            cur = c.cursor()
+            cur.execute(
+                """
+                UPDATE lc_contracts
+                   SET status          = 'done',
+                       analyzed_at     = NOW(),
+                       summary         = %s,
+                       total_risk_high   = %s,
+                       total_risk_medium = %s,
+                       total_risk_low    = %s,
+                       error_message   = NULL
+                 WHERE id = %s
+                """,
+                (
+                    summary,
+                    risk_counts["高"], risk_counts["中"], risk_counts["低"],
+                    cid,
+                ),
+            )
+            c.commit()
+            cur.close()
+
+        log.info("analyze done: contract_id=%s clauses=%d risk=%s",
+                 cid, len(clauses), risk_counts)
+        return {
+            "ok":          True,
+            "contract_id": cid,
+            "clauses":     len(clauses),
+            "risk":        risk_counts,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log.exception("analyze failed: contract_id=%s", cid)
+        _set_error(cid, str(e)[:500])
+        raise HTTPException(status_code=500, detail=str(e))

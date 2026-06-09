@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="ja"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>フクのAI寺子屋｜講師募集要項</title>
+  <style>
+	
+      :root{
+	  --bg:#141a2b;          /* 背景を少し明るく */
+	  --panel:#1b233a;
+	  --panel2:#1a2240;
+	  --text:#f1f4ff;       /* 文字を純白寄りに */
+	  --muted:#c7d2f2;      /* サブ文字を薄く */
+	  --line:rgba(255,255,255,.18);
+	  --accent:#8bbcff;     /* 青を淡く */
+	  --accent2:#9af5d6;    /* 緑を淡く */
+	  --warn:#ffe2a3;       /* 黄色を柔らかく */
+	  --shadow: 0 10px 30px rgba(0,0,0,.28);
+	  --radius: 16px;
+	  --radius2: 22px;
+	}
+
+    :root{
+      --bg:#0b1220;
+      --panel:#111a2e;
+      --panel2:#0f172a;
+      --text:#e8eefc;
+      --muted:#b9c6e6;
+      --line:rgba(255,255,255,.12);
+      --accent:#62a8ff;
+      --accent2:#7cf0c6;
+      --warn:#ffcc66;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius2: 22px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Yu Gothic", "Meiryo", sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(900px 600px at 10% 10%, rgba(98,168,255,.18), transparent 60%),
+        radial-gradient(900px 600px at 90% 20%, rgba(124,240,198,.10), transparent 55%),
+        radial-gradient(800px 500px at 40% 100%, rgba(255,204,102,.08), transparent 60%),
+        linear-gradient(180deg, var(--bg), #050814);
+      min-height:100vh;
+    }
+    header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter: blur(10px);
+      background: rgba(10,16,30,.75);
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{ max-width: 1100px; margin: 0 auto; padding: 18px 16px; }
+    .topbar{ display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .brand{ display:flex; gap:12px; align-items:center; }
+    .logo{
+      width:42px;height:42px;border-radius: 14px;
+      background: linear-gradient(135deg, rgba(98,168,255,.95), rgba(124,240,198,.85));
+      box-shadow: var(--shadow);
+      position:relative; overflow:hidden;
+    }
+    .logo:after{
+      content:""; position:absolute; inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), transparent 55%);
+      transform: rotate(10deg);
+    }
+    h1{ margin:0; font-size: 18px; letter-spacing: .2px; }
+    .subtitle{ margin:2px 0 0; font-size: 12.5px; color: var(--muted); }
+
+    .actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(17,26,46,.7);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: .15s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+      box-shadow: 0 8px 18px rgba(0,0,0,.25);
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(98,168,255,.45); }
+    .btn:active{ transform: translateY(0px); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(98,168,255,.95), rgba(98,168,255,.70));
+      border-color: rgba(98,168,255,.60);
+    }
+    .btn.good{
+      background: linear-gradient(135deg, rgba(124,240,198,.9), rgba(124,240,198,.55));
+      color:#04110c;
+      border-color: rgba(124,240,198,.7);
+    }
+    .btn.warn{
+      background: linear-gradient(135deg, rgba(255,204,102,.95), rgba(255,204,102,.55));
+      color:#1a1200;
+      border-color: rgba(255,204,102,.7);
+    }
+    .btn.ghost{ background: rgba(17,26,46,.35); box-shadow:none; }
+
+    main{ padding: 22px 0 46px; }
+    .grid{ display:grid; grid-template-columns: 340px 1fr; gap: 16px; }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+
+    .card{
+      background: rgba(17,26,46,.68);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(15,23,42,.45);
+    }
+    .card .hd h2{ margin:0; font-size: 14.5px; letter-spacing:.2px; }
+    .card .bd{ padding: 14px 16px 16px; }
+
+    .pillrow{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .pill{
+      font-size:12px; padding:6px 10px; border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(17,26,46,.5);
+      color: var(--muted);
+    }
+    .pill strong{ color: var(--text); font-weight:600; }
+    .pill.accent{ border-color: rgba(98,168,255,.35); }
+    .pill.good{ border-color: rgba(124,240,198,.35); }
+    .pill.warn{ border-color: rgba(255,204,102,.35); }
+
+    .nav{ display:flex; flex-direction:column; gap:8px; }
+    .nav button{
+      width:100%;
+      text-align:left;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(17,26,46,.42);
+      color: var(--text);
+      cursor:pointer;
+      transition:.15s ease;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .nav button:hover{ border-color: rgba(98,168,255,.45); transform: translateY(-1px); }
+    .nav button.active{ background: rgba(98,168,255,.16); border-color: rgba(98,168,255,.55); }
+
+    .badge{
+      font-size:12px; padding:3px 8px; border-radius:999px;
+      border:1px solid var(--line);
+      color: var(--muted);
+      background: rgba(15,23,42,.45);
+      white-space:nowrap;
+    }
+
+    .sectionTitle{
+      display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
+      flex-wrap:wrap; margin-bottom: 10px;
+    }
+    .sectionTitle h2{ margin:0; font-size: 18px; }
+    .sectionTitle p{
+      margin:6px 0 0; color: var(--muted); font-size: 13px;
+      max-width: 70ch; line-height: 1.6;
+    }
+    .content{ display:none; animation: fade .18s ease; }
+    .content.active{ display:block; }
+    @keyframes fade { from{opacity:.7; transform: translateY(2px);} to{opacity:1; transform: translateY(0);} }
+
+    .box{
+      border: 1px solid var(--line);
+      background: rgba(15,23,42,.55);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin: 12px 0;
+    }
+    .box h3{ margin:0 0 8px; font-size: 14.5px; }
+    .box ul{ margin: 8px 0 0 18px; color: var(--text); line-height: 1.7; font-size: 14px; }
+    .box p{ margin: 8px 0 0; color: var(--text); line-height: 1.7; font-size: 14px; }
+
+    .kvs{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    @media (max-width: 720px){ .kvs{ grid-template-columns:1fr; } }
+    .kv{
+      border:1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(17,26,46,.35);
+    }
+    .kv .k{ color: var(--muted); font-size: 12px; }
+    .kv .v{ margin-top:6px; font-weight:600; }
+
+    .copybar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 12px; }
+
+    textarea{
+      width:100%;
+      min-height: 220px;
+      resize: vertical;
+      padding: 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: rgba(5,8,20,.55);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12.8px;
+      line-height: 1.55;
+      outline:none;
+    }
+
+    .note{ font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(17,26,46,.92);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow);
+      color: var(--text);
+      font-size: 13px;
+      opacity:0;
+      pointer-events:none;
+      transition: .2s ease;
+    }
+    .toast.show{ opacity:1; transform: translateX(-50%) translateY(-2px); }
+
+    .hr{ height:1px; background: var(--line); margin: 14px 0; }
+    .muted{ color: var(--muted); }
+    .strong{ font-weight:700; }
+    .mark{
+      padding: 2px 6px;
+      border-radius: 8px;
+      background: rgba(98,168,255,.18);
+      border: 1px solid rgba(98,168,255,.25);
+    }
+
+    footer{
+      padding: 14px 0 28px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align:center;
+      border-top:1px solid var(--line);
+      background: rgba(10,16,30,.35);
+    }
+
+    a.link{ color: var(--accent2); text-decoration: none; border-bottom: 1px dotted rgba(124,240,198,.55); }
+    a.link:hover{ opacity:.9; }
+    input[type="text"]{
+      width:100%;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(5,8,20,.45);
+      color:var(--text);
+      outline:none;
+      margin:6px 0 10px;
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>フクのAI寺子屋｜講師募集要項</h1>
+          <div class="subtitle">20歳以上（上限なし）／生成AI経験1年以上／遠隔操作必須／守秘義務契約（NDA）あり</div>
+        </div>
+      </div>
+      <div class="actions">
+        <a class="btn ghost" href="/terakoya_03/">⬆️ 先頭に戻る</a>
+        <button class="btn ghost" id="btnPrint">🖨️ 印刷</button>
+        <button class="btn primary" id="btnCopyAll">📋 全文コピー</button>
+        <button class="btn good" id="btnDownload">⬇️ HTML保存</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <aside class="card">
+      <div class="hd">
+        <h2>メニュー</h2>
+        <div class="pillrow">
+          <span class="pill accent"><strong>時給</strong> 1,230円〜</span>
+          <span class="pill good"><strong>在宅</strong> 完全オンライン</span>
+          <span class="pill warn"><strong>NDA</strong> 締結</span>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="box">
+          <h3>お問い合わせ（主催）</h3>
+          <p>
+            <span class="strong">福永 篤</span><br>
+            メール：<a class="link" href="mailto:afky5906@gmail.com">afky5906@gmail.com</a><br>
+            電話：<a class="link" href="tel:08047882900">080-4788-2900</a>
+          </p>
+          <p class="note">※お電話に出られない場合があります。メールでのご連絡が確実です。</p>
+        </div>
+
+        <div class="nav">
+          <button class="" data-target="sec-overview"><span>募集概要</span><span class="badge">概要</span></button>
+          <button data-target="sec-details" class=""><span>募集要項（詳細）</span><span class="badge">必須条件</span></button>
+          <button data-target="sec-resume" class=""><span>簡単な経歴書テンプレ</span><span class="badge">提出物</span></button>
+          <button data-target="sec-test" class=""><span>スキルテスト案内</span><span class="badge">選考</span></button>
+          <button data-target="sec-apply" class="active"><span>応募方法</span><span class="badge">送付</span></button>
+          <button data-target="sec-faq" class=""><span>FAQ</span><span class="badge">質問</span></button>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="box">
+          <h3>任意入力（差し替え）</h3>
+          <p class="note">必要なら「支払い条件」「遠隔操作ツール例」だけ記載を追加できます。</p>
+
+          <label class="note" for="payInfo">支払い条件（任意）</label>
+          <input id="payInfo" type="text" placeholder="例：月末締め翌月10日払い（予定）">
+
+          <label class="note" for="remoteTool">遠隔操作ツール例（任意）</label>
+          <input id="remoteTool" type="text" placeholder="例：Zoomリモート制御 / Chrome Remote Desktop">
+
+          <div class="copybar">
+            <button class="btn ghost" id="btnReset">↩︎ リセット</button>
+            <button class="btn warn" id="btnCopyApply">📋 応募方法だけコピー</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="card">
+      <div class="hd"><h2 id="currentTitle">応募方法
+送付</h2></div>
+      <div class="bd">
+
+        <div class="content" id="sec-overview">
+          <div class="sectionTitle">
+            <div>
+              <h2>募集概要</h2>
+              <p>
+                <span class="mark">フクのAI寺子屋</span>では、講師（在宅・オンライン）を募集しています。
+                Zoomを使い、受講者の「やりたいこと」を一緒に進める伴走型サポートが中心です。
+                必要に応じて、受講者の同意のもと遠隔操作で補助しながら、解決まで丁寧に支援していただきます。
+              </p>
+            </div>
+            <div class="copybar">
+              <button class="btn primary" data-copy="overviewText">📋 コピー</button>
+            </div>
+          </div>
+
+          <div class="kvs">
+            <div class="kv"><div class="k">対象</div><div class="v">20歳以上（上限は能力があれば問いません）</div></div>
+            <div class="kv"><div class="k">報酬</div><div class="v">時給 1,230円〜（能力に応じて支給）</div></div>
+            <div class="kv"><div class="k">勤務形態</div><div class="v">完全オンライン（在宅）</div></div>
+            <div class="kv"><div class="k">重要条件</div><div class="v">生成AI経験1年以上／遠隔操作必須／守秘義務契約（NDA）締結</div></div>
+          </div>
+
+          <textarea id="overviewText" readonly=""></textarea>
+        </div>
+
+        <div class="content" id="sec-details">
+          <div class="sectionTitle">
+            <div>
+              <h2>募集要項（詳細）</h2>
+              <p>報酬は <span class="mark">時給 1,230円〜（能力に応じて支給）</span> です。</p>
+            </div>
+            <div class="copybar">
+              <button class="btn primary" data-copy="detailsText">📋 コピー</button>
+            </div>
+          </div>
+
+          <div class="box">
+            <h3>報酬</h3>
+            <ul>
+              <li><span class="strong">時給 1,230円〜（能力に応じて支給）</span></li>
+              <li>支払い方法・締日・支払日：応相談（決定後に明示）</li>
+              <li class="muted">※まずは試験的に少ない時間から開始し、双方合意のうえで継続します。</li>
+            </ul>
+          </div>
+
+          <div class="box">
+            <h3>応募条件（必須）</h3>
+            <ul>
+              <li><span class="strong">20歳以上（上限は能力があれば問いません）</span></li>
+              <li><span class="strong">守秘義務を確実に守れること</span>（採用時に守秘義務契約書（NDA）を締結）</li>
+              <li>Zoomでのオンライン説明ができること</li>
+              <li><span class="strong">遠隔操作でのサポートができること（必須）</span>（同意がある場合のみ／必要最小限）</li>
+              <li><span class="strong">生成AI（ChatGPT／Claude／Gemini 等）の利用経験が1年以上あり、問題なく使えること（必須）</span></li>
+              <li>IT関連の実務経験1年以上、または同等のスキルがあること</li>
+              <li>専門用語をかみ砕いて丁寧に説明できること</li>
+            </ul>
+          </div>
+
+          <div class="box">
+            <h3>連絡先（主催）</h3>
+            <p>
+              <span class="strong">福永 篤</span><br>
+              メール：<a class="link" href="mailto:afky5906@gmail.com">afky5906@gmail.com</a><br>
+              電話：<a class="link" href="tel:08047882900">080-4788-2900</a>
+            </p>
+          </div>
+
+          <textarea id="detailsText" readonly=""></textarea>
+        </div>
+
+        <div class="content" id="sec-resume">
+          <div class="sectionTitle">
+            <div>
+              <h2>簡単な経歴書テンプレ</h2>
+              <p>応募者がコピペして埋められるテンプレです。</p>
+            </div>
+            <div class="copybar">
+              <button class="btn primary" data-copy="resumeText">📋 コピー</button>
+              <button class="btn ghost" id="btnClearResume">🧹 テンプレに戻す</button>
+              <button class="btn warn" id="btnDownloadResumeTxt">⬇️ TXT保存</button>
+            </div>
+          </div>
+          <textarea id="resumeText"></textarea>
+        </div>
+
+        <div class="content" id="sec-test">
+          <div class="sectionTitle">
+            <div>
+              <h2>スキルテスト案内</h2>
+              <p>短時間・オンラインで実施します。</p>
+            </div>
+            <div class="copybar">
+              <button class="btn primary" data-copy="testText">📋 コピー</button>
+            </div>
+          </div>
+          <textarea id="testText" readonly=""></textarea>
+        </div>
+
+        <div class="content active" id="sec-apply">
+          <div class="sectionTitle">
+            <div>
+              <h2>応募方法</h2>
+              <p>メール・電話の連絡先を明記しています。</p>
+            </div>
+            <div class="copybar">
+              <button class="btn primary" data-copy="applyText">📋 コピー</button>
+            </div>
+          </div>
+          <textarea id="applyText" readonly=""></textarea>
+        </div>
+
+        <div class="content" id="sec-faq">
+          <div class="sectionTitle">
+            <div>
+              <h2>FAQ</h2>
+              <p>よくある質問です。</p>
+            </div>
+            <div class="copybar">
+              <button class="btn primary" data-copy="faqText">📋 コピー</button>
+            </div>
+          </div>
+          <textarea id="faqText" readonly=""></textarea>
+        </div>
+
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">HTML 1枚で動作します。印刷からPDF保存もできます。</div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite">コピーしました</div>
+
+<script>
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+  const toast = (msg) => {
+    const el = $("#toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(()=>el.classList.remove("show"), 1800);
+  };
+
+  async function copyToClipboard(text){
+    try{
+      await navigator.clipboard.writeText(text);
+      toast("コピーしました");
+    }catch(e){
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      toast("コピーしました（互換モード）");
+    }
+  }
+
+  function downloadFile(filename, content, mime="text/plain;charset=utf-8"){
+    const blob = new Blob([content], {type:mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast("保存しました");
+  }
+
+  const CONTACT = {
+    name: "福永 篤",
+    email: "afky5906@gmail.com",
+    phoneDisplay: "080-4788-2900"
+  };
+
+  const state = { payInfo: "", remoteTool: "" };
+
+  function buildOverview(){
+    return `【募集概要：フクのAI寺子屋】
+フクのAI寺子屋では、講師（在宅・オンライン）を募集しています。
+Zoomを使い、受講者の「やりたいこと」を一緒に進める伴走型サポートが中心です。
+必要に応じて、受講者の同意のもと遠隔操作で補助しながら、解決まで丁寧に支援していただきます。
+
+【ポイント】
+・対象：20歳以上（上限は能力があれば問いません）
+・報酬：時給 1,230円〜（能力に応じて支給）
+・勤務形態：完全オンライン（在宅）
+・必須：生成AI経験1年以上／遠隔操作対応／守秘義務（NDA締結）
+・応募時提出：簡単な経歴書
+・選考：オンライン面談＋簡単なスキルテストあり
+
+【連絡先（主催）】
+${CONTACT.name}
+メール：${CONTACT.email}
+電話：${CONTACT.phoneDisplay}
+`;
+  }
+
+  function buildDetails(){
+    const pay = state.payInfo
+      ? `・支払い条件：${state.payInfo}\n`
+      : `・支払い方法・締日・支払日：応相談（決定後に明示）\n`;
+    const remoteTool = state.remoteTool
+      ? `（遠隔操作ツール例：${state.remoteTool}）`
+      : "（使用ツールは運用に合わせて案内します）";
+
+    return `【募集要項（詳細）：フクのAI寺子屋】
+【募集職種】
+オンライン講座 講師（PC・IT・生成AI活用サポート）
+
+【業務内容】
+・Zoomによるオンライン対応（説明・相談・学習伴走）
+・受講者の目標を聞き取り、ゴールまで一緒に進める支援
+・受講者の同意を得たうえでの遠隔操作による補助（必須対応）
+・簡単な手順メモや次回までの進め方の整理（短い文章でOK）
+
+【報酬】
+・時給 1,230円〜（能力に応じて支給）
+${pay}※まずは試験的に少ない時間から開始し、双方合意のうえで継続します。
+
+【応募条件（必須）】
+・20歳以上（上限は能力があれば問いません）
+・守秘義務を確実に守れること（採用時に守秘義務契約書（NDA）を締結）
+・Zoomでのオンライン説明ができること
+・遠隔操作でのサポートができること（必須／同意がある場合のみ／必要最小限）
+・生成AI（ChatGPT／Claude／Gemini 等）の利用経験が1年以上あり、問題なく使えること（必須）
+・IT関連の実務経験1年以上、または同等のスキルがあること
+・専門用語をかみ砕いて丁寧に説明できること
+
+【必要な環境】
+・PC（Windows/Mac）
+・安定したインターネット回線
+・Zoom利用環境（マイク・ヘッドセット推奨）
+・遠隔操作が可能な環境 ${remoteTool}
+
+【守秘義務・個人情報の取り扱い（重要）】
+・受講者の個人情報・相談内容・画面上の情報を外部に漏らさない
+・遠隔操作時は許可された範囲のみ操作し、不要な閲覧・変更は行わない
+・パスワード等の秘匿情報の取得・記録は行わない
+・採用時に守秘義務契約書（NDA）を締結し、遵守していただきます
+
+【連絡先（主催）】
+${CONTACT.name}
+メール：${CONTACT.email}
+電話：${CONTACT.phoneDisplay}
+`;
+  }
+
+  function buildResumeTemplate(){
+    return `【簡単な経歴書】（コピペしてご記入ください）
+1. 氏名：
+2. 年齢：
+3. 住所（市区町村まで可／詳細は任意）：
+4. 連絡先メールアドレス：
+5. IT関連の職務経験（期間・内容）：
+6. 得意分野（例：PC操作、Office、Web、Python、AI活用など）：
+
+7. 生成AIの利用経験（1年以上必須：具体的に）
+  - 使用ツール（ChatGPT/Claude/Gemini 等）：
+  - 活用内容（例：要約、文章作成、手順書、コード補助、学習支援など）：
+  - 利用歴（例：2024年○月〜）：
+
+8. 遠隔操作の対応経験（使用ツールや経験内容）：
+9. 守秘義務に関する同意：守秘義務契約（NDA）締結に同意します（はい／いいえ）
+10. 対応可能な曜日・時間帯（例：平日夜、土日午前など）：
+11. 自己PR（短くでOK）：
+`;
+  }
+
+  function buildTest(){
+    return `【スキルテストについて（案内）】
+応募内容を確認後、短時間のスキルテスト（オンライン）を実施します。
+「分かりやすい説明ができるか」「生成AIを適切に使えるか」「遠隔操作を安全に扱えるか」
+「守秘義務意識（情報の扱い方）」を、実務に近い形で確認します。
+事前に流れを案内しますのでご安心ください。
+`;
+  }
+
+  function buildApply(){
+    return `【応募方法：フクのAI寺子屋】
+・応募先：福永 篤
+・メール：${CONTACT.email}
+・電話：${CONTACT.phoneDisplay}
+・件名：【講師応募】氏名（フルネーム）
+・本文：簡単な挨拶＋対応可能な曜日・時間帯
+・添付：簡単な経歴書（PDF推奨／本文貼り付けでも可）
+
+※採用時に守秘義務契約書（NDA）を締結します。
+※お電話に出られない場合があります。メールでのご連絡が確実です。
+`;
+  }
+
+  function buildFAQ(){
+    return `【FAQ（よくある質問）】
+Q1. 年齢制限はありますか？
+A. 20歳以上の方を募集しています。上限は能力があれば問いません。
+
+Q2. 生成AIはどの程度の経験が必要ですか？
+A. 利用経験1年以上を必須としています。文章作成・要約・調査整理・手順書作成・コード補助などを、業務で支障なく使える方が対象です。
+
+Q3. 守秘義務はありますか？
+A. はい。受講者の個人情報や相談内容を扱うため、守秘義務を守れる方が必須です。採用時に守秘義務契約書（NDA）を締結します。
+
+Q4. スキルテストは難しいですか？
+A. 難問ではありません。実務で想定される「説明力」「整理力」「生成AI活用」「安全な遠隔操作」を確認する内容です。
+
+Q5. 遠隔操作は必須ですか？
+A. はい、必須です。受講者の学習支援では、状況に応じて遠隔操作による補助が必要になるため、対応できる方を募集しています。実施は受講者の同意がある場合のみで、操作の範囲・手順は事前に説明し、必要最小限で行います。
+
+【連絡先（主催）】
+${CONTACT.name}
+メール：${CONTACT.email}
+電話：${CONTACT.phoneDisplay}
+`;
+  }
+
+  function rebuildAll(){
+    $("#overviewText").value = buildOverview();
+    $("#detailsText").value  = buildDetails();
+    $("#resumeText").value   = $("#resumeText").value || buildResumeTemplate();
+    $("#testText").value     = buildTest();
+    $("#applyText").value    = buildApply();
+    $("#faqText").value      = buildFAQ();
+  }
+
+  // nav
+  $$(".nav button").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      $$(".nav button").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      const target = btn.dataset.target;
+      $$(".content").forEach(c=>c.classList.remove("active"));
+      document.getElementById(target).classList.add("active");
+      $("#currentTitle").textContent = btn.innerText.trim();
+      window.scrollTo({top:0, behavior:"smooth"});
+    });
+  });
+
+  // copy
+  $$("[data-copy]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.getAttribute("data-copy");
+      const el = document.getElementById(id);
+      copyToClipboard(el.value || "");
+    });
+  });
+
+  $("#btnCopyAll").addEventListener("click", ()=>{
+    const all =
+      buildOverview() + "\n" +
+      buildDetails() + "\n" +
+      $("#resumeText").value + "\n" +
+      buildTest() + "\n" +
+      buildApply() + "\n" +
+      buildFAQ();
+    copyToClipboard(all.trim());
+  });
+
+  $("#btnCopyApply").addEventListener("click", ()=>{
+    copyToClipboard($("#applyText").value.trim());
+  });
+
+  // optional inputs
+  $("#payInfo").addEventListener("input", (e)=>{
+    state.payInfo = (e.target.value || "").trim();
+    rebuildAll();
+  });
+  $("#remoteTool").addEventListener("input", (e)=>{
+    state.remoteTool = (e.target.value || "").trim();
+    rebuildAll();
+  });
+
+  $("#btnReset").addEventListener("click", ()=>{
+    state.payInfo = "";
+    state.remoteTool = "";
+    $("#payInfo").value = "";
+    $("#remoteTool").value = "";
+    $("#resumeText").value = buildResumeTemplate();
+    rebuildAll();
+    toast("リセットしました");
+  });
+
+  $("#btnClearResume").addEventListener("click", ()=>{
+    $("#resumeText").value = buildResumeTemplate();
+    toast("テンプレに戻しました");
+  });
+
+  $("#btnDownloadResumeTxt").addEventListener("click", ()=>{
+    downloadFile("keirekisho_template.txt", $("#resumeText").value, "text/plain;charset=utf-8");
+  });
+
+  $("#btnPrint").addEventListener("click", ()=> window.print());
+
+  $("#btnDownload").addEventListener("click", ()=>{
+    const html = "<!doctype html>\n" + document.documentElement.outerHTML;
+    downloadFile("fuku_online_terakoya_recruitment.html", html, "text/html;charset=utf-8");
+  });
+
+  // init
+  $("#resumeText").value = buildResumeTemplate();
+  rebuildAll();
+</script>
+
+
+</body></html>

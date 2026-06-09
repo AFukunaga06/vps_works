@@ -1,0 +1,1342 @@
+<?php
+require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/config.php';
+
+// 日付調整（パスワード照合してセッションに保存）
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'adjust_date') {
+    if (($_POST['adjust_pass'] ?? '') === '1192') {
+        $adj = $_POST['adjust_date_val'] ?? '';
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $adj)) {
+            $_SESSION['today_override'] = $adj;
+        }
+    }
+    header("Location: index.php");
+    exit;
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'reset_date') {
+    unset($_SESSION['today_override']);
+    header("Location: index.php");
+    exit;
+}
+
+$today = $_SESSION['today_override'] ?? date('Y-m-d');
+$date  = $_GET['date'] ?? $today;
+
+// CSRF トークン生成
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf = $_SESSION['csrf_token'];
+
+// 削除パスワード
+define('DEL_PASSWORD', 'REDACTED_FOR_PUBLIC');
+
+$add_error   = '';
+$show_modal  = false;
+$modal_name  = '';
+$modal_kana  = '';
+$modal_group = '';
+
+
+// ── 日本の祝日・平日チェック ──────────────────────────────
+$jp_holidays = [
+    // 2024
+    '2024-01-01','2024-01-08','2024-02-11','2024-02-12','2024-02-23',
+    '2024-03-20','2024-04-29','2024-05-03','2024-05-04','2024-05-05','2024-05-06',
+    '2024-07-15','2024-08-11','2024-08-12','2024-09-16','2024-09-22','2024-09-23',
+    '2024-10-14','2024-11-03','2024-11-04','2024-11-23',
+    // 2025
+    '2025-01-01','2025-01-13','2025-02-11','2025-02-23','2025-02-24',
+    '2025-03-20','2025-04-29','2025-05-03','2025-05-04','2025-05-05','2025-05-06',
+    '2025-07-21','2025-08-11','2025-09-15','2025-09-22','2025-09-23',
+    '2025-10-13','2025-11-03','2025-11-23','2025-11-24',
+    // 2026
+    '2026-01-01','2026-01-12','2026-02-11','2026-02-23',
+    '2026-03-20','2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-05-06',
+    '2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23',
+    '2026-10-12','2026-11-03','2026-11-23',
+];
+function isWeekdayNonHoliday(string $d, array $holidays): bool {
+    $dow = (int)date('w', strtotime($d)); // 0=日, 6=土
+    if ($dow === 0 || $dow === 6) return false; // 土日はNG
+    if (in_array($d, $holidays)) return false;  // 祝日はNG
+    return true;
+}
+
+// ── 会員追加 ──────────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_member') {
+    if (!hash_equals($csrf, $_POST['csrf'] ?? '')) {
+        $add_error  = 'セキュリティエラーが発生しました';
+        $show_modal = true;
+    } else {
+        $modal_name  = trim($_POST['name'] ?? '');
+        $modal_kana  = trim($_POST['kana'] ?? '');
+        $modal_group = $_POST['group_name'] ?? '';
+        if ($modal_name === '') {
+            $add_error = '氏名を入力してください';
+            $show_modal = true;
+        } elseif ($modal_kana === '') {
+            $add_error = '読み仮名を入力してください';
+            $show_modal = true;
+        } elseif (!in_array($modal_group, ['男性', '女性'])) {
+            $add_error = '性別を選択してください';
+            $show_modal = true;
+        } else {
+            $pdo->prepare("INSERT INTO members (name, kana, group_name, is_active) VALUES (?, ?, ?, 1)")
+                ->execute([$modal_name, $modal_kana, $modal_group]);
+            header("Location: index.php?date=" . urlencode($date) . "&added=" . urlencode($modal_name));
+            exit;
+        }
+    }
+}
+
+// ── 会員削除（1件） ───────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_member') {
+    $redir_date = $_POST['redir_date'] ?? $today;
+    if (hash_equals($csrf, $_POST['csrf'] ?? '') && !empty($_SESSION['del_auth'])) {
+        $del_id = (int)($_POST['member_id'] ?? 0);
+        if ($del_id > 0) {
+            $pdo->prepare("DELETE FROM attendance WHERE member_id=?")->execute([$del_id]);
+            $pdo->prepare("DELETE FROM members WHERE id=?")->execute([$del_id]);
+        }
+    }
+    header("Location: index.php?date=" . urlencode($redir_date) . "&deleted=1");
+    exit;
+}
+
+
+// ── 削除パスワード認証 ────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'verify_del') {
+    $redir_date = $_POST['redir_date'] ?? $today;
+    $next       = $_POST['next'] ?? '';
+    if (($_POST['del_password'] ?? '') === DEL_PASSWORD) {
+        $_SESSION['del_auth'] = true;
+        $extra = ($next === 'del_mode') ? '&del_mode=1' : '';
+        header("Location: index.php?date=" . urlencode($redir_date) . $extra);
+    } else {
+        header("Location: index.php?date=" . urlencode($redir_date)
+            . "&del_err=1&next=" . urlencode($next));
+    }
+    exit;
+}
+
+// ── 会員削除（複数） ──────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'bulk_delete') {
+    $redir_date = $_POST['redir_date'] ?? $today;
+    $del_count  = 0;
+    if (hash_equals($csrf, $_POST['csrf'] ?? '') && !empty($_SESSION['del_auth'])) {
+        $ids = array_filter(
+            array_map('intval', $_POST['del_ids'] ?? []),
+            fn($id) => $id > 0
+        );
+        foreach ($ids as $del_id) {
+            $pdo->prepare("DELETE FROM attendance WHERE member_id=?")->execute([$del_id]);
+            $pdo->prepare("DELETE FROM members WHERE id=?")->execute([$del_id]);
+            $del_count++;
+        }
+    }
+    header("Location: index.php?date=" . urlencode($redir_date) . "&bulk_deleted=" . $del_count);
+    exit;
+}
+
+// ── 確定解除 ──────────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'unconfirm') {
+    $post_date = $_POST['date'] ?? $today;
+    $pdo->prepare("DELETE FROM confirmed_dates WHERE attend_date=?")->execute([$post_date]);
+    header("Location: index.php?date=" . urlencode($post_date));
+    exit;
+}
+
+// ── 保存 or 確定 ──────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' &&
+    in_array($_POST['action'] ?? '', ['save', 'confirm'])) {
+
+    $post_date = $_POST['date'] ?? $today;
+
+    // 平日（土日祝除く）チェック
+    if (!isWeekdayNonHoliday($post_date, $jp_holidays)) {
+        header("Location: index.php?date=" . urlencode($post_date) . "&weekday_err=1");
+        exit;
+    }
+
+    $chk = $pdo->prepare("SELECT COUNT(*) FROM confirmed_dates WHERE attend_date=?");
+    $chk->execute([$post_date]);
+    if ((int)$chk->fetchColumn() === 0) {
+        $checked = $_POST['present'] ?? [];
+        $all_ids = $pdo->query("SELECT id FROM members WHERE is_active=1")
+                       ->fetchAll(\PDO::FETCH_COLUMN);
+        $pdo->prepare("DELETE FROM attendance WHERE attend_date=?")->execute([$post_date]);
+        $stmt = $pdo->prepare(
+            "INSERT INTO attendance (member_id, attend_date, status) VALUES (?, ?, ?)"
+        );
+        foreach ($all_ids as $mid) {
+            $status = in_array((string)$mid, $checked) ? '出席' : '欠席';
+            $stmt->execute([(int)$mid, $post_date, $status]);
+        }
+    }
+
+    if ($_POST['action'] === 'confirm') {
+        $pdo->prepare("INSERT IGNORE INTO confirmed_dates (attend_date) VALUES (?)")
+            ->execute([$post_date]);
+    }
+
+    $param = ($_POST['action'] === 'confirm') ? '&confirmed=1' : '&saved=1';
+    header("Location: index.php?date=" . urlencode($post_date) . $param);
+    exit;
+}
+
+// ── タイムカードテーブル作成 ───────────────────────────────
+$pdo->exec("CREATE TABLE IF NOT EXISTS timecard (
+    id        INT AUTO_INCREMENT PRIMARY KEY,
+    member_id INT  NOT NULL,
+    work_date DATE NOT NULL,
+    clock_in  TIME DEFAULT NULL,
+    clock_out TIME DEFAULT NULL,
+    UNIQUE KEY uq_tc (member_id, work_date)
+)");
+
+// ── members に evaluation カラム追加（未存在時のみ） ──────────
+if (empty($pdo->query("SHOW COLUMNS FROM members LIKE 'evaluation'")->fetchAll())) {
+    $pdo->exec("ALTER TABLE members ADD COLUMN evaluation ENUM('A','B','C') NOT NULL DEFAULT 'B'");
+}
+
+// ── タイムカード AJAX ─────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tc_action'])) {
+    header('Content-Type: application/json; charset=utf-8');
+    if (!hash_equals($csrf, $_POST['csrf'] ?? '')) {
+        echo json_encode(['error' => 'csrf']); exit;
+    }
+    $mid   = (int)($_POST['member_id'] ?? 0);
+    $wdate = $_POST['work_date'] ?? $today;
+    $time  = preg_match('/^\d{2}:\d{2}$/', $_POST['time'] ?? '') ? $_POST['time'] : date('H:i');
+    if ($mid > 0) {
+        if ($_POST['tc_action'] === 'set_evaluation') {
+            $eval = $_POST['evaluation'] ?? '';
+            if (in_array($eval, ['A','B','C'], true)) {
+                $pdo->prepare("UPDATE members SET evaluation=? WHERE id=?")->execute([$eval, $mid]);
+                echo json_encode(['ok' => true]);
+            } else {
+                echo json_encode(['error' => 'invalid evaluation']);
+            }
+            exit;
+        } elseif ($_POST['tc_action'] === 'clock_clear') {
+            $pdo->prepare("UPDATE timecard SET clock_in=NULL, clock_out=NULL WHERE member_id=? AND work_date=?")
+                ->execute([$mid, $wdate]);
+            echo json_encode(['ok' => true]);
+        } else {
+            $col = ($_POST['tc_action'] === 'clock_in') ? 'clock_in' : 'clock_out';
+            $pdo->prepare("INSERT INTO timecard (member_id,work_date,`$col`) VALUES (?,?,?)
+                           ON DUPLICATE KEY UPDATE `$col`=VALUES(`$col`)")
+                ->execute([$mid, $wdate, $time]);
+            echo json_encode(['ok' => true, 'time' => $time]);
+        }
+    } else {
+        echo json_encode(['error' => 'invalid']);
+    }
+    exit;
+}
+
+// ── 表示データ取得 ─────────────────────────────────────────
+$chk = $pdo->prepare("SELECT confirmed_at FROM confirmed_dates WHERE attend_date=?");
+$chk->execute([$date]);
+$confirmed_row = $chk->fetch();
+$is_confirmed     = (bool)$confirmed_row;
+$is_date_editable = ($date === $today);
+$locked           = $is_confirmed || !$is_date_editable;
+
+$men   = $pdo->query("SELECT id,name,evaluation FROM members WHERE is_active=1 AND group_name='男性' ORDER BY kana")->fetchAll();
+$women = $pdo->query("SELECT id,name,evaluation FROM members WHERE is_active=1 AND group_name='女性' ORDER BY kana")->fetchAll();
+
+$att = $pdo->prepare("SELECT member_id FROM attendance WHERE attend_date=? AND status='出席'");
+$att->execute([$date]);
+$present_ids = array_flip($att->fetchAll(\PDO::FETCH_COLUMN));
+
+$men_present   = count(array_filter($men,   fn($m) => isset($present_ids[$m['id']])));
+$women_present = count(array_filter($women, fn($m) => isset($present_ids[$m['id']])));
+
+$saved          = isset($_GET['saved']);
+$confirmed_flag = isset($_GET['confirmed']);
+$added          = $_GET['added'] ?? '';
+$deleted        = isset($_GET['deleted']);
+$bulk_deleted   = isset($_GET['bulk_deleted']) ? (int)$_GET['bulk_deleted'] : 0;
+$del_mode       = isset($_GET['del_mode']);
+$del_err        = isset($_GET['del_err']);
+$del_authorized    = !empty($_SESSION['del_auth']);
+$weekday_err       = isset($_GET['weekday_err']);
+$weekday_ok        = isWeekdayNonHoliday($date, $jp_holidays);
+$weekday_err_msg   = $weekday_ok ? '' : '土日祝日を除く平日が選ばれてません。';
+
+// ── タイムカードデータ取得 ─────────────────────────────────
+$tc_stmt = $pdo->prepare("SELECT member_id, clock_in, clock_out FROM timecard WHERE work_date=?");
+$tc_stmt->execute([$date]);
+$timecard_data = [];
+foreach ($tc_stmt->fetchAll() as $row) {
+    $timecard_data[$row['member_id']] = [
+        'in'  => $row['clock_in']  ? substr($row['clock_in'],  0, 5) : '',
+        'out' => $row['clock_out'] ? substr($row['clock_out'], 0, 5) : '',
+    ];
+}
+
+function calcWorkMinutes(string $ci, string $co): ?int {
+    if ($ci === '' || $co === '') return null;
+    [$ih, $im] = explode(':', $ci);
+    [$oh, $om] = explode(':', $co);
+    $in_m  = (int)$ih * 60 + (int)$im;
+    $out_m = (int)$oh * 60 + (int)$om;
+    if ($out_m <= $in_m) return null;
+    $work = $out_m - $in_m;
+    // 13:00以降出勤かつ17:00以前退勤は休憩なし
+    if ($in_m >= 780) {
+        // no deduction
+    } elseif ($out_m > 780) {
+        $work -= 60;
+    }
+    return max(0, $work);
+}
+function fmtWork(?int $min): string {
+    if ($min === null) return '';
+    return intdiv($min, 60) . ':' . str_pad($min % 60, 2, '0', STR_PAD_LEFT);
+}
+const EVAL_RATES = ['A' => 1300, 'B' => 1200, 'C' => 1100];
+function evalToRate(string $eval): int {
+    return EVAL_RATES[$eval] ?? 1200;
+}
+function fmtWage(?int $min, int $rate = 1200): string {
+    if ($min === null || $min <= 0) return '';
+    return number_format((int)round($min / 60 * $rate)) . '円';
+}
+?>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>つばさ名簿 - 平日（土日祝を除く）</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f0f4f8; color: #333; font-size: 15px; }
+header { background: #2c5f8a; color: #fff; padding: 12px 20px; display: flex; align-items: center; gap: 10px; }
+header h1 { font-size: 1.1rem; }
+nav a { color: #cde; text-decoration: none; font-size: .85rem; margin-left: 14px; }
+nav a:hover { color: #fff; }
+.container { max-width: 760px; margin: 16px auto; padding: 0 14px; }
+.date-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.date-bar label { font-weight: bold; }
+.date-bar input[type=date] { padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: .95rem; }
+.btn-nav   { padding: 6px 12px; background: #fff; border: 1px solid #bbb; border-radius: 4px; cursor: pointer; font-size: .9rem; }
+.btn-nav:hover { background: #e8f0f8; border-color: #2c5f8a; }
+.btn-today { padding: 6px 12px; background: #2c5f8a; border: none; border-radius: 4px; cursor: pointer; font-size: .85rem; color: #fff; }
+.btn-today:hover { background: #1a4a70; }
+.btn-adjust { padding: 6px 12px; background: #e8f0fe; border: 1px solid #5b8def; border-radius: 4px; cursor: pointer; font-size: .85rem; color: #1a4abf; }
+.btn-adjust:hover { background: #d0e2ff; }
+.btn-adjust.active { background: #ff8f00; border-color: #e65100; color: #fff; }
+.btn-adjust.active:hover { background: #e65100; }
+.btn-gender { padding: 6px 14px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: .85rem; font-weight: bold; }
+.btn-gender.men   { background: #d0e8ff; border-color: #1a5c99; color: #1a5c99; }
+.btn-gender.women { background: #ffd0e8; border-color: #99195c; color: #99195c; }
+.badge-past { background: #ffe0b2; color: #7a3500; }
+/* 日付調整モーダル */
+.adj-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1000; align-items:center; justify-content:center; }
+.adj-overlay.open { display:flex; }
+.adj-box { background:#fff; border-radius:10px; padding:24px 28px; width:320px; max-width:90vw; box-shadow:0 4px 24px rgba(0,0,0,.25); }
+.adj-box h2 { font-size:1rem; margin-bottom:16px; color:#333; }
+.adj-box label { display:block; font-size:.85rem; color:#555; margin-bottom:4px; }
+.adj-box input { width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:5px; font-size:.95rem; margin-bottom:14px; }
+.adj-box .adj-btns { display:flex; gap:8px; justify-content:flex-end; }
+.adj-box .btn-ok { padding:8px 20px; background:#2c5f8a; color:#fff; border:none; border-radius:5px; cursor:pointer; font-size:.9rem; }
+.adj-box .btn-ok:hover { background:#1a4a70; }
+.adj-box .btn-cancel { padding:8px 16px; background:#f5f5f5; color:#555; border:1px solid #ccc; border-radius:5px; cursor:pointer; font-size:.9rem; }
+.adj-box .btn-cancel:hover { background:#e8e8e8; }
+.adj-error { color:#c62828; font-size:.82rem; margin-bottom:10px; display:none; }
+.badge { padding: 3px 10px; border-radius: 12px; font-size: .82rem; font-weight: bold; }
+.badge-saved     { background: #c8e6c9; color: #1b5e20; }
+.badge-confirmed { background: #fff9c4; color: #7a5c00; }
+.badge-added     { background: #c8e6c9; color: #1b5e20; }
+.badge-deleted   { background: #ffcdd2; color: #b71c1c; }
+.weekday-msg { width: 100%; padding: 6px 12px; background: #ffebee; color: #c62828; border-radius: 6px; font-size: .88rem; font-weight: bold; display: none; }
+.confirm-bar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.confirm-bar.is-locked   { background: #fff8e1; border: 2px solid #f9c00d; }
+.confirm-bar.is-unlocked { background: #f1f8e9; border: 1px solid #aed581; }
+.confirm-info { flex: 1; font-size: .88rem; color: #555; }
+.confirm-info strong { color: #333; }
+.btn-confirm   { padding: 8px 20px; background: #f9c00d; color: #3a2a00; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: .9rem; }
+.btn-confirm:hover { background: #e6b000; }
+.btn-unconfirm { padding: 7px 16px; background: #fff; color: #777; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; font-size: .85rem; }
+.btn-unconfirm:hover { background: #f5f5f5; }
+/* ツールバー */
+.toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.toolbar-right { margin-left: auto; display: flex; gap: 8px; }
+.wage-summary { display: flex; align-items: center; gap: 8px; background: #fff8e1; border: 1px solid #f9c00d; border-radius: 6px; padding: 5px 12px; font-size: .85rem; flex-wrap: wrap; }
+.wage-summary-label { font-weight: bold; color: #7a5c00; white-space: nowrap; }
+.wage-summary-item { color: #555; white-space: nowrap; }
+.wage-summary-item b { color: #333; }
+.btn-add { background: #2e7d52; color: #fff; border: none; padding: 8px 18px; border-radius: 6px; font-size: .9rem; cursor: pointer; font-weight: bold; }
+.btn-add:hover { background: #1b5e38; }
+.btn-bulk-del { background: #fff; color: #c44; border: 1px solid #e88; padding: 8px 18px; border-radius: 6px; font-size: .9rem; cursor: pointer; font-weight: bold; }
+.btn-bulk-del:hover { background: #fff0f0; }
+/* セクション */
+.columns { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.section { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+.section-header { padding: 10px 14px; font-weight: bold; font-size: .95rem; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sec-men   .section-header { background: #d0e8ff; color: #1a5c99; }
+.sec-women .section-header { background: #ffd0e8; color: #99195c; }
+.section-header .count { font-size: .82rem; opacity: .85; }
+.select-all { font-size: .78rem; padding: 3px 8px; border: 1px solid currentColor; border-radius: 4px; cursor: pointer; background: transparent; color: inherit; }
+/* 全選択エリア（削除モード時のみ表示） */
+.del-header-wrap { display: none; align-items: center; gap: 4px; font-size: .82rem; font-weight: normal; }
+.del-header-wrap input[type=checkbox] { width: 15px; height: 15px; accent-color: #c44; cursor: pointer; }
+/* メンバー行 */
+.member-list { padding: 4px 0; }
+.member-row { display: flex; align-items: center; padding: 4px 14px; gap: 10px; flex-wrap: nowrap; }
+.member-row.is-present { background: #f0f7ff; }
+.member-row.row-selected { background: #b3d9ff !important; }
+.member-label { flex: 0 0 120px; min-width: 0; }
+.member-label .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; font-size: .95rem; }
+.member-row.is-present .name { font-weight: bold; color: #1a5c99; }
+/* 出席・欠席ボタン */
+.att-btns { display: flex; gap: 4px; flex-shrink: 0; }
+.btn-present, .btn-absent {
+  padding: 5px 12px; border-radius: 5px; font-size: .82rem; font-weight: bold;
+  border: 1px solid #ccc; cursor: pointer; transition: all .15s;
+}
+.btn-present { background: #fff; color: #999; border-color: #ccc; }
+.btn-absent  { background: #fff; color: #999; border-color: #ccc; }
+.btn-present.active { background: #1a5c99; color: #fff; border-color: #1a5c99; }
+.btn-absent.active  { background: #c44; color: #fff; border-color: #c44; }
+.btn-present:hover:not(.active) { background: #e8f0f8; border-color: #2c5f8a; color: #2c5f8a; }
+.btn-absent:hover:not(.active)  { background: #fff0f0; border-color: #c44; color: #c44; }
+.att-btns.locked .btn-present,
+.att-btns.locked .btn-absent { cursor: default; pointer-events: none; }
+/* タイムカード */
+.tc-area { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.btn-clockin, .btn-clockout {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 4px 8px; border-radius: 5px; font-size: .8rem; font-weight: bold;
+  border: 1px solid #ccc; cursor: pointer; transition: all .15s; min-width: 58px; }
+.btn-clockin  { background: #fff; color: #aaa; }
+.btn-clockout { background: #fff; color: #aaa; }
+.btn-clockin.active  { background: #1a5c99; color: #fff; border-color: #1a5c99; }
+.btn-clockout.active { background: #2e7d52; color: #fff; border-color: #2e7d52; }
+.btn-clockin:hover:not(.active)  { background: #e8f0f8; border-color: #2c5f8a; color: #2c5f8a; }
+.btn-clockout:hover:not(.active) { background: #e8f5ee; border-color: #2e7d52; color: #2e7d52; }
+.tc-time-val { font-size: .72rem; font-weight: normal; margin-top: 1px; min-height: 1em; }
+.work-hours { font-size: .82rem; color: #333; font-weight: bold; min-width: 40px; text-align: center; }
+/* 管理者調整モーダル */
+.tc-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.tc-edit-grid label { display: block; font-size: .83rem; color: #555; margin-bottom: 4px; }
+.tc-edit-grid input[type=time] { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: .95rem; }
+.btn-tc-edit { padding: 5px 8px; border-radius: 5px; font-size: .75rem; border: 1px solid #bbb; background: #f5f5f5; color: #666; cursor: pointer; }
+.btn-tc-edit:hover { background: #e8e8e8; border-color: #999; }
+/* 列ヘッダー */
+.col-header { display: flex; align-items: center; padding: 4px 14px; gap: 10px; background: #f7f9fb; border-bottom: 1px solid #e0e8f0; font-size: .78rem; color: #888; font-weight: bold; }
+.col-header .ch-name  { flex: 0 0 120px; }
+.col-header .ch-tc    { display: flex; gap: 4px; }
+.col-header .ch-ci, .col-header .ch-co { min-width: 58px; text-align: center; }
+.col-header .ch-wh    { min-width: 40px; text-align: center; }
+.col-header .ch-wage  { min-width: 64px; text-align: center; }
+/* 評価 */
+.eval-sel { font-size: .82rem; padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; width: 48px; text-align: center; background: #f9f9f9; cursor: pointer; }
+.col-header .ch-eval { min-width: 48px; text-align: center; }
+/* 時給 */
+.wage-val { font-size: .82rem; color: #7a5c00; font-weight: bold; min-width: 64px; text-align: center; }
+/* 削除チェックボックス（通常時は非表示） */
+.del-cb-wrap { display: none; padding-right: 8px; }
+.del-cb { width: 17px; height: 17px; accent-color: #c44; cursor: pointer; }
+/* 行が選択された状態 */
+.member-row.del-selected { background: #fff0f0 !important; }
+/* フッター */
+.footer-bar { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #ddd; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.total-info { font-size: .9rem; color: #555; }
+.btn-save { background: #2c5f8a; color: #fff; border: none; padding: 10px 28px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+.btn-save:hover { background: #1a4a70; }
+.locked-notice { font-size: .88rem; color: #999; }
+/* 削除モードのフッターボタン */
+#del-btns { display: none; gap: 8px; }
+.btn-exec-del { background: #c44; color: #fff; border: none; padding: 10px 24px; border-radius: 6px; font-size: .95rem; cursor: pointer; font-weight: bold; }
+.btn-exec-del:hover { background: #a33; }
+.btn-cancel-del { background: #fff; color: #555; border: 1px solid #ccc; padding: 10px 20px; border-radius: 6px; font-size: .95rem; cursor: pointer; }
+.btn-cancel-del:hover { background: #f5f5f5; }
+/* モーダル */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: #fff; border-radius: 10px; padding: 32px 28px; width: 340px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+.modal h3 { color: #2c5f8a; margin-bottom: 20px; font-size: 1.05rem; }
+.modal-field { margin-top: 14px; }
+.modal-field label { display: block; font-size: .85rem; color: #555; margin-bottom: 4px; }
+.modal-field input[type=text],
+.modal-field select { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: .95rem; }
+.modal-field input:focus,
+.modal-field select:focus { outline: none; border-color: #2c5f8a; box-shadow: 0 0 0 2px rgba(44,95,138,.15); }
+.modal-error { color: #c62828; background: #ffebee; border-radius: 6px; padding: 8px 12px; font-size: .88rem; margin-bottom: 4px; }
+.modal-btns { display: flex; gap: 10px; margin-top: 22px; }
+.btn-modal-submit { flex: 1; background: #2c5f8a; color: #fff; border: none; padding: 10px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+.btn-modal-submit:hover { background: #1a4a70; }
+.btn-modal-cancel { flex: 1; background: #fff; color: #555; border: 1px solid #ccc; padding: 10px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+.btn-modal-cancel:hover { background: #f5f5f5; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ABC○○商事㈱</h1>
+  <nav>
+    <a href="index.php">出欠入力</a>
+    <a href="members.php">会員管理</a>
+    <a href="report.php">レポート</a>
+    <a href="timecard_report.php?mode=monthly">月計</a>
+    <a href="timecard_report.php?mode=yearly">年計</a>
+    <a href="logout.php" style="margin-left:auto;color:#ffd0d0;">ログアウト</a>
+  </nav>
+</header>
+
+<!-- メインフォーム（チェックボックス・保存・確定） -->
+<form method="post" id="main-form">
+  <input type="hidden" name="action" id="form-action" value="save">
+  <input type="hidden" name="date"   value="<?= htmlspecialchars($date) ?>">
+
+  <div class="container">
+    <!-- 日付ナビ -->
+    <div class="date-bar">
+      <label>日付：</label>
+      <button type="button" class="btn-nav" onclick="moveDate(-1)">◀ 前日</button>
+      <input type="date" id="date-input" value="<?= htmlspecialchars($date) ?>"
+             onchange="onDateChange(this.value)">
+      <button type="button" class="btn-nav" onclick="moveDate(1)">翌日 ▶</button>
+      <button type="button" class="btn-today"
+              onclick="location.href='index.php'">今日</button>
+      <?php if (isset($_SESSION['today_override'])): ?>
+        <button type="button" class="btn-adjust active" onclick="openAdjModal()">
+          日付調整中: <?= htmlspecialchars($_SESSION['today_override']) ?>
+        </button>
+      <?php else: ?>
+        <button type="button" class="btn-adjust" onclick="openAdjModal()">日付調整</button>
+      <?php endif; ?>
+      <button type="button" class="btn-gender men" id="btn-gender" onclick="toggleGender()">男性</button>
+      <span style="font-size:.82rem;color:#666;">評価：A=1300円 / B=1200円 / C=1100円</span>
+      <?php if (!$is_date_editable): ?>
+        <span class="badge badge-past">閲覧のみ（編集不可）</span>
+      <?php elseif ($weekday_err || !$weekday_ok): ?>
+        <span class="badge badge-deleted"><?= htmlspecialchars($weekday_err_msg) ?></span>
+      <?php elseif ($saved): ?>
+        <span class="badge badge-saved">✓ 保存しました</span>
+      <?php elseif ($confirmed_flag): ?>
+        <span class="badge badge-confirmed">🔒 確定しました</span>
+      <?php elseif ($added !== ''): ?>
+        <span class="badge badge-added">✓ <?= htmlspecialchars($added) ?> を追加しました</span>
+      <?php elseif ($bulk_deleted > 0): ?>
+        <span class="badge badge-deleted"><?= $bulk_deleted ?>件削除しました</span>
+      <?php elseif ($deleted): ?>
+        <span class="badge badge-deleted">削除しました</span>
+      <?php endif; ?>
+    </div>
+    <div id="weekday-msg" class="weekday-msg"><?= htmlspecialchars($weekday_err_msg) ?></div>
+
+    <!-- 確定バー -->
+    <?php if ($is_confirmed): ?>
+      <div class="confirm-bar is-locked">
+        <span style="font-size:1.2rem">🔒</span>
+        <div class="confirm-info">
+          <strong><?= date('Y年n月j日', strtotime($date)) ?></strong> は確定済みです。
+          （<?= date('Y/m/d H:i', strtotime($confirmed_row['confirmed_at'])) ?>）
+        </div>
+        <?php if ($is_date_editable): ?>
+        <form method="post" style="display:inline"
+              onsubmit="return confirm('確定を解除して編集可能にしますか？')">
+          <input type="hidden" name="action" value="unconfirm">
+          <input type="hidden" name="date"   value="<?= htmlspecialchars($date) ?>">
+          <button class="btn-unconfirm" type="submit">🔓 確定を解除</button>
+        </form>
+        <?php endif; ?>
+      </div>
+    <?php elseif (!$is_date_editable): ?>
+      <div class="confirm-bar is-locked">
+        <span style="font-size:1.2rem">📅</span>
+        <div class="confirm-info">
+          <strong><?= date('Y年n月j日', strtotime($date)) ?></strong>
+          — 過去・未来の日付は閲覧のみです。編集するには「日付調整」ボタンを使用してください。
+        </div>
+      </div>
+    <?php else: ?>
+      <div class="confirm-bar is-unlocked">
+        <span style="font-size:1.2rem">🔓</span>
+        <div class="confirm-info">
+          <strong><?= date('Y年n月j日', strtotime($date)) ?></strong>
+          — 出欠を入力して保存または確定してください。
+        </div>
+        <button type="button" class="btn-confirm" onclick="doConfirm()">✔ 確定する</button>
+      </div>
+    <?php endif; ?>
+
+    <!-- ツールバー -->
+    <div class="toolbar">
+      <div class="wage-summary">
+        <span class="wage-summary-label">男女時給計</span>
+        <span class="wage-summary-item">男性：<b id="wage-sum-men">0円</b></span>
+        <span class="wage-summary-item">女性：<b id="wage-sum-women">0円</b></span>
+        <span class="wage-summary-item">合計：<b id="wage-sum-total">0円</b></span>
+      </div>
+      <?php if ($is_date_editable): ?>
+      <div class="toolbar-right">
+        <button type="button" class="btn-add" id="btn-add" onclick="openModal()">＋ 新規追加</button>
+        <button type="button" class="btn-bulk-del" id="btn-bulk-del" onclick="startBulkDelMode()">🗑 名簿削除</button>
+      </div>
+      <?php endif; ?>
+    </div>
+
+    <!-- 会員リスト -->
+    <div class="columns">
+      <!-- 男性 -->
+      <div class="section sec-men">
+        <div class="section-header">
+          <span class="del-header-wrap" id="del-header-men">
+            <input type="checkbox" id="del-all-men" onchange="toggleSelectAllDel('men', this.checked)">
+            <label for="del-all-men">全選択</label>
+          </span>
+          <span>男性</span>
+          <span class="count">
+            <span id="men-count"><?= $men_present ?></span>/<?= count($men) ?>名
+            <?php if (!$locked): ?>
+              <button type="button" class="select-all" onclick="selectAll('men',false)">クリア</button>
+            <?php endif; ?>
+          </span>
+        </div>
+        <div class="col-header">
+          <span class="ch-name">氏名</span>
+          <span class="ch-tc">
+            <span class="ch-ci">出勤</span>
+            <span class="ch-co">退勤</span>
+          </span>
+          <span class="ch-wh">勤務時間</span>
+          <span class="ch-eval">評価</span>
+          <span class="ch-wage">時給</span>
+        </div>
+        <div class="member-list" id="men-list">
+          <?php foreach ($men as $m):
+            $chk  = isset($present_ids[$m['id']]);
+            $tc   = $timecard_data[$m['id']] ?? ['in'=>'','out'=>''];
+            $wm   = calcWorkMinutes($tc['in'], $tc['out']);
+            $wh   = fmtWork($wm);
+            $eval = $m['evaluation'] ?? 'B';
+            $wage = fmtWage($wm, evalToRate($eval));
+          ?>
+            <div class="member-row <?= $chk?'is-present':'' ?>">
+              <input type="checkbox" name="present[]" value="<?= $m['id'] ?>"
+                     <?= $chk ? 'checked' : '' ?> style="display:none"
+                     class="att-hidden" id="cb-<?= $m['id'] ?>">
+              <span class="member-label">
+                <span class="name"><?= htmlspecialchars($m['name']) ?></span>
+              </span>
+              <span class="tc-area">
+                <button type="button" class="btn-clockin <?= $tc['in']!==''?'active':'' ?>"
+                        onclick="clockIn(<?= $m['id'] ?>)" id="btn-ci-<?= $m['id'] ?>">
+                  出勤<span class="tc-time-val" id="ci-<?= $m['id'] ?>"><?= htmlspecialchars($tc['in']) ?></span>
+                </button>
+                <button type="button" class="btn-clockout <?= $tc['out']!==''?'active':'' ?>"
+                        onclick="clockOut(<?= $m['id'] ?>)" id="btn-co-<?= $m['id'] ?>">
+                  退勤<span class="tc-time-val" id="co-<?= $m['id'] ?>"><?= htmlspecialchars($tc['out']) ?></span>
+                </button>
+                <span class="work-hours" id="wh-<?= $m['id'] ?>"><?= htmlspecialchars($wh) ?></span>
+                <select class="eval-sel" id="eval-<?= $m['id'] ?>" onchange="onEvalChange(<?= $m['id'] ?>)">
+                  <option value="A" <?= $eval==='A'?'selected':'' ?>>A</option>
+                  <option value="B" <?= $eval==='B'?'selected':'' ?>>B</option>
+                  <option value="C" <?= $eval==='C'?'selected':'' ?>>C</option>
+                </select>
+                <span class="wage-val" id="wage-<?= $m['id'] ?>"><?= htmlspecialchars($wage) ?></span>
+              </span>
+              <span class="att-btns <?= $locked?'locked':'' ?>">
+                <button type="button" class="btn-absent <?= !$chk?'active':'' ?>"
+                        onclick="setAtt(<?= $m['id'] ?>, false)">欠勤</button>
+                <button type="button" class="btn-tc-edit"
+                        onclick="openTcEdit(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name']) ?>')">管理者調整</button>
+              </span>
+              <span class="del-cb-wrap">
+                <input type="checkbox" class="del-cb" value="<?= $m['id'] ?>"
+                       onchange="onDelCbChange(this)">
+              </span>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+
+      <!-- 女性 -->
+      <div class="section sec-women">
+        <div class="section-header">
+          <span class="del-header-wrap" id="del-header-women">
+            <input type="checkbox" id="del-all-women" onchange="toggleSelectAllDel('women', this.checked)">
+            <label for="del-all-women">全選択</label>
+          </span>
+          <span>女性</span>
+          <span class="count">
+            <span id="women-count"><?= $women_present ?></span>/<?= count($women) ?>名
+            <?php if (!$locked): ?>
+              <button type="button" class="select-all" onclick="selectAll('women',false)">クリア</button>
+            <?php endif; ?>
+          </span>
+        </div>
+        <div class="col-header">
+          <span class="ch-name">氏名</span>
+          <span class="ch-tc">
+            <span class="ch-ci">出勤</span>
+            <span class="ch-co">退勤</span>
+          </span>
+          <span class="ch-wh">勤務時間</span>
+          <span class="ch-eval">評価</span>
+          <span class="ch-wage">時給</span>
+        </div>
+        <div class="member-list" id="women-list">
+          <?php foreach ($women as $m):
+            $chk  = isset($present_ids[$m['id']]);
+            $tc   = $timecard_data[$m['id']] ?? ['in'=>'','out'=>''];
+            $wm   = calcWorkMinutes($tc['in'], $tc['out']);
+            $wh   = fmtWork($wm);
+            $eval = $m['evaluation'] ?? 'B';
+            $wage = fmtWage($wm, evalToRate($eval));
+          ?>
+            <div class="member-row <?= $chk?'is-present':'' ?>">
+              <input type="checkbox" name="present[]" value="<?= $m['id'] ?>"
+                     <?= $chk ? 'checked' : '' ?> style="display:none"
+                     class="att-hidden" id="cb-<?= $m['id'] ?>">
+              <span class="member-label">
+                <span class="name"><?= htmlspecialchars($m['name']) ?></span>
+              </span>
+              <span class="tc-area">
+                <button type="button" class="btn-clockin <?= $tc['in']!==''?'active':'' ?>"
+                        onclick="clockIn(<?= $m['id'] ?>)" id="btn-ci-<?= $m['id'] ?>">
+                  出勤<span class="tc-time-val" id="ci-<?= $m['id'] ?>"><?= htmlspecialchars($tc['in']) ?></span>
+                </button>
+                <button type="button" class="btn-clockout <?= $tc['out']!==''?'active':'' ?>"
+                        onclick="clockOut(<?= $m['id'] ?>)" id="btn-co-<?= $m['id'] ?>">
+                  退勤<span class="tc-time-val" id="co-<?= $m['id'] ?>"><?= htmlspecialchars($tc['out']) ?></span>
+                </button>
+                <span class="work-hours" id="wh-<?= $m['id'] ?>"><?= htmlspecialchars($wh) ?></span>
+                <select class="eval-sel" id="eval-<?= $m['id'] ?>" onchange="onEvalChange(<?= $m['id'] ?>)">
+                  <option value="A" <?= $eval==='A'?'selected':'' ?>>A</option>
+                  <option value="B" <?= $eval==='B'?'selected':'' ?>>B</option>
+                  <option value="C" <?= $eval==='C'?'selected':'' ?>>C</option>
+                </select>
+                <span class="wage-val" id="wage-<?= $m['id'] ?>"><?= htmlspecialchars($wage) ?></span>
+              </span>
+              <span class="att-btns <?= $locked?'locked':'' ?>">
+                <button type="button" class="btn-absent <?= !$chk?'active':'' ?>"
+                        onclick="setAtt(<?= $m['id'] ?>, false)">欠勤</button>
+                <button type="button" class="btn-tc-edit"
+                        onclick="openTcEdit(<?= $m['id'] ?>, '<?= htmlspecialchars($m['name']) ?>')">管理者調整</button>
+              </span>
+              <span class="del-cb-wrap">
+                <input type="checkbox" class="del-cb" value="<?= $m['id'] ?>"
+                       onchange="onDelCbChange(this)">
+              </span>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <span class="total-info" id="normal-total">
+      合計出席：<strong id="total-count"><?= $men_present + $women_present ?></strong>/<?= count($men) + count($women) ?>名
+    </span>
+    <span class="total-info" id="del-total" style="display:none">
+      選択中：<strong id="del-count">0</strong> 件
+    </span>
+    <div id="normal-btns">
+      <?php if ($is_confirmed): ?>
+        <span class="locked-notice">🔒 確定済みのため編集できません</span>
+      <?php elseif (!$is_date_editable): ?>
+        <span class="locked-notice">📅 閲覧のみ（今日以外は編集不可）</span>
+      <?php else: ?>
+        <button class="btn-save" type="submit" id="btn-save" <?= !$weekday_ok ? 'disabled style="opacity:.45;cursor:not-allowed;"' : '' ?>>保存する</button>
+      <?php endif; ?>
+    </div>
+    <div id="del-btns">
+      <button type="button" class="btn-cancel-del" onclick="exitDelMode()">キャンセル</button>
+      <button type="button" class="btn-exec-del"   onclick="execBulkDelete()">削除実行</button>
+    </div>
+  </div>
+</form>
+
+<!-- ── 日付調整モーダル ──────────────────────────────── -->
+<div class="adj-overlay" id="adj-modal">
+  <div class="adj-box">
+    <h2>📅 日付調整</h2>
+    <div id="adj-step1">
+      <label>パスワード</label>
+      <input type="password" id="adj-pass" placeholder="パスワードを入力"
+             onkeydown="if(event.key==='Enter')adjCheckPass()">
+      <p class="adj-error" id="adj-err">パスワードが違います</p>
+      <div class="adj-btns">
+        <button type="button" class="btn-cancel" onclick="closeAdjModal()">キャンセル</button>
+        <button type="button" class="btn-ok" onclick="adjCheckPass()">次へ</button>
+      </div>
+    </div>
+    <div id="adj-step2" style="display:none">
+      <form method="post" id="adj-form">
+        <input type="hidden" name="action" value="adjust_date">
+        <input type="hidden" name="adjust_pass" id="adj-pass-hidden">
+        <label>「今日」として扱う日付</label>
+        <input type="date" name="adjust_date_val" id="adj-date" value="<?= htmlspecialchars($today) ?>">
+        <?php if (isset($_SESSION['today_override'])): ?>
+          <button type="button" class="btn-cancel" style="width:100%;margin-bottom:10px"
+            onclick="if(confirm('日付調整をリセットして本日に戻しますか？'))adjReset()">調整をリセット（本日に戻す）</button>
+        <?php endif; ?>
+        <div class="adj-btns">
+          <button type="button" class="btn-cancel" onclick="closeAdjModal()">キャンセル</button>
+          <button type="submit" class="btn-ok">適用</button>
+        </div>
+      </form>
+      <form method="post" id="adj-reset-form" style="display:none">
+        <input type="hidden" name="action" value="reset_date">
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── 新規追加モーダル ─────────────────────────────── -->
+<div class="modal-overlay <?= $show_modal?'open':'' ?>" id="modal">
+  <div class="modal">
+    <h3>新規メンバー追加</h3>
+    <?php if ($add_error): ?>
+      <div class="modal-error"><?= htmlspecialchars($add_error) ?></div>
+    <?php endif; ?>
+    <form method="post" action="index.php?date=<?= urlencode($date) ?>">
+      <input type="hidden" name="action" value="add_member">
+      <input type="hidden" name="csrf"   value="<?= htmlspecialchars($csrf) ?>">
+      <div class="modal-field">
+        <label>氏名</label>
+        <input type="text" name="name" value="<?= htmlspecialchars($modal_name) ?>"
+               placeholder="例：山田太郎" required autofocus>
+      </div>
+      <div class="modal-field">
+        <label>読み仮名</label>
+        <input type="text" name="kana" value="<?= htmlspecialchars($modal_kana) ?>"
+               placeholder="例：やまだたろう" required>
+      </div>
+      <div class="modal-field">
+        <label>性別</label>
+        <select name="group_name" required>
+          <option value="">選択してください</option>
+          <option value="男性" <?= $modal_group==='男性'?'selected':'' ?>>男性</option>
+          <option value="女性" <?= $modal_group==='女性'?'selected':'' ?>>女性</option>
+        </select>
+      </div>
+      <div class="modal-btns">
+        <button type="button" class="btn-modal-cancel" onclick="closeModal()">キャンセル</button>
+        <button type="submit" class="btn-modal-submit">登録</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- ── 管理者調整モーダル ────────────────────────────── -->
+<div class="modal-overlay" id="tc-edit-modal">
+  <div class="modal">
+    <h3>🕐 管理者調整：<span id="tc-edit-name"></span></h3>
+    <div id="tc-edit-pw-area">
+      <div class="modal-field">
+        <label>管理者パスワード</label>
+        <input type="password" id="tc-edit-pw" placeholder="パスワードを入力" autocomplete="off">
+      </div>
+      <div class="modal-error" id="tc-edit-pw-err" style="display:none;margin-top:8px;">パスワードが違います。</div>
+      <div class="modal-btns" style="margin-top:16px;">
+        <button type="button" class="btn-modal-cancel" onclick="closeTcEdit()">キャンセル</button>
+        <button type="button" class="btn-modal-submit" onclick="verifyTcPw()">認証</button>
+      </div>
+    </div>
+    <div id="tc-edit-time-area" style="display:none;">
+      <div class="tc-edit-grid">
+        <div>
+          <label>出勤時間</label>
+          <input type="time" id="tc-edit-ci">
+        </div>
+        <div>
+          <label>退勤時間</label>
+          <input type="time" id="tc-edit-co">
+        </div>
+      </div>
+      <div class="modal-btns" style="margin-top:20px;">
+        <button type="button" class="btn-modal-cancel" onclick="closeTcEdit()">キャンセル</button>
+        <button type="button" class="btn-modal-submit" onclick="saveTcEdit()">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 削除パスワードモーダル ──────────────────────────── -->
+<div class="modal-overlay" id="del-pw-modal">
+  <div class="modal">
+    <h3>🔒 削除認証</h3>
+    <?php if ($del_err): ?>
+      <div class="modal-error">パスワードが違います。再度入力してください。</div>
+    <?php endif; ?>
+    <form method="post" action="index.php?date=<?= urlencode($date) ?>">
+      <input type="hidden" name="action"     value="verify_del">
+      <input type="hidden" name="csrf"       value="<?= htmlspecialchars($csrf) ?>">
+      <input type="hidden" name="redir_date" value="<?= htmlspecialchars($date) ?>">
+      <input type="hidden" name="next"       id="del-next" value="">
+      <div class="modal-field">
+        <label>削除パスワード</label>
+        <input type="password" name="del_password" placeholder="パスワードを入力" required>
+      </div>
+      <div class="modal-btns">
+        <button type="button" class="btn-modal-cancel" onclick="closePwModal()">キャンセル</button>
+        <button type="submit" class="btn-modal-submit">認証</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── 削除フォーム（非表示） ─────────────────────────── -->
+<form id="delete-form" method="post" style="display:none">
+  <input type="hidden" name="action"     value="delete_member">
+  <input type="hidden" name="csrf"       value="<?= htmlspecialchars($csrf) ?>">
+  <input type="hidden" name="redir_date" value="<?= htmlspecialchars($date) ?>">
+  <input type="hidden" name="member_id"  id="del-member-id" value="">
+</form>
+
+<script>
+
+// ── 削除パスワード認証 ────────────────────────────────────
+var delAuthorized = <?= $del_authorized ? 'true' : 'false' ?>;
+
+function openDelPwModal(next) {
+  document.getElementById('del-next').value = next;
+  document.getElementById('del-pw-modal').classList.add('open');
+}
+function closePwModal() {
+  document.getElementById('del-pw-modal').classList.remove('open');
+}
+function startBulkDelMode() {
+  if (!delAuthorized) { openDelPwModal('del_mode'); return; }
+  enterDelMode();
+}
+
+
+// ── 平日チェック ──────────────────────────────────────────
+const jpHolidays = new Set([
+  '2024-01-01','2024-01-08','2024-02-11','2024-02-12','2024-02-23',
+  '2024-03-20','2024-04-29','2024-05-03','2024-05-04','2024-05-05','2024-05-06',
+  '2024-07-15','2024-08-11','2024-08-12','2024-09-16','2024-09-22','2024-09-23',
+  '2024-10-14','2024-11-03','2024-11-04','2024-11-23',
+  '2025-01-01','2025-01-13','2025-02-11','2025-02-23','2025-02-24',
+  '2025-03-20','2025-04-29','2025-05-03','2025-05-04','2025-05-05','2025-05-06',
+  '2025-07-21','2025-08-11','2025-09-15','2025-09-22','2025-09-23',
+  '2025-10-13','2025-11-03','2025-11-23','2025-11-24',
+  '2026-01-01','2026-01-12','2026-02-11','2026-02-23',
+  '2026-03-20','2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-05-06',
+  '2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23',
+  '2026-10-12','2026-11-03','2026-11-23',
+]);
+function isWeekdayNonHolidayJS(dateStr) {
+  const d   = new Date(dateStr + 'T00:00:00');
+  const dow = d.getDay();
+  if (dow === 0 || dow === 6) return false; // 土日はNG
+  if (jpHolidays.has(dateStr)) return false; // 祝日はNG
+  return true;
+}
+function checkWeekday(dateStr) {
+  const msgEl  = document.getElementById('weekday-msg');
+  const savBtn = document.getElementById('btn-save');
+  if (!dateStr || !msgEl) return;
+  if (!isWeekdayNonHolidayJS(dateStr)) {
+    const label = '土日祝日を除く平日が選ばれてません。';
+    msgEl.textContent  = label;
+    msgEl.style.display = '';
+    if (savBtn) { savBtn.disabled = true; savBtn.style.opacity = '.45'; savBtn.style.cursor = 'not-allowed'; }
+  } else {
+    msgEl.style.display = 'none';
+    if (savBtn) { savBtn.disabled = false; savBtn.style.opacity = ''; savBtn.style.cursor = ''; }
+  }
+}
+function onDateChange(val) {
+  checkWeekday(val);
+  location.href = 'index.php?date=' + val;
+}
+
+// ── 出欠関連 ───────────────────────────────────────────────
+function doConfirm() {
+  if (!confirm('<?= date('Y年n月j日', strtotime($date)) ?> の出欠を確定します。\n確定後は編集できなくなります。よろしいですか？')) return;
+  document.getElementById('form-action').value = 'confirm';
+  document.getElementById('main-form').submit();
+}
+function moveDate(delta) {
+  const d = new Date(document.getElementById('date-input').value + 'T00:00:00');
+  d.setDate(d.getDate() + delta);
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  location.href = 'index.php?date=' + y + '-' + m + '-' + day;
+}
+const TC_CSRF = '<?= htmlspecialchars($csrf) ?>';
+const TC_DATE = '<?= htmlspecialchars($date) ?>';
+const TC_ADM_PW = '1192';
+const TC_EDITABLE = <?= $locked ? 'false' : 'true' ?>;
+
+// ── タイムカード ──────────────────────────────────────────
+function getNow() {
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+function calcWorkHoursJS(ci, co) {
+  if (!ci || !co) return '';
+  const [ih,im] = ci.split(':').map(Number);
+  const [oh,om] = co.split(':').map(Number);
+  const inM = ih*60+im, outM = oh*60+om;
+  if (outM <= inM) return '';
+  let work = outM - inM;
+  if (inM >= 780) { /* 13:00以降出勤→休憩なし */ }
+  else if (outM > 780) { work -= 60; }
+  if (work <= 0) return '0:00';
+  return Math.floor(work/60) + ':' + String(work%60).padStart(2,'0');
+}
+const EVAL_RATES_JS = { A: 1300, B: 1200, C: 1100 };
+function getMemberRate(id) {
+  const sel = document.getElementById('eval-' + id);
+  return sel ? (EVAL_RATES_JS[sel.value] || 1200) : 1200;
+}
+function calcWageJS(workStr, rate) {
+  if (!workStr) return '';
+  const [h, m] = workStr.split(':').map(Number);
+  const wage = Math.round((h + m / 60) * (rate || 1200));
+  return wage.toLocaleString() + '円';
+}
+function recalcAllWages() {
+  document.querySelectorAll('[id^="wh-"]').forEach(el => {
+    const id = el.id.replace('wh-', '');
+    const wh = el.textContent.trim();
+    const wageEl = document.getElementById('wage-' + id);
+    if (wageEl && wh && wh !== 'ー') wageEl.textContent = calcWageJS(wh, getMemberRate(id));
+  });
+  updateWageSummary();
+}
+function onEvalChange(id) {
+  fetch('index.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    body: new URLSearchParams({tc_action:'set_evaluation', member_id:id,
+          evaluation:document.getElementById('eval-'+id).value, csrf:TC_CSRF, work_date:TC_DATE})
+  });
+  const wh = document.getElementById('wh-'+id).textContent.trim();
+  const wageEl = document.getElementById('wage-'+id);
+  if (wageEl && wh && wh !== 'ー') wageEl.textContent = calcWageJS(wh, getMemberRate(id));
+  updateWageSummary();
+}
+function updateWageSummary() {
+  function sumGroup(listId) {
+    let total = 0;
+    document.querySelectorAll('#' + listId + ' [id^="wage-"]').forEach(el => {
+      const txt = el.textContent.replace(/[^0-9]/g, '');
+      if (txt) total += parseInt(txt);
+    });
+    return total;
+  }
+  const men   = sumGroup('men-list');
+  const women = sumGroup('women-list');
+  const fmt   = n => n.toLocaleString() + '円';
+  document.getElementById('wage-sum-men').textContent   = fmt(men);
+  document.getElementById('wage-sum-women').textContent = fmt(women);
+  document.getElementById('wage-sum-total').textContent = fmt(men + women);
+}
+function updateWorkHoursUI(id) {
+  const ci = document.getElementById('ci-'+id).textContent.trim();
+  const co = document.getElementById('co-'+id).textContent.trim();
+  const wh = calcWorkHoursJS(ci, co);
+  document.getElementById('wh-'+id).textContent   = wh;
+  document.getElementById('wage-'+id).textContent = calcWageJS(wh, getMemberRate(id));
+  updateWageSummary();
+}
+function tcPost(action, id, time) {
+  return fetch('index.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    body: new URLSearchParams({tc_action:action, member_id:id, work_date:TC_DATE, time:time, csrf:TC_CSRF})
+  }).then(r => r.json());
+}
+function clockIn(id) {
+  if (!TC_EDITABLE) return;
+  const t = getNow();
+  tcPost('clock_in', id, t).then(d => {
+    if (!d.ok) return;
+    document.getElementById('ci-'+id).textContent = d.time;
+    document.getElementById('btn-ci-'+id).classList.add('active');
+    updateWorkHoursUI(id);
+    setAtt(id, true);
+  });
+}
+function clockOut(id) {
+  if (!TC_EDITABLE) return;
+  const t = getNow();
+  tcPost('clock_out', id, t).then(d => {
+    if (!d.ok) return;
+    document.getElementById('co-'+id).textContent = d.time;
+    document.getElementById('btn-co-'+id).classList.add('active');
+    updateWorkHoursUI(id);
+  });
+}
+
+// ── 管理者調整モーダル ────────────────────────────────────
+var tcEditId = null;
+function openTcEdit(id, name) {
+  tcEditId = id;
+  document.getElementById('tc-edit-name').textContent = name;
+  document.getElementById('tc-edit-pw').value = '';
+  document.getElementById('tc-edit-pw-err').style.display = 'none';
+  document.getElementById('tc-edit-pw-area').style.display = '';
+  document.getElementById('tc-edit-time-area').style.display = 'none';
+  document.getElementById('tc-edit-modal').classList.add('open');
+}
+function closeTcEdit() {
+  document.getElementById('tc-edit-modal').classList.remove('open');
+  tcEditId = null;
+}
+function verifyTcPw() {
+  if (document.getElementById('tc-edit-pw').value === TC_ADM_PW) {
+    document.getElementById('tc-edit-pw-err').style.display = 'none';
+    document.getElementById('tc-edit-pw-area').style.display = 'none';
+    document.getElementById('tc-edit-time-area').style.display = '';
+    const ci = document.getElementById('ci-'+tcEditId).textContent.trim();
+    const co = document.getElementById('co-'+tcEditId).textContent.trim();
+    document.getElementById('tc-edit-ci').value = ci || '';
+    document.getElementById('tc-edit-co').value = co || '';
+  } else {
+    document.getElementById('tc-edit-pw-err').style.display = '';
+    document.getElementById('tc-edit-pw').value = '';
+  }
+}
+function saveTcEdit() {
+  const ci = document.getElementById('tc-edit-ci').value;
+  const co = document.getElementById('tc-edit-co').value;
+  const id = tcEditId;
+  const saves = [];
+  if (ci) saves.push(tcPost('clock_in',  id, ci));
+  if (co) saves.push(tcPost('clock_out', id, co));
+  Promise.all(saves).then(() => {
+    if (ci) { document.getElementById('ci-'+id).textContent = ci; document.getElementById('btn-ci-'+id).classList.add('active'); }
+    if (co) { document.getElementById('co-'+id).textContent = co; document.getElementById('btn-co-'+id).classList.add('active'); }
+    updateWorkHoursUI(id);
+    closeTcEdit();
+  });
+}
+document.getElementById('tc-edit-modal').addEventListener('click', function(e){
+  if (e.target===this) closeTcEdit();
+});
+
+// ── 出欠関連 ───────────────────────────────────────────────
+function setAtt(id, present) {
+  const cb  = document.getElementById('cb-' + id);
+  const row = cb.closest('.member-row');
+  cb.checked = present;
+  row.classList.toggle('is-present', present);
+  const absentBtn = row.querySelector('.btn-absent');
+  if (absentBtn) absentBtn.classList.toggle('active', !present);
+  if (!present) {
+    const whEl   = document.getElementById('wh-'+id);
+    const wageEl = document.getElementById('wage-'+id);
+    const ciEl   = document.getElementById('ci-'+id);
+    const coEl   = document.getElementById('co-'+id);
+    const ciBtn  = document.getElementById('btn-ci-'+id);
+    const coBtn  = document.getElementById('btn-co-'+id);
+    if (whEl)   whEl.textContent   = 'ー';
+    if (wageEl) wageEl.textContent = 'ー';
+    if (ciEl)   ciEl.textContent   = '';
+    if (coEl)   coEl.textContent   = '';
+    if (ciBtn)  ciBtn.classList.remove('active');
+    if (coBtn)  coBtn.classList.remove('active');
+    tcPost('clock_clear', id, '').catch(()=>{});
+  }
+  updateCounts();
+}
+function selectAll(group, checked) {
+  document.querySelectorAll('#'+group+'-list .att-hidden').forEach(cb => {
+    setAtt(parseInt(cb.id.replace('cb-','')), checked);
+  });
+}
+function updateCounts() {
+  const mc = document.querySelectorAll('#men-list .att-hidden:checked').length;
+  const wc = document.querySelectorAll('#women-list .att-hidden:checked').length;
+  document.getElementById('men-count').textContent   = mc;
+  document.getElementById('women-count').textContent = wc;
+  document.getElementById('total-count').textContent = mc + wc;
+}
+
+// ── モーダル ──────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', function() { recalcAllWages(); updateWageSummary(); });
+
+// ── 男女切替 ─────────────────────────────────────────
+(function() {
+  var stored = localStorage.getItem('gender_view') || 'men';
+  applyGender(stored);
+})();
+function applyGender(g) {
+  var menEl    = document.querySelector('.sec-men');
+  var womenEl  = document.querySelector('.sec-women');
+  var btn      = document.getElementById('btn-gender');
+  if (g === 'men') {
+    if (menEl)   menEl.style.display   = '';
+    if (womenEl) womenEl.style.display = 'none';
+    btn.textContent = '男性';
+    btn.className   = 'btn-gender men';
+  } else {
+    if (menEl)   menEl.style.display   = 'none';
+    if (womenEl) womenEl.style.display = '';
+    btn.textContent = '女性';
+    btn.className   = 'btn-gender women';
+  }
+  localStorage.setItem('gender_view', g);
+}
+function toggleGender() {
+  var current = localStorage.getItem('gender_view') || 'men';
+  applyGender(current === 'men' ? 'women' : 'men');
+}
+
+// ── 日付調整モーダル ──────────────────────────────────
+function openAdjModal() {
+  document.getElementById('adj-pass').value = '';
+  document.getElementById('adj-err').style.display = 'none';
+  document.getElementById('adj-step1').style.display = '';
+  document.getElementById('adj-step2').style.display = 'none';
+  document.getElementById('adj-modal').classList.add('open');
+  setTimeout(() => document.getElementById('adj-pass').focus(), 50);
+}
+function closeAdjModal() {
+  document.getElementById('adj-modal').classList.remove('open');
+}
+function adjCheckPass() {
+  if (document.getElementById('adj-pass').value === '1192') {
+    document.getElementById('adj-pass-hidden').value = '1192';
+    document.getElementById('adj-step1').style.display = 'none';
+    document.getElementById('adj-step2').style.display = '';
+    setTimeout(() => document.getElementById('adj-date').focus(), 50);
+  } else {
+    document.getElementById('adj-err').style.display = '';
+    document.getElementById('adj-pass').select();
+  }
+}
+function adjReset() {
+  document.getElementById('adj-reset-form').submit();
+}
+document.getElementById('adj-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeAdjModal();
+});
+
+function openModal() {
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+// ページロード時に現在日付をチェック
+window.addEventListener('DOMContentLoaded', function() {
+  checkWeekday('<?= htmlspecialchars($date) ?>');
+});
+
+// ページロード時の処理
+<?php if ($del_mode && $del_authorized): ?>
+window.addEventListener('DOMContentLoaded', function(){ enterDelMode(); });
+<?php endif; ?>
+<?php if ($del_err): ?>
+window.addEventListener('DOMContentLoaded', function(){
+  openDelPwModal('<?= htmlspecialchars($_GET['next'] ?? '') ?>');
+});
+<?php endif; ?>
+
+
+// ── 1件削除 ───────────────────────────────────────────────
+function deleteMember(id, name) {
+  if (!delAuthorized) { openDelPwModal(''); return; }
+  if (!confirm(name + ' を名簿から削除します。\n出欠データも削除されます。\n本当に削除しますか？')) return;
+  var csrf      = document.querySelector('#delete-form input[name=csrf]').value;
+  var redirDate = document.querySelector('#delete-form input[name=redir_date]').value;
+  var f = document.createElement('form');
+  f.method = 'post';
+  f.style.display = 'none';
+  [['action','delete_member'],['csrf',csrf],['redir_date',redirDate],['member_id',id]].forEach(function(p){
+    var i = document.createElement('input');
+    i.type='hidden'; i.name=p[0]; i.value=p[1];
+    f.appendChild(i);
+  });
+  document.body.appendChild(f);
+  f.submit();
+}
+
+// ── 複数削除モード ────────────────────────────────────────
+function enterDelMode() {
+  document.querySelectorAll('.del-cb-wrap').forEach(el => el.style.display = 'flex');
+  document.querySelectorAll('.del-header-wrap').forEach(el => el.style.display = 'flex');
+  document.getElementById('normal-btns').style.display = 'none';
+  document.getElementById('del-btns').style.display    = 'flex';
+  document.getElementById('normal-total').style.display = 'none';
+  document.getElementById('del-total').style.display    = '';
+  document.getElementById('btn-add').style.display      = 'none';
+  document.getElementById('btn-bulk-del').style.display = 'none';
+  updateDelCount();
+}
+function exitDelMode() {
+  document.querySelectorAll('.del-cb-wrap').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.del-header-wrap').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.del-cb').forEach(cb => { cb.checked = false; });
+  document.querySelectorAll('.del-select-all').forEach(cb => { cb.checked = false; });
+  document.querySelectorAll('.member-row').forEach(r => r.classList.remove('del-selected'));
+  document.getElementById('del-all-men').checked   = false;
+  document.getElementById('del-all-women').checked = false;
+  document.getElementById('normal-btns').style.display  = '';
+  document.getElementById('del-btns').style.display     = 'none';
+  document.getElementById('normal-total').style.display = '';
+  document.getElementById('del-total').style.display    = 'none';
+  document.getElementById('btn-add').style.display      = '';
+  document.getElementById('btn-bulk-del').style.display = '';
+}
+function toggleSelectAllDel(group, checked) {
+  document.querySelectorAll('#'+group+'-list .del-cb').forEach(cb => {
+    cb.checked = checked;
+    cb.closest('.member-row').classList.toggle('del-selected', checked);
+  });
+  updateDelCount();
+}
+function onDelCbChange(cb) {
+  cb.closest('.member-row').classList.toggle('del-selected', cb.checked);
+  updateDelCount();
+}
+function updateDelCount() {
+  var count = document.querySelectorAll('.del-cb:checked').length;
+  document.getElementById('del-count').textContent = count;
+}
+function execBulkDelete() {
+  var checked = document.querySelectorAll('.del-cb:checked');
+  if (checked.length === 0) {
+    alert('削除する項目を選択してください');
+    return;
+  }
+  if (!confirm('選択した ' + checked.length + ' 件を削除しますか？\n出欠データも削除されます。\nこの操作は取り消せません。')) return;
+  var csrf      = document.querySelector('#delete-form input[name=csrf]').value;
+  var redirDate = document.querySelector('#delete-form input[name=redir_date]').value;
+  var f = document.createElement('form');
+  f.method = 'post';
+  f.style.display = 'none';
+  [['action','bulk_delete'],['csrf',csrf],['redir_date',redirDate]].forEach(function(p){
+    var i = document.createElement('input');
+    i.type='hidden'; i.name=p[0]; i.value=p[1];
+    f.appendChild(i);
+  });
+  checked.forEach(function(cb){
+    var i = document.createElement('input');
+    i.type='hidden'; i.name='del_ids[]'; i.value=cb.value;
+    f.appendChild(i);
+  });
+  document.body.appendChild(f);
+  f.submit();
+}
+document.querySelectorAll('.member-row').forEach(function(row) {
+  row.addEventListener('click', function(e) {
+    if (e.target.closest('button, input, select, a')) return;
+    var isSelected = row.classList.contains('row-selected');
+    document.querySelectorAll('.member-row.row-selected').forEach(function(r) { r.classList.remove('row-selected'); });
+    if (!isSelected) row.classList.add('row-selected');
+  });
+});
+</script>
+</body>
+</html>

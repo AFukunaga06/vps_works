@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCリマインダー</title>
+<style>
+  :root {
+    --bg: #fafaf5;
+    --card: #ffffff;
+    --border: #d9d9d9;
+    --text: #222;
+    --sub: #666;
+    --accent: #1a73e8;
+    --amado: #b8312f;
+    --oyasumi: #1c4789;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Yu Gothic UI", "Hiragino Sans", "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px 80px;
+  }
+  h1 {
+    text-align: center;
+    margin: 0 0 8px;
+    font-size: 28px;
+  }
+  .desc {
+    text-align: center;
+    color: var(--sub);
+    margin: 0 0 24px;
+    font-size: 14px;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .card h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card .dot {
+    width: 14px; height: 14px; border-radius: 50%;
+  }
+  .amado .dot { background: var(--amado); }
+  .oyasumi .dot { background: var(--oyasumi); }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  label { font-size: 14px; color: var(--sub); }
+  select, input[type="time"] {
+    font-size: 22px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    font-family: inherit;
+  }
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .toggle input { width: 18px; height: 18px; }
+  .status {
+    font-size: 13px;
+    color: var(--sub);
+    margin-top: 8px;
+  }
+  .now {
+    text-align: center;
+    font-size: 48px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin: 8px 0 20px;
+    font-variant-numeric: tabular-nums;
+  }
+  .now .date { font-size: 16px; color: var(--sub); display: block; font-weight: normal; letter-spacing: 0; }
+  .testrow { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+  .testrow button {
+    font-size: 13px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .testrow button:hover { background: #f3f3f3; }
+
+  /* Modal */
+  .modal-mask {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  .modal-mask.show { display: flex; }
+  .modal {
+    background: #ffffe0;
+    border: 3px solid #333;
+    border-radius: 14px;
+    width: min(720px, 92vw);
+    padding: 36px 28px 28px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modal h2 {
+    margin: 0 0 24px;
+    font-size: 40px;
+    font-weight: bold;
+  }
+  .modal.amado h2 { color: var(--amado); }
+  .modal.oyasumi h2 { color: var(--oyasumi); }
+  .modal button {
+    font-size: 22px;
+    font-weight: bold;
+    padding: 12px 60px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+  }
+  .modal button:hover { background: #1557b0; }
+  .hint {
+    font-size: 13px;
+    color: #888;
+    margin-top: 14px;
+  }
+</style>
+</head>
+<body>
+
+<h1>PCリマインダー</h1>
+<p class="desc">このタブを開いている間、設定時刻にポップアップ＋音声でお知らせします</p>
+
+<div class="now" id="nowClock">
+  <span id="nowTime">--:--:--</span>
+  <span class="date" id="nowDate">----/--/--</span>
+</div>
+
+<div class="container">
+
+  <div class="card amado">
+    <h2><span class="dot"></span>雨戸リマインド</h2>
+    <div class="row">
+      <label for="amadoTime">時刻</label>
+      <input type="time" id="amadoTime" value="18:00">
+      <label class="toggle">
+        <input type="checkbox" id="amadoEnabled" checked>
+        有効
+      </label>
+    </div>
+    <div class="status" id="amadoStatus"></div>
+  </div>
+
+  <div class="card oyasumi">
+    <h2><span class="dot"></span>お休みリマインド</h2>
+    <div class="row">
+      <label for="oyasumiTime">時刻</label>
+      <select id="oyasumiTime"></select>
+      <label class="toggle">
+        <input type="checkbox" id="oyasumiEnabled" checked>
+        有効
+      </label>
+    </div>
+    <div class="status" id="oyasumiStatus"></div>
+  </div>
+
+  <div class="testrow">
+    <button id="testAmado">雨戸ポップアップをテスト</button>
+    <button id="testOyasumi">お休みポップアップをテスト</button>
+  </div>
+
+</div>
+
+<div class="modal-mask" id="modalMask">
+  <div class="modal" id="modal">
+    <h2 id="modalText">お休みの時間になりました</h2>
+    <button id="okBtn">OK</button>
+    <div class="hint">音声を止めるには OK を押してください</div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const OYASUMI_TIMES = [
+    '22:00','22:15','22:30','22:45',
+    '23:00','23:15','23:30','23:45','24:00'
+  ];
+  const STORAGE_KEY = 'pc_reminder_settings_v1';
+
+  // DOM
+  const amadoTimeEl = document.getElementById('amadoTime');
+  const amadoEnabledEl = document.getElementById('amadoEnabled');
+  const amadoStatusEl = document.getElementById('amadoStatus');
+  const oyasumiTimeEl = document.getElementById('oyasumiTime');
+  const oyasumiEnabledEl = document.getElementById('oyasumiEnabled');
+  const oyasumiStatusEl = document.getElementById('oyasumiStatus');
+  const nowTimeEl = document.getElementById('nowTime');
+  const nowDateEl = document.getElementById('nowDate');
+  const modalMask = document.getElementById('modalMask');
+  const modalEl = document.getElementById('modal');
+  const modalText = document.getElementById('modalText');
+  const okBtn = document.getElementById('okBtn');
+
+  // populate oyasumi select
+  for (const t of OYASUMI_TIMES) {
+    const o = document.createElement('option');
+    o.value = t; o.textContent = t;
+    oyasumiTimeEl.appendChild(o);
+  }
+
+  // load settings
+  const loadSettings = () => {
+    try {
+      const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      if (s.amadoTime) amadoTimeEl.value = s.amadoTime;
+      if (typeof s.amadoEnabled === 'boolean') amadoEnabledEl.checked = s.amadoEnabled;
+      if (s.oyasumiTime && OYASUMI_TIMES.includes(s.oyasumiTime)) oyasumiTimeEl.value = s.oyasumiTime;
+      else oyasumiTimeEl.value = '23:00';
+      if (typeof s.oyasumiEnabled === 'boolean') oyasumiEnabledEl.checked = s.oyasumiEnabled;
+    } catch (e) {
+      oyasumiTimeEl.value = '23:00';
+    }
+  };
+  const saveSettings = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      amadoTime: amadoTimeEl.value,
+      amadoEnabled: amadoEnabledEl.checked,
+      oyasumiTime: oyasumiTimeEl.value,
+      oyasumiEnabled: oyasumiEnabledEl.checked,
+    }));
+    updateStatus();
+  };
+
+  [amadoTimeEl, amadoEnabledEl, oyasumiTimeEl, oyasumiEnabledEl].forEach(el =>
+    el.addEventListener('change', saveSettings)
+  );
+
+  // audio state
+  let currentAudio = null;
+  let playing = false;
+  let currentTracks = [];
+  let trackIdx = 0;
+  const AMADO_TRACKS = ['audio/westminster_full_hour.mp3'];
+  const OYASUMI_TRACKS = ['audio/oyasuminojikann_01.mp3'];
+
+  const playNext = () => {
+    if (!playing) return;
+    if (currentAudio) {
+      try { currentAudio.pause(); } catch (_) {}
+      currentAudio = null;
+    }
+    const a = new Audio(currentTracks[trackIdx % currentTracks.length]);
+    a.volume = 0.9;
+    a.addEventListener('ended', () => {
+      trackIdx++;
+      playNext();
+    });
+    a.play().catch(err => {
+      console.warn('audio play blocked:', err);
+    });
+    currentAudio = a;
+  };
+
+  const startAudio = (tracks) => {
+    playing = true;
+    currentTracks = tracks;
+    trackIdx = 0;
+    playNext();
+  };
+  const stopAudio = () => {
+    playing = false;
+    if (currentAudio) {
+      try { currentAudio.pause(); } catch (_) {}
+      currentAudio.currentTime = 0;
+      currentAudio = null;
+    }
+  };
+
+  // modal
+  let modalOpen = false;
+  const showModal = (kind) => {
+    if (modalOpen) return;
+    modalOpen = true;
+    modalEl.classList.remove('amado','oyasumi');
+    let tracks;
+    if (kind === 'amado') {
+      modalEl.classList.add('amado');
+      modalText.textContent = '雨戸を閉める時間です';
+      tracks = AMADO_TRACKS;
+    } else {
+      modalEl.classList.add('oyasumi');
+      modalText.textContent = 'お休みの時間になりました';
+      tracks = OYASUMI_TRACKS;
+    }
+    modalMask.classList.add('show');
+    startAudio(tracks);
+    okBtn.focus();
+  };
+  const closeModal = () => {
+    modalMask.classList.remove('show');
+    stopAudio();
+    modalOpen = false;
+  };
+  okBtn.addEventListener('click', closeModal);
+  modalMask.addEventListener('click', (e) => {
+    if (e.target === modalMask) { /* don't close on backdrop click - require OK */ }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (modalOpen && (e.key === 'Enter' || e.key === 'Escape')) {
+      e.preventDefault();
+      closeModal();
+    }
+  });
+
+  // time check
+  let lastFiredKey = ''; // "HH:MM|amado" or "HH:MM|oyasumi" to avoid double-fire within same minute
+  const pad = (n) => String(n).padStart(2,'0');
+
+  const tick = () => {
+    const now = new Date();
+    const hh = pad(now.getHours());
+    const mm = pad(now.getMinutes());
+    const ss = pad(now.getSeconds());
+    nowTimeEl.textContent = `${hh}:${mm}:${ss}`;
+    nowDateEl.textContent = `${now.getFullYear()}/${pad(now.getMonth()+1)}/${pad(now.getDate())} (${'日月火水木金土'[now.getDay()]})`;
+
+    const cur = `${hh}:${mm}`;
+    // amado check (HH:MM matches and second is 00..9 to keep window short, but ss > 0 first second also ok)
+    if (amadoEnabledEl.checked && amadoTimeEl.value === cur) {
+      const key = `${cur}|amado|${now.getFullYear()}${now.getMonth()}${now.getDate()}`;
+      if (key !== lastFiredKey) {
+        lastFiredKey = key;
+        showModal('amado');
+      }
+    }
+    // oyasumi check (24:00 means 00:00 next day)
+    if (oyasumiEnabledEl.checked) {
+      const t = oyasumiTimeEl.value;
+      const want = (t === '24:00') ? '00:00' : t;
+      if (want === cur) {
+        const key = `${cur}|oyasumi|${now.getFullYear()}${now.getMonth()}${now.getDate()}`;
+        if (key !== lastFiredKey) {
+          lastFiredKey = key;
+          showModal('oyasumi');
+        }
+      }
+    }
+  };
+
+  setInterval(tick, 1000);
+  tick();
+
+  const updateStatus = () => {
+    amadoStatusEl.textContent = amadoEnabledEl.checked
+      ? `→ 毎日 ${amadoTimeEl.value} に通知`
+      : '→ オフ';
+    oyasumiStatusEl.textContent = oyasumiEnabledEl.checked
+      ? `→ 毎日 ${oyasumiTimeEl.value} に通知`
+      : '→ オフ';
+  };
+
+  // test buttons
+  document.getElementById('testAmado').addEventListener('click', () => showModal('amado'));
+  document.getElementById('testOyasumi').addEventListener('click', () => showModal('oyasumi'));
+
+  loadSettings();
+  updateStatus();
+})();
+</script>
+
+</body>
+</html>

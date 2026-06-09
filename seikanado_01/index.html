@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>讃美歌 再生</title>
+  <style>
+    body {
+      font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+      background: #f5f0e8;
+      color: #333;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #5a3e28;
+      margin-bottom: 30px;
+    }
+    .track {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: background 0.3s;
+    }
+    .track.playing {
+      background: #dff0f8;
+    }
+    .track h2 {
+      font-size: 1rem;
+      margin: 0 0 10px;
+      color: #5a3e28;
+    }
+    audio {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>讃美歌 再生</h1>
+
+  <div class="track">
+    <h2>そのひとり子を</h2>
+    <audio controls playsinline>
+      <source src="そのひとり子を.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="track">
+    <h2>そのひとり子を 01</h2>
+    <audio controls playsinline>
+      <source src="そのひとり子を 01.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="track">
+    <h2>永遠のいのちのために</h2>
+    <audio controls playsinline>
+      <source src="永遠のいのちのために.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="track">
+    <h2>永遠のいのちのために 01</h2>
+    <audio controls playsinline>
+      <source src="永遠のいのちのために01.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="track">
+    <h2>父のもとへ帰ろう</h2>
+    <audio controls playsinline>
+      <source src="父のもとへ帰ろう.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="track">
+    <h2>父のもとへ帰ろう 01</h2>
+    <audio controls playsinline>
+      <source src="父のもとへ帰ろう 01.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="track">
+    <h2>父のもとへ帰ろう 02</h2>
+    <audio controls playsinline>
+      <source src="父のもとへ帰ろう02.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="track">
+    <h2>父のもとへ帰ろう 03</h2>
+    <audio controls playsinline>
+      <source src="父のもとへ帰ろう03.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <script>
+    const audios = Array.from(document.querySelectorAll('audio'));
+    const tracks = Array.from(document.querySelectorAll('.track'));
+
+    audios.forEach((audio, i) => {
+      audio.addEventListener('play', () => {
+        audios.forEach((a, j) => {
+          if (j !== i) a.pause();
+        });
+        tracks.forEach((t, j) => {
+          t.classList.toggle('playing', j === i);
+        });
+      });
+
+      audio.addEventListener('pause', () => {
+        tracks[i].classList.remove('playing');
+      });
+
+      audio.addEventListener('ended', () => {
+        tracks[i].classList.remove('playing');
+        if (i + 1 < audios.length) {
+          const next = audios[i + 1];
+          next.play().catch(() => {});
+        }
+      });
+    });
+  </script>
+</body>
+</html>

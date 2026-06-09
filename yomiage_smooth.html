@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ナレーション読み上げ（なめらか＆確実版）</title>
+<style>
+  body {
+    font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #eaeaea;
+    margin: 0;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 36px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+  h1 {
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 16px;
+    margin-top: 0;
+    color: #f5d76e;
+  }
+  .badge {
+    font-size: 11px;
+    color: #1a1a2e;
+    background: #f5d76e;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    letter-spacing: 0.1em;
+    vertical-align: middle;
+  }
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.3);
+    color: #eaeaea;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 14px;
+    font-size: 15px;
+    line-height: 1.8;
+    font-family: inherit;
+    resize: vertical;
+  }
+  textarea:focus {
+    outline: none;
+    border-color: #f5d76e;
+  }
+  .controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+  }
+  button {
+    background: #f5d76e;
+    color: #1a1a2e;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  button:hover { opacity: 0.85; }
+  button:active { transform: translateY(1px); }
+  button:disabled {
+    background: #555;
+    color: #999;
+    cursor: not-allowed;
+  }
+  button.secondary {
+    background: transparent;
+    color: #f5d76e;
+    border: 1px solid #f5d76e;
+  }
+  .settings {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .setting {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  label {
+    font-size: 13px;
+    color: #b8b8b8;
+    letter-spacing: 0.05em;
+  }
+  select, input[type=range] {
+    background: rgba(0, 0, 0, 0.3);
+    color: #eaeaea;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 6px;
+    font-family: inherit;
+  }
+  .value {
+    font-size: 12px;
+    color: #f5d76e;
+    text-align: right;
+  }
+  .status {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #b8b8b8;
+    font-style: italic;
+    min-height: 20px;
+  }
+  .progress {
+    font-size: 11px;
+    color: #f5d76e;
+    margin-top: 4px;
+  }
+  .hint {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .pause-setting {
+    grid-column: 1 / -1;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>― ナレーション ―<span class="badge">SMOOTH</span></h1>
+
+    <textarea id="text" rows="8">これは、静かな朝のことでした。
+
+窓の外では、小鳥たちがやさしく歌い、柔らかな光が部屋を満たしていきます。
+彼は深く息を吸い、ゆっくりと一日を始めるのでした。
+
+― フクのAI寺子屋へ、ようこそ。</textarea>
+
+    <div class="controls">
+      <button id="playBtn" onclick="speak()" disabled>▶ 朗読開始</button>
+      <button id="pauseBtn" class="secondary" onclick="togglePause()" disabled>‖ 一時停止</button>
+      <button id="stopBtn" class="secondary" onclick="stop()" disabled>■ 停止</button>
+      <button id="rewindBtn" class="secondary" onclick="rewindOne()">⏪ 巻き戻し</button>
+      <button id="restartBtn" class="secondary" onclick="restartFromStart()">⏮ 先頭へ</button>
+    </div>
+
+    <div class="settings">
+      <div class="setting">
+        <label for="voice">声（★が高品質候補）</label>
+        <select id="voice"></select>
+      </div>
+      <div class="setting">
+        <label for="rate">速度 <span class="value" id="rateVal">0.95</span></label>
+        <input type="range" id="rate" min="0.5" max="1.5" step="0.05" value="0.95">
+      </div>
+      <div class="setting">
+        <label for="pitch">声の高さ <span class="value" id="pitchVal">1.00</span></label>
+        <input type="range" id="pitch" min="0.5" max="1.5" step="0.05" value="1.0">
+      </div>
+      <div class="setting">
+        <label for="volume">音量 <span class="value" id="volumeVal">1.00</span></label>
+        <input type="range" id="volume" min="0" max="1" step="0.05" value="1.0">
+      </div>
+      <div class="setting pause-setting">
+        <label for="pauseMs">文の区切りの間（ミリ秒） <span class="value" id="pauseMsVal">250</span></label>
+        <input type="range" id="pauseMs" min="0" max="800" step="50" value="250">
+        <div class="hint">句点（。！？）ごとに小さな間を挟みます。</div>
+      </div>
+    </div>
+
+    <div class="status" id="status">― 音声読み込み中… ―</div>
+    <div class="progress" id="progress"></div>
+  </div>
+
+<script>
+  const synth = window.speechSynthesis;
+  const voiceSelect = document.getElementById('voice');
+  const rate = document.getElementById('rate');
+  const pitch = document.getElementById('pitch');
+  const volume = document.getElementById('volume');
+  const pauseMs = document.getElementById('pauseMs');
+  const playBtn = document.getElementById('playBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const status = document.getElementById('status');
+  const progress = document.getElementById('progress');
+
+  let voices = [];
+  let queue = [];
+  let queueIndex = 0;
+  let stopped = false;
+  let watchdog = null;
+
+  const PREFERRED = [
+    'Google 日本語', 'Google Japanese',
+    'Microsoft Nanami', 'Microsoft Keita', 'Microsoft Ayumi', 'Microsoft Haruka',
+    'Kyoko (Enhanced)', 'Otoya (Enhanced)', 'Kyoko', 'Otoya',
+    'O-Ren'
+  ];
+
+  function scoreVoice(v) {
+    for (let i = 0; i < PREFERRED.length; i++) {
+      if (v.name.includes(PREFERRED[i])) return -i;
+    }
+    return 100;
+  }
+
+  function loadVoices() {
+    voices = synth.getVoices();
+    if (!voices.length) return;
+    const jaVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('ja'));
+    const list = (jaVoices.length ? jaVoices : voices).slice()
+                   .sort((a, b) => scoreVoice(a) - scoreVoice(b));
+    voiceSelect.innerHTML = '';
+    list.forEach((v) => {
+      const opt = document.createElement('option');
+      opt.value = voices.indexOf(v);
+      const tag = scoreVoice(v) < 100 ? ' ★' : '';
+      opt.textContent = `${v.name} (${v.lang})${tag}`;
+      voiceSelect.appendChild(opt);
+    });
+    // デフォルトを Google 日本語 にする（あれば）
+    const googleJa = voices.find(v =>
+      (v.name.includes('Google 日本語') || v.name.includes('Google Japanese'))
+      && v.lang && v.lang.toLowerCase().startsWith('ja')
+    );
+    if (googleJa) {
+      voiceSelect.value = voices.indexOf(googleJa);
+    }
+    playBtn.disabled = false;
+    if (status.textContent.includes('読み込み中')) {
+      status.textContent = '― 準備完了 ―';
+    }
+  }
+  loadVoices();
+  if (synth.onvoiceschanged !== undefined) {
+    synth.onvoiceschanged = loadVoices;
+  }
+  // Safari など voiceschanged が来ないブラウザのためのフォールバック
+  setTimeout(loadVoices, 500);
+  setTimeout(loadVoices, 1500);
+
+  ['rate', 'pitch', 'volume', 'pauseMs'].forEach(id => {
+    const el = document.getElementById(id);
+    const val = document.getElementById(id + 'Val');
+    el.addEventListener('input', () => {
+      if (id === 'pauseMs') val.textContent = el.value;
+      else val.textContent = parseFloat(el.value).toFixed(2);
+    });
+  });
+
+  // ----- テキスト正規化 -----
+  // 読まれない／読み間違えやすい記号を吸収して句点で分割する。
+  function normalize(text) {
+    return text
+      .replace(/\r\n/g, '\n')
+      .replace(/[—―ー─━][—―ー─━]+/g, '、')  // 罫線の連続は読点へ
+      .replace(/[―—─━]/g, '、')              // 単独罫線も読点へ
+      .replace(/…+/g, '、')                   // 三点リーダーは読点へ
+      .replace(/[「『（(\[【〈《]/g, ' ')
+      .replace(/[」』）)\]】〉》]/g, ' ')
+      .replace(/[ \t　]+/g, ' ')
+      .replace(/\n{2,}/g, '\n\n')
+      .replace(/([。！？!?])\s*/g, '$1\n')   // 句点で改行
+      .trim();
+  }
+
+  // 最大 chunk 長（おおむね 12 秒以内で読み切れる長さに収める）
+  const MAX_CHUNK = 80;
+
+  function splitLongLine(line) {
+    // 80 文字超の文は読点でさらに分割。読点で切れない場合は強制スライス。
+    if (line.length <= MAX_CHUNK) return [line];
+    const parts = [];
+    let buf = '';
+    line.split(/(、)/).forEach(tok => {
+      if ((buf + tok).length > MAX_CHUNK && buf) {
+        parts.push(buf);
+        buf = tok;
+      } else {
+        buf += tok;
+      }
+    });
+    if (buf) parts.push(buf);
+    // それでも長すぎるものは強制分割
+    const final = [];
+    parts.forEach(p => {
+      if (p.length <= MAX_CHUNK) { final.push(p); return; }
+      for (let i = 0; i < p.length; i += MAX_CHUNK) {
+        final.push(p.slice(i, i + MAX_CHUNK));
+      }
+    });
+    return final;
+  }
+
+  function buildQueue(text) {
+    const lines = normalize(text).split('\n');
+    const result = [];
+    lines.forEach(line => {
+      const s = line.trim();
+      if (!s) {
+        result.push({ type: 'pause', ms: 600 });   // 段落間
+        return;
+      }
+      splitLongLine(s).forEach(chunk => {
+        const t = chunk.trim();
+        if (t) result.push({ type: 'speak', text: t });
+      });
+    });
+    return result;
+  }
+
+  // ----- watchdog: onend が来ない場合の保険 -----
+  function startWatchdog(textLen, rateVal) {
+    clearWatchdog();
+    // 日本語 1 文字 ≒ 0.15 秒（rate 1.0 基準）+ 余裕
+    const estimateMs = (textLen * 150) / rateVal + 3000;
+    watchdog = setTimeout(() => {
+      console.warn('watchdog fired — onend が来ないので次へ進めます');
+      synth.cancel();
+      // onend は呼ばれないので、ここから次を起動
+      setTimeout(playNext, 100);
+    }, Math.max(estimateMs, 4000));
+  }
+  function clearWatchdog() {
+    if (watchdog) { clearTimeout(watchdog); watchdog = null; }
+  }
+
+  // ----- キュー再生 -----
+  function playNext() {
+    if (stopped) return;
+    if (queueIndex >= queue.length) {
+      finish();
+      return;
+    }
+    const item = queue[queueIndex++];
+    updateProgress();
+    if (item.type === 'pause') {
+      setTimeout(playNext, item.ms);
+      return;
+    }
+    const r = parseFloat(rate.value);
+    const utter = new SpeechSynthesisUtterance(item.text);
+    utter.lang = 'ja-JP';
+    utter.rate = r;
+    utter.pitch = parseFloat(pitch.value);
+    utter.volume = parseFloat(volume.value);
+    const vIdx = voiceSelect.value;
+    if (vIdx !== '' && voices[vIdx]) utter.voice = voices[vIdx];
+
+    let advanced = false;
+    const advance = () => {
+      if (advanced) return;
+      advanced = true;
+      clearWatchdog();
+      if (stopped) return;
+      const ms = parseInt(pauseMs.value, 10);
+      setTimeout(playNext, ms);
+    };
+    utter.onend = advance;
+    utter.onerror = (e) => {
+      console.warn('speech error:', e.error || e);
+      advance();
+    };
+
+    startWatchdog(item.text.length, r);
+    synth.speak(utter);
+  }
+
+  function updateProgress() {
+    const speakCount = queue.filter(q => q.type === 'speak').length;
+    const doneCount = queue.slice(0, queueIndex).filter(q => q.type === 'speak').length;
+    progress.textContent = speakCount ? `読み上げ ${doneCount} / ${speakCount}` : '';
+  }
+
+  function speak() {
+    stop();
+    const text = document.getElementById('text').value.trim();
+    if (!text) return;
+
+    queue = buildQueue(text);
+    queueIndex = 0;
+    stopped = false;
+
+    if (!queue.some(q => q.type === 'speak')) {
+      status.textContent = '― 読み上げる文字がありません ―';
+      return;
+    }
+
+    status.textContent = '― 朗読中 ―';
+    playBtn.disabled = true;
+    pauseBtn.disabled = false;
+    stopBtn.disabled = false;
+
+    // 念のため一度キャンセルしてからスタート
+    synth.cancel();
+    setTimeout(playNext, 120);
+  }
+
+  function jumpTo(idx) {
+    synth.cancel();
+    clearWatchdog();
+    queueIndex = Math.max(0, idx);
+    stopped = false;
+    playBtn.disabled = true;
+    pauseBtn.disabled = false;
+    stopBtn.disabled = false;
+    pauseBtn.textContent = '‖ 一時停止';
+    status.textContent = '― 朗読中 ―';
+    setTimeout(playNext, 120);
+  }
+
+  function rewindOne() {
+    if (!queue.length) {
+      // まだ再生していない場合は先頭から
+      speak();
+      return;
+    }
+    // queueIndex は「次に読む位置」。今読んでいる項目は queueIndex - 1。
+    // その 1 つ前の speak 項目まで戻す。
+    let i = queueIndex - 2;
+    while (i >= 0 && queue[i].type !== 'speak') i--;
+    if (i < 0) i = 0;
+    jumpTo(i);
+  }
+
+  function restartFromStart() {
+    if (!queue.length) {
+      speak();
+      return;
+    }
+    jumpTo(0);
+  }
+
+  function togglePause() {
+    if (synth.paused) {
+      synth.resume();
+      pauseBtn.textContent = '‖ 一時停止';
+      status.textContent = '― 朗読中 ―';
+    } else {
+      synth.pause();
+      pauseBtn.textContent = '▶ 再開';
+      status.textContent = '― 一時停止中 ―';
+    }
+  }
+
+  function finish() {
+    clearWatchdog();
+    status.textContent = '― 朗読終了 ―';
+    progress.textContent = '';
+    playBtn.disabled = false;
+    pauseBtn.disabled = true;
+    stopBtn.disabled = true;
+    pauseBtn.textContent = '‖ 一時停止';
+  }
+
+  function stop() {
+    stopped = true;
+    queue = [];
+    queueIndex = 0;
+    clearWatchdog();
+    synth.cancel();
+    status.textContent = '― 停止 ―';
+    progress.textContent = '';
+    playBtn.disabled = false;
+    pauseBtn.disabled = true;
+    stopBtn.disabled = true;
+    pauseBtn.textContent = '‖ 一時停止';
+  }
+
+  window.addEventListener('beforeunload', () => synth.cancel());
+</script>
+</body>
+</html>

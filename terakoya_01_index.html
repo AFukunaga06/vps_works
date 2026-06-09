@@ -1,0 +1,2850 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>フクのオンライン寺子屋 - 受講者募集</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #1a1a1a;
+      --color-primary-dark: #000000;
+      --color-primary-light: #f4f1ec;
+      --color-accent: #c9a86a;
+      --color-bg: #f7f5f1;
+      --color-bg-card: #ffffff;
+      --color-text: #1a1a1a;
+      --color-text-light: #555555;
+      --color-text-muted: #909090;
+      --color-border: #e6e2db;
+      --color-error: #b03a3a;
+      --color-success: #4a7c59;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.06);
+      --shadow-lg: 0 16px 48px rgba(0,0,0,0.10);
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+      --font-main: "Inter", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      --font-serif: "Cormorant Garamond", "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.85;
+      margin: 0;
+      padding: 0;
+      letter-spacing: 0.02em;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ========== Header / Nav ========== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255,255,255,0);
+      z-index: 1000;
+      padding: 0 32px;
+      transition: background 0.4s var(--ease-out), border-color 0.4s, backdrop-filter 0.4s;
+      border-bottom: 1px solid transparent;
+    }
+
+    .header.is-scrolled {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom-color: var(--color-border);
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 76px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--color-text);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .header:not(.is-scrolled) .logo,
+    .header:not(.is-scrolled) .nav-link {
+      color: #fff;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+
+    .header:not(.is-scrolled) .logo-icon {
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(6px);
+      color: #fff;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .nav-link {
+      color: var(--color-text);
+      text-decoration: none;
+      padding: 10px 16px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      position: relative;
+      transition: opacity 0.2s, color 0.3s;
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 6px;
+      height: 1px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s var(--ease-out);
+    }
+
+    .nav-link:hover::after, .nav-link:focus::after {
+      transform: scaleX(1);
+    }
+
+    .nav-cta {
+      background: var(--color-primary);
+      color: #fff !important;
+      padding: 12px 24px;
+      margin-left: 12px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+    }
+
+    .nav-cta::after { display: none; }
+
+    .header:not(.is-scrolled) .nav-cta {
+      background: #fff;
+      color: var(--color-text) !important;
+    }
+
+    .nav-cta:hover, .nav-cta:focus {
+      background: var(--color-accent);
+      color: #fff !important;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--color-text);
+      margin: 6px 0;
+      transition: 0.3s;
+    }
+
+    .header:not(.is-scrolled) .mobile-menu-btn span {
+      background: #fff;
+    }
+
+    /* ========== Main Content ========== */
+    main {
+      margin-top: 0;
+    }
+
+    .section {
+      padding: 140px 32px;
+      position: relative;
+    }
+
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-eyebrow {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.36em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 4.5vw, 3.4rem);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      text-align: center;
+      margin: 0 0 20px;
+      line-height: 1.25;
+      color: var(--color-text);
+    }
+
+    .section-title::after {
+      display: none;
+    }
+
+    .section-lead {
+      text-align: center;
+      color: var(--color-text-light);
+      margin-bottom: 80px;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ========== Hero ========== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      padding: 120px 32px 80px;
+      text-align: center;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #1a1a1a;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .hero-bg::before {
+      content: "";
+      position: absolute;
+      inset: -10%;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(201,168,106,0.42) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 70%, rgba(70,90,120,0.55) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 110%, rgba(180,90,90,0.35) 0%, transparent 60%),
+        linear-gradient(135deg, #15171b 0%, #2a2f36 100%);
+      filter: blur(0px);
+      animation: heroBgDrift 22s ease-in-out infinite alternate;
+    }
+
+    .hero-bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 100%);
+    }
+
+    @keyframes heroBgDrift {
+      0%   { transform: scale(1) translate(0,0); }
+      50%  { transform: scale(1.08) translate(-2%, 1%); }
+      100% { transform: scale(1.03) translate(2%, -1%); }
+    }
+
+    .hero-grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.08;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: transparent;
+      color: rgba(255,255,255,0.85);
+      border: 1px solid rgba(255,255,255,0.45);
+      padding: 8px 22px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      margin-bottom: 36px;
+    }
+
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2.4rem, 6.4vw, 5.4rem);
+      font-weight: 400;
+      line-height: 1.18;
+      letter-spacing: 0.01em;
+      margin: 0 0 28px;
+      color: #fff;
+    }
+
+    .hero-title .hero-title-line {
+      display: block;
+      overflow: hidden;
+    }
+
+    .hero-title .char {
+      display: inline-block;
+      transform: translateY(110%);
+      opacity: 0;
+      transition: transform 1s var(--ease-out), opacity 1s var(--ease-out);
+    }
+
+    .hero-title.is-revealed .char {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .hero-subtitle {
+      color: rgba(255,255,255,0.82);
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      line-height: 2;
+      margin: 0 auto 44px;
+      max-width: 620px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s var(--ease-out) 1.2s, transform 1s var(--ease-out) 1.2s;
+    }
+
+    .hero-title.is-revealed ~ .hero-subtitle {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      background: #fff;
+      color: var(--color-text);
+      padding: 20px 40px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s var(--ease-out) 1.5s, transform 1s var(--ease-out) 1.5s, background 0.3s, color 0.3s;
+    }
+
+    .hero-title.is-revealed ~ .hero-cta {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hero-cta::after {
+      content: "→";
+      transition: transform 0.3s var(--ease-out);
+    }
+
+    .hero-cta:hover, .hero-cta:focus {
+      background: var(--color-accent);
+      color: #fff;
+    }
+
+    .hero-cta:hover::after, .hero-cta:focus::after {
+      transform: translateX(6px);
+    }
+
+    .hero-note {
+      margin-top: 22px;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.6);
+      opacity: 0;
+      transition: opacity 1s var(--ease-out) 1.8s;
+    }
+
+    .hero-title.is-revealed ~ .hero-note {
+      opacity: 1;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.7);
+      font-size: 0.68rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      z-index: 2;
+    }
+
+    .hero-scroll::after {
+      content: "";
+      display: block;
+      width: 1px;
+      height: 48px;
+      background: rgba(255,255,255,0.5);
+      margin: 12px auto 0;
+      animation: scrollLineDrop 2.2s ease-in-out infinite;
+      transform-origin: top;
+    }
+
+    @keyframes scrollLineDrop {
+      0%   { transform: scaleY(0); opacity: 0; }
+      40%  { transform: scaleY(1); opacity: 1; }
+      100% { transform: scaleY(1) translateY(48px); opacity: 0; }
+    }
+
+    /* ========== Cards ========== */
+    .card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-sm);
+      padding: 48px 40px;
+      box-shadow: none;
+      border: 1px solid var(--color-border);
+      transition: transform 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out), border-color 0.4s;
+    }
+
+    .card-grid {
+      display: grid;
+      gap: 28px;
+    }
+
+    .card-grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .card-grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .card-grid-3 .card,
+    .card-grid-2 .card {
+      cursor: default;
+    }
+
+    .card-grid-3 .card:hover,
+    .card-grid-2 .card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--color-accent);
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      background: transparent;
+      border: 1px solid var(--color-accent);
+      color: var(--color-accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 28px;
+      transition: background 0.4s, color 0.4s, transform 0.6s var(--ease-out);
+    }
+
+    .card:hover .card-icon {
+      background: var(--color-accent);
+      color: #fff;
+      transform: rotate(8deg) scale(1.05);
+    }
+
+    .card-title {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .card-text {
+      color: var(--color-text-light);
+      font-size: 0.92rem;
+      line-height: 1.95;
+      letter-spacing: 0.04em;
+    }
+
+    /* ========== Target Audience ========== */
+    .audience-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .audience-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .audience-item:last-child {
+      border-bottom: none;
+    }
+
+    .audience-icon {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .audience-icon.ok {
+      background: #e8f5e9;
+      color: #43a047;
+    }
+
+    .audience-icon.ng {
+      background: #fff3e0;
+      color: #ef6c00;
+    }
+
+    .audience-text {
+      font-size: 0.95rem;
+    }
+
+    .audience-note {
+      display: block;
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+
+    /* ========== Flow ========== */
+    .flow-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .flow-item {
+      display: flex;
+      gap: 20px;
+      position: relative;
+    }
+
+    .flow-step {
+      flex-shrink: 0;
+      width: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .flow-number {
+      width: 36px;
+      height: 36px;
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .flow-line {
+      flex: 1;
+      width: 2px;
+      background: var(--color-border);
+      margin-top: 8px;
+    }
+
+    .flow-item:last-child .flow-line {
+      display: none;
+    }
+
+    .flow-content {
+      flex: 1;
+      padding-bottom: 32px;
+    }
+
+    .flow-item:last-child .flow-content {
+      padding-bottom: 0;
+    }
+
+    .flow-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .flow-text {
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+    }
+
+    /* ========== Pricing ========== */
+    .pricing-card {
+      text-align: center;
+      padding: 40px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .pricing-label {
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+      margin-bottom: 8px;
+    }
+
+    .pricing-price {
+      font-family: var(--font-serif);
+      font-size: 4.2rem;
+      font-weight: 400;
+      color: var(--color-primary);
+      line-height: 1;
+      margin: 16px 0 8px;
+    }
+
+    .pricing-price span {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--color-text-light);
+    }
+
+    .pricing-duration {
+      font-size: 0.95rem;
+      color: var(--color-text-light);
+      margin-bottom: 24px;
+    }
+
+    .pricing-features {
+      text-align: left;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px;
+    }
+
+    .pricing-features li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .pricing-features li::before {
+      content: "✓";
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .pricing-note {
+      background: var(--color-primary-light);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      color: var(--color-text-light);
+      line-height: 1.7;
+    }
+
+    /* ========== Payment Buttons ========== */
+    .payment-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .payment-btn {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      grid-template-rows: auto auto;
+      gap: 2px 12px;
+      align-items: center;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      color: #fff;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      box-shadow: var(--shadow-sm);
+    }
+    .payment-btn:hover, .payment-btn:focus {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    .payment-btn .payment-icon {
+      grid-row: 1 / span 2;
+      font-size: 1.6rem;
+      text-align: center;
+    }
+    .payment-btn .payment-label {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .payment-btn .payment-sub {
+      font-size: 0.78rem;
+      opacity: 0.9;
+    }
+    .payment-btn-paypay  { background: #FF0033; }
+    .payment-btn-stripe  { background: #635BFF; }
+    .payment-btn-square  { background: #006AFF; }
+    .payment-btn[href*="REPLACE_WITH"] {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* ========== FAQ ========== */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .faq-item {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .faq-item[open] {
+      border-color: var(--color-accent);
+    }
+
+    .faq-item summary {
+      padding: 28px 32px;
+      cursor: pointer;
+      font-weight: 500;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 0.98rem;
+      letter-spacing: 0.04em;
+    }
+
+    .faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-item summary::after {
+      content: "+";
+      font-size: 1.2rem;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    .faq-item[open] summary::after {
+      content: "−";
+    }
+
+    .faq-item summary:hover {
+      background: var(--color-primary-light);
+    }
+
+    .faq-item summary:focus {
+      outline: 2px solid var(--color-primary);
+      outline-offset: -2px;
+    }
+
+    .faq-answer {
+      padding: 0 24px 20px;
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    /* ========== Reservation Section ========== */
+    .reservation-section {
+      background: var(--color-primary-light);
+    }
+    .reservation-section .section-title { color: var(--color-text); }
+    .calendar-wrapper, .form-wrapper {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .form-submit-btn {
+      border-radius: 0 !important;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .reservation-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ========== Calendar ========== */
+    .calendar-wrapper {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border);
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .calendar-nav-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: var(--color-text-muted);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .calendar-nav-btn:hover, .calendar-nav-btn:focus {
+      background: var(--color-primary);
+    }
+
+    .calendar-nav-btn:disabled {
+      background: var(--color-border);
+      cursor: not-allowed;
+    }
+
+    .calendar-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .calendar-weekday {
+      text-align: center;
+      padding: 10px 4px;
+      font-size: 0.85rem;
+      color: var(--color-text-light);
+      font-weight: 500;
+    }
+
+    .calendar-weekday:first-child {
+      color: #c44b4b;
+    }
+
+    .calendar-weekday:last-child {
+      color: #4a7c59;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.2s;
+      background: transparent;
+      border: none;
+      color: var(--color-text);
+    }
+
+    .calendar-day:hover:not(:disabled):not(.calendar-day-empty) {
+      background: var(--color-primary-light);
+    }
+
+    .calendar-day:focus:not(:disabled) {
+      outline: 2px solid var(--color-primary);
+      outline-offset: -2px;
+    }
+
+    .calendar-day-empty {
+      cursor: default;
+    }
+
+    .calendar-day-past {
+      color: var(--color-text-muted);
+      cursor: not-allowed;
+    }
+
+    .calendar-day-today {
+      background: var(--color-primary-light);
+      font-weight: 600;
+    }
+
+    .calendar-day-selected {
+      background: var(--color-primary) !important;
+      color: #fff !important;
+    }
+
+    .calendar-day-sunday {
+      color: #c44b4b;
+    }
+
+    .calendar-day-saturday {
+      color: #4a7c59;
+    }
+
+    .calendar-day-past.calendar-day-sunday,
+    .calendar-day-past.calendar-day-saturday {
+      opacity: 0.5;
+    }
+
+    /* ========== Reservation Form ========== */
+    .form-wrapper {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border);
+    }
+
+    .form-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .form-selected-date {
+      color: var(--color-primary);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .form-label .required {
+      color: var(--color-error);
+      font-size: 0.8rem;
+      margin-left: 4px;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: var(--color-bg-card);
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+    }
+
+    .form-input::placeholder,
+    .form-textarea::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .form-checkbox input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    .form-error {
+      color: var(--color-error);
+      font-size: 0.8rem;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .form-error.visible {
+      display: block;
+    }
+
+    .form-submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .form-submit-btn:hover:not(:disabled) {
+      background: var(--color-primary-dark);
+    }
+
+    .form-submit-btn:focus {
+      outline: 2px solid var(--color-primary-dark);
+      outline-offset: 2px;
+    }
+
+    .form-submit-btn:disabled {
+      background: var(--color-text-muted);
+      cursor: not-allowed;
+    }
+
+    .form-note {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+
+    /* ========== Terms ========== */
+    .terms-section {
+      background: var(--color-bg);
+    }
+
+    .terms-details {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .terms-details summary {
+      padding: 16px 20px;
+      cursor: pointer;
+      font-weight: 500;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .terms-details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .terms-details summary::before {
+      content: "▶";
+      font-size: 0.7rem;
+      color: var(--color-primary);
+      transition: transform 0.2s;
+    }
+
+    .terms-details[open] summary::before {
+      transform: rotate(90deg);
+    }
+
+    .terms-content {
+      padding: 0 20px 20px;
+      font-size: 0.85rem;
+      color: var(--color-text-light);
+      line-height: 1.8;
+    }
+
+    .terms-content h4 {
+      font-size: 0.9rem;
+      margin: 20px 0 10px;
+      color: var(--color-text);
+    }
+
+    .terms-content h4:first-child {
+      margin-top: 0;
+    }
+
+    .terms-content ul {
+      padding-left: 20px;
+      margin: 10px 0;
+    }
+
+    .terms-content li {
+      margin: 6px 0;
+    }
+
+    /* ========== Admin Panel ========== */
+    .admin-section {
+      background: #f5f5f5;
+      border-top: 2px dashed var(--color-border);
+    }
+
+    .admin-title {
+      font-size: 1rem;
+      color: var(--color-text-light);
+      margin-bottom: 20px;
+    }
+
+    .admin-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .admin-table th {
+      background: var(--color-primary-light);
+      font-weight: 500;
+      color: var(--color-text);
+    }
+
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .admin-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .admin-status.confirmed {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .admin-status.pending {
+      background: #fff3e0;
+      color: #ef6c00;
+    }
+
+    .admin-delete-btn {
+      padding: 6px 12px;
+      background: var(--color-error);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .admin-delete-btn:hover {
+      background: #a83232;
+    }
+
+    .admin-empty {
+      text-align: center;
+      padding: 40px;
+      color: var(--color-text-muted);
+    }
+
+    /* ========== Footer ========== */
+    .footer {
+      background: var(--color-primary);
+      color: rgba(255,255,255,0.7);
+      padding: 80px 32px 40px;
+      text-align: center;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+    }
+
+    .footer a {
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+    }
+    .footer a:hover {
+      color: var(--color-accent);
+    }
+
+    /* ========== Modal ========== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(20px);
+      transition: transform 0.3s;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 24px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--color-border);
+    }
+
+    .modal-body {
+      padding: 20px 24px;
+    }
+
+    .modal-message {
+      background: #f8f9fa;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      margin-bottom: 16px;
+    }
+
+    .modal-copy-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .modal-copy-btn:hover {
+      background: var(--color-primary-dark);
+    }
+
+    .modal-copy-btn.copied {
+      background: var(--color-success);
+    }
+
+    .modal-footer {
+      padding: 0 24px 24px;
+    }
+
+    .modal-footer-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--color-border);
+      color: var(--color-text);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .modal-footer-btn:hover {
+      background: #d0cdc8;
+    }
+
+    /* ========== Toast ========== */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--color-text);
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      z-index: 3000;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .toast.active {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      background: var(--color-success);
+    }
+
+    .toast.error {
+      background: var(--color-error);
+    }
+
+    /* ========== Scroll Animations ========== */
+    [data-anim] {
+      opacity: 0;
+      transition: opacity 1.2s var(--ease-out), transform 1.2s var(--ease-out);
+      will-change: opacity, transform;
+    }
+    [data-anim="fade-up"]    { transform: translateY(50px); }
+    [data-anim="fade-down"]  { transform: translateY(-50px); }
+    [data-anim="fade-left"]  { transform: translateX(50px); }
+    [data-anim="fade-right"] { transform: translateX(-50px); }
+    [data-anim="zoom-in"]    { transform: scale(0.92); }
+    [data-anim].is-visible {
+      opacity: 1;
+      transform: none;
+    }
+    [data-anim-delay="100"] { transition-delay: 0.1s; }
+    [data-anim-delay="200"] { transition-delay: 0.2s; }
+    [data-anim-delay="300"] { transition-delay: 0.3s; }
+    [data-anim-delay="400"] { transition-delay: 0.4s; }
+    [data-anim-delay="500"] { transition-delay: 0.5s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      [data-anim], .hero-title .char, .hero-subtitle, .hero-cta, .hero-note {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+      .hero-bg::before { animation: none; }
+    }
+
+    /* ========== Parallax / Sticky Showcase ========== */
+    .showcase {
+      position: relative;
+      padding: 0;
+    }
+    .showcase-track {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      align-items: stretch;
+    }
+    .showcase-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px;
+      background: var(--color-primary);
+      color: #fff;
+    }
+    .showcase-sticky-inner {
+      max-width: 460px;
+    }
+    .showcase-sticky-eyebrow {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.36em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 24px;
+    }
+    .showcase-sticky h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 3.6vw, 3rem);
+      font-weight: 400;
+      line-height: 1.3;
+      margin: 0 0 24px;
+    }
+    .showcase-sticky p {
+      color: rgba(255,255,255,0.78);
+      line-height: 2;
+      font-size: 0.94rem;
+      letter-spacing: 0.04em;
+    }
+    .showcase-scroll {
+      display: flex;
+      flex-direction: column;
+    }
+    .showcase-panel {
+      min-height: 100vh;
+      padding: 100px 80px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .showcase-panel:nth-child(1) { background: #ede7df; }
+    .showcase-panel:nth-child(2) { background: #d8d2c8; }
+    .showcase-panel:nth-child(3) { background: #c4bcae; }
+    .showcase-panel-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.55;
+      transition: transform 1.2s var(--ease-out);
+      will-change: transform;
+    }
+    .showcase-panel-inner {
+      position: relative;
+      max-width: 500px;
+    }
+    .showcase-panel-num {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 4rem;
+      color: var(--color-accent);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .showcase-panel h3 {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 500;
+      margin: 0 0 16px;
+      line-height: 1.4;
+    }
+    .showcase-panel p {
+      color: var(--color-text-light);
+      line-height: 2;
+      font-size: 0.94rem;
+    }
+
+    /* ========== Section variants ========== */
+    .section.section-dark {
+      background: var(--color-primary);
+      color: #fff;
+    }
+    .section.section-dark .section-title,
+    .section.section-dark .section-lead {
+      color: #fff;
+    }
+    .section.section-dark .section-lead {
+      color: rgba(255,255,255,0.7);
+    }
+    .section.section-parallax {
+      background-image:
+        linear-gradient(180deg, rgba(247,245,241,0.92), rgba(247,245,241,0.92)),
+        radial-gradient(circle at 20% 30%, rgba(201,168,106,0.12), transparent 60%),
+        radial-gradient(circle at 80% 70%, rgba(70,90,120,0.10), transparent 60%);
+      background-attachment: fixed, fixed, fixed;
+      background-size: cover, cover, cover;
+    }
+
+    /* ========== Examples thumb hover ========== */
+    .thumb-card {
+      display: block;
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-sm);
+      aspect-ratio: 4/3;
+      background: #1a1a1a;
+      text-decoration: none;
+      color: #fff;
+      max-width: 720px;
+      margin: 40px auto 0;
+    }
+    .thumb-card-img {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(201,168,106,0.55), transparent 55%),
+        radial-gradient(ellipse at 70% 80%, rgba(70,90,120,0.6), transparent 60%),
+        linear-gradient(135deg, #2a2f36 0%, #1a1d21 100%);
+      transition: transform 1.4s var(--ease-out);
+      transform: scale(1);
+    }
+    .thumb-card:hover .thumb-card-img {
+      transform: scale(1.08);
+    }
+    .thumb-card-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      gap: 14px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.45));
+    }
+    .thumb-card-overlay span:first-child {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      letter-spacing: 0.04em;
+    }
+    .thumb-card-overlay span:last-child {
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.8);
+      padding: 10px 22px;
+      transition: background 0.3s, color 0.3s;
+    }
+    .thumb-card:hover .thumb-card-overlay span:last-child {
+      background: #fff;
+      color: var(--color-text);
+    }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 900px) {
+      .reservation-container {
+        grid-template-columns: 1fr;
+      }
+      .showcase-track { grid-template-columns: 1fr; }
+      .showcase-sticky { position: relative; height: auto; padding: 80px 32px; }
+      .showcase-panel { padding: 80px 32px; min-height: auto; }
+    }
+
+    @media (max-width: 768px) {
+      .header { padding: 0 20px; }
+      .header-inner { height: 64px; }
+      .nav {
+        display: none;
+      }
+
+      .nav.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: var(--color-bg-card);
+        padding: 24px;
+        border-bottom: 1px solid var(--color-border);
+        box-shadow: var(--shadow-md);
+        gap: 8px;
+      }
+
+      .nav-link, .nav-cta {
+        width: 100%;
+        text-align: center;
+        margin-left: 0;
+      }
+
+      .nav-link {
+        color: var(--color-text) !important;
+        padding: 14px;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .hero {
+        padding: 100px 20px 100px;
+        min-height: 92vh;
+      }
+      .hero-scroll {
+        bottom: 16px;
+        font-size: 0.62rem;
+      }
+
+      .section {
+        padding: 80px 20px;
+      }
+
+      .section-lead {
+        margin-bottom: 48px;
+      }
+
+      .card {
+        padding: 32px 24px;
+      }
+
+      .card-title {
+        font-size: 1.25rem;
+      }
+
+      .pricing-price {
+        font-size: 3rem;
+      }
+
+      .flow-item {
+        gap: 16px;
+      }
+    }
+
+    /* ========== Focus visible ========== */
+    :focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    button:focus:not(:focus-visible),
+    a:focus:not(:focus-visible) {
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header" id="siteHeader">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <span class="logo-icon">F</span>
+        FUKU TERAKOYA
+      </a>
+      <nav class="nav" id="nav">
+        <a href="#features" class="nav-link">特徴</a>
+        <a href="#flow" class="nav-link">受講の流れ</a>
+        <a href="#pricing" class="nav-link">料金</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="/fuku_ai_terakoya_bosyuu_01.html" class="nav-link">講師募集</a>
+        <a href="#reservation" class="nav-link nav-cta">RESERVE</a>
+      </nav>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="メニューを開く">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-bg" data-parallax="0.3"></div>
+      <div class="hero-grain"></div>
+      <div class="hero-inner">
+        <span class="hero-badge">Online · Private · Tailored</span>
+        <h1 class="hero-title" id="heroTitle">
+          <span class="hero-title-line">1回50分、</span>
+          <span class="hero-title-line">Zoomで、</span>
+          <span class="hero-title-line">一緒に。</span>
+        </h1>
+        <p class="hero-subtitle">
+          「こんなことをやりたい」を一緒に進める、伴走型のオンラインPCサポート。<br>
+          教材を使わず、あなたの目標に合わせて、ひとつずつ丁寧に。
+        </p>
+        <a href="#reservation" class="hero-cta">START WITH ORIENTATION</a>
+        <p class="hero-note">※ まずは無料オリエンテーション（20〜30分）からスタート</p>
+      </div>
+      <a href="#audience" class="hero-scroll">SCROLL</a>
+    </section>
+
+    <!-- Target Audience -->
+    <section class="section" id="audience">
+      <div class="section-inner">
+        <span class="section-eyebrow" data-anim="fade-up">For Whom</span>
+        <h2 class="section-title" data-anim="fade-up" data-anim-delay="100">こんな方に向いています</h2>
+        <p class="section-lead" data-anim="fade-up" data-anim-delay="200">当サポートは「パソコン中級者」の方を対象としています</p>
+        <div class="card" data-anim="fade-up" data-anim-delay="300">
+          <ul class="audience-list">
+            <li class="audience-item">
+              <span class="audience-icon ok">◎</span>
+              <div>
+                <span class="audience-text">基本操作はできるけど、やりたいことがうまくいかない方</span>
+                <span class="audience-note">例：設定変更、ソフトの使い方、トラブル対応など</span>
+              </div>
+            </li>
+            <li class="audience-item">
+              <span class="audience-icon ok">◎</span>
+              <div>
+                <span class="audience-text">一人で調べても解決できず、誰かと一緒に進めたい方</span>
+                <span class="audience-note">検索はできるけど、情報が多すぎて迷ってしまう…という方にも</span>
+              </div>
+            </li>
+            <li class="audience-item">
+              <span class="audience-icon ok">◎</span>
+              <div>
+                <span class="audience-text">具体的にやりたいこと・達成したい目標がある方</span>
+                <span class="audience-note">「○○を作りたい」「○○ができるようになりたい」など</span>
+              </div>
+            </li>
+            <li class="audience-item">
+              <span class="audience-icon ng">△</span>
+              <div>
+                <span class="audience-text">パソコンに触ったことがない・電源の入れ方から知りたい方</span>
+                <span class="audience-note">完全初心者の方は対象外とさせていただいています。基本操作（文字入力・マウス操作・ファイル保存など）ができる方が対象です。</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features (sticky scrub showcase) -->
+    <section class="showcase" id="features">
+      <div class="showcase-track">
+        <div class="showcase-sticky">
+          <div class="showcase-sticky-inner">
+            <span class="showcase-sticky-eyebrow">Our Approach</span>
+            <h2>寺子屋の特徴</h2>
+            <p>
+              教えるより、「一緒に解決する」スタイル。<br>
+              あなたのペースで、あなたの目標を、ひとつずつ。<br>
+              小規模運営だからこそできる、丁寧なサポート。
+            </p>
+          </div>
+        </div>
+        <div class="showcase-scroll">
+          <div class="showcase-panel">
+            <div class="showcase-panel-bg" data-parallax="0.15"></div>
+            <div class="showcase-panel-inner">
+              <div class="showcase-panel-num">01</div>
+              <h3>目標型・伴走スタイル</h3>
+              <p>教材やカリキュラムは使いません。「こんなことをやりたい」という目標を立て、それに向かって一緒に進めます。一人で詰まっていた部分を、隣で一緒にほどいていきます。</p>
+            </div>
+          </div>
+          <div class="showcase-panel">
+            <div class="showcase-panel-bg" data-parallax="0.15"></div>
+            <div class="showcase-panel-inner">
+              <div class="showcase-panel-num">02</div>
+              <h3>完全オンライン</h3>
+              <p>ZoomとZoomの遠隔操作機能を使います。ご自宅から、移動なしで受講できます。場所にとらわれず、いつもの環境で安心して相談できます。</p>
+            </div>
+          </div>
+          <div class="showcase-panel">
+            <div class="showcase-panel-bg" data-parallax="0.15"></div>
+            <div class="showcase-panel-inner">
+              <div class="showcase-panel-num">03</div>
+              <h3>安心設計</h3>
+              <p>遠隔操作は事前許可制。金融情報や個人情報には一切触れません。小規模運営だからこそ、丁寧に対応します。「分からない」を、隠さなくていい場所です。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Examples -->
+    <section class="section section-parallax" id="examples">
+      <div class="section-inner" style="text-align:center;">
+        <span class="section-eyebrow" data-anim="fade-up">Gallery</span>
+        <h2 class="section-title" data-anim="fade-up" data-anim-delay="100">例えば、こんなものが作れます</h2>
+        <p class="section-lead" data-anim="fade-up" data-anim-delay="200">受講者が制作した作品集の一例です</p>
+        <a href="https://sakuhinnsyuu01.afuku5906.com/" target="_blank" rel="noopener" class="thumb-card" data-anim="zoom-in" data-anim-delay="300">
+          <div class="thumb-card-img"></div>
+          <div class="thumb-card-overlay">
+            <span>受講者の作品集</span>
+            <span>VIEW GALLERY →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Orientation -->
+    <section class="section" id="orientation">
+      <div class="section-inner">
+        <span class="section-eyebrow" data-anim="fade-up">Orientation</span>
+        <h2 class="section-title" data-anim="fade-up" data-anim-delay="100">オリエンテーションについて</h2>
+        <p class="section-lead" data-anim="fade-up" data-anim-delay="200">受講前に20〜30分のオリエンテーションを行います（無料）</p>
+        <div class="card" data-anim="fade-up" data-anim-delay="300">
+          <div class="card-grid card-grid-2">
+            <div>
+              <h3 class="card-title">オリエンテーションの目的</h3>
+              <p class="card-text">
+                ・システム（Zoom・遠隔操作）の説明<br>
+                ・目標の設定（いつまでに何をやりたいか）<br>
+                ・お互いの認識ズレを防ぐ<br><br>
+                「思っていたのと違った」を防ぐための大切な時間です。
+              </p>
+            </div>
+            <div>
+              <h3 class="card-title">当日の流れ</h3>
+              <p class="card-text">
+                1. Zoomに入室<br>
+                2. 簡単な自己紹介・サービス説明<br>
+                3. やりたいこと・目標のヒアリング<br>
+                4. 質問タイム<br><br>
+                <strong>※ 無理な勧誘は一切しません。</strong><br>
+                合わないと思ったらお断りいただいて大丈夫です。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Flow -->
+    <section class="section" id="flow" style="background: #efeae2;">
+      <div class="section-inner">
+        <span class="section-eyebrow" data-anim="fade-up">Process</span>
+        <h2 class="section-title" data-anim="fade-up" data-anim-delay="100">受講の流れ</h2>
+        <p class="section-lead" data-anim="fade-up" data-anim-delay="200">お申し込みから受講までのステップ</p>
+        <div class="card" data-anim="fade-up" data-anim-delay="300">
+          <div class="flow-list">
+            <div class="flow-item">
+              <div class="flow-step">
+                <span class="flow-number">1</span>
+                <span class="flow-line"></span>
+              </div>
+              <div class="flow-content">
+                <h3 class="flow-title">オリエンテーション申込み</h3>
+                <p class="flow-text">このページ下部のカレンダーから、ご希望の日時を選んでお申し込みください。</p>
+              </div>
+            </div>
+            <div class="flow-item">
+              <div class="flow-step">
+                <span class="flow-number">2</span>
+                <span class="flow-line"></span>
+              </div>
+              <div class="flow-content">
+                <h3 class="flow-title">オリエンテーション実施（20〜30分・無料）</h3>
+                <p class="flow-text">Zoomでシステム説明と目標設定を行います。ご不明点があればこの時間に解消できます。</p>
+              </div>
+            </div>
+            <div class="flow-item">
+              <div class="flow-step">
+                <span class="flow-number">3</span>
+                <span class="flow-line"></span>
+              </div>
+              <div class="flow-content">
+                <h3 class="flow-title">本講座の予約・お支払い</h3>
+                <p class="flow-text">オリエンテーション後、本講座をご希望の場合は日程を決めて前払いでお支払いいただきます。</p>
+              </div>
+            </div>
+            <div class="flow-item">
+              <div class="flow-step">
+                <span class="flow-number">4</span>
+                <span class="flow-line"></span>
+              </div>
+              <div class="flow-content">
+                <h3 class="flow-title">入金確認後、Zoom案内</h3>
+                <p class="flow-text">入金確認ができ次第、ZoomのURLをお送りします。</p>
+              </div>
+            </div>
+            <div class="flow-item">
+              <div class="flow-step">
+                <span class="flow-number">5</span>
+                <span class="flow-line"></span>
+              </div>
+              <div class="flow-content">
+                <h3 class="flow-title">本講座スタート（1回50分）</h3>
+                <p class="flow-text">目標に向かって一緒に進めていきます。できたところまででOK、続きは次回に持ち越しても大丈夫です。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="section section-dark" id="pricing">
+      <div class="section-inner">
+        <span class="section-eyebrow" data-anim="fade-up">Pricing</span>
+        <h2 class="section-title" data-anim="fade-up" data-anim-delay="100">料金プラン</h2>
+        <p class="section-lead" data-anim="fade-up" data-anim-delay="200">シンプルな料金体系です</p>
+        <div class="card pricing-card" data-anim="zoom-in" data-anim-delay="300">
+          <p class="pricing-label">マンツーマンサポート</p>
+          <p class="pricing-price">1,500<span>円（税込）</span></p>
+          <p class="pricing-duration">1回50分</p>
+          <ul class="pricing-features">
+            <li>完全前払い制（入金確認後にZoom案内）</li>
+            <li>質問対応・操作補助・設定サポート</li>
+            <li>トラブルの切り分けサポート</li>
+            <li>必要時のみ遠隔操作（事前許可制）</li>
+          </ul>
+          <div class="pricing-note">
+            <strong>50分の考え方</strong><br>
+            1回50分は、集中して相談しやすく、次回への整理もしやすい長さとして設定しています。できたところまででOK、続きは次回で無理なく進められます。原則50分で終了し、押し売りの延長はしません。
+          </div>
+        </div>
+        <div class="card" style="max-width: 500px; margin: 20px auto 0;">
+          <h3 class="card-title">お支払い方法</h3>
+          <p class="card-text" style="font-size: 0.9rem; margin-bottom: 16px;">
+            ご予約後、以下のいずれかの方法でお支払いください。入金確認後にZoomのご案内をお送りします。
+          </p>
+          <div class="payment-methods">
+            <a class="payment-btn payment-btn-paypay" href="#" target="_blank" rel="noopener">
+              <span class="payment-icon">💴</span>
+              <span class="payment-label">PayPay でお支払い</span>
+              <span class="payment-sub">スマホから即時送金</span>
+            </a>
+            <a class="payment-btn payment-btn-stripe" href="https://buy.stripe.com/REPLACE_WITH_PAYMENT_LINK" target="_blank" rel="noopener">
+              <span class="payment-icon">💳</span>
+              <span class="payment-label">クレジットカードでお支払い（Stripe）</span>
+              <span class="payment-sub">Visa / Master / JCB / Amex / Apple Pay / Google Pay</span>
+            </a>
+            <a class="payment-btn payment-btn-square" href="https://square.link/u/REPLACE_WITH_PAYMENT_LINK" target="_blank" rel="noopener">
+              <span class="payment-icon">🟦</span>
+              <span class="payment-label">クレジットカードでお支払い（Square）</span>
+              <span class="payment-sub">翌営業日入金 / Visa / Master / JCB / Amex / Apple Pay / Google Pay</span>
+            </a>
+          </div>
+          <p class="card-text" style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 16px;">
+            ※ 領収書が必要な場合はお問い合わせください。
+          </p>
+        </div>
+
+        <div class="card" style="max-width: 500px; margin: 20px auto 0;">
+          <h3 class="card-title">返金について</h3>
+          <p class="card-text" style="font-size: 0.9rem;">
+            講座終了後24時間以内にお申し出いただいた場合、内容を確認のうえ返金を検討いたします。<br>
+            ただし、通信環境のみに起因する問題は対象外となります。<br>
+            「必ず返金」ではなく、運営側で状況を確認したうえでの判断となりますことをご了承ください。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq" style="background: #efeae2;">
+      <div class="section-inner">
+        <span class="section-eyebrow" data-anim="fade-up">FAQ</span>
+        <h2 class="section-title" data-anim="fade-up" data-anim-delay="100">よくある質問</h2>
+        <p class="section-lead" data-anim="fade-up" data-anim-delay="200">ご不明点があればお気軽にどうぞ</p>
+        <div class="faq-list" data-anim="fade-up" data-anim-delay="300">
+          <details class="faq-item">
+            <summary>遠隔操作は安全ですか？</summary>
+            <div class="faq-answer">
+              遠隔操作は必ず事前に許可をいただいてから行います。操作範囲は相談内容に必要な部分のみに限定し、ネットバンキング・クレジットカード番号・パスワードなどの金融情報や個人情報には一切触れません。また、サポート品質向上のため、必要に応じて画面の記録を取らせていただく場合があります。
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>なぜ初心者は対象外なのですか？</summary>
+            <div class="faq-answer">
+              当サポートは「教材を使わず、目標に向かって一緒に進める」スタイルです。そのため、基本操作（文字入力・マウス操作・ファイル保存など）ができる方を対象としています。完全初心者の方には、まず基本操作を学べる教室やサービスをおすすめしています。
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>何を準備すればいいですか？</summary>
+            <div class="faq-answer">
+              ・パソコン（Windows/Mac）<br>
+              ・安定したインターネット環境<br>
+              ・Zoomアプリ（事前にインストールをお願いします）<br>
+              ・相談したい内容のメモ（あると進めやすいです）<br><br>
+              Zoomの使い方に不安がある方は、オリエンテーションで一緒に確認できます。
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>録画はされますか？</summary>
+            <div class="faq-answer">
+              サポート品質向上や確認のため、必要に応じて画面の記録を取らせていただく場合があります。記録は管理目的のみに使用し、第三者への提供は行いません。ご不安な場合は事前にお知らせください。
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>支払い方法は？</summary>
+            <div class="faq-answer">
+              完全前払い制です。オリエンテーション後、本講座をご希望の場合に支払い方法をご案内します。入金確認後にZoomのURLをお送りします。
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>キャンセルや返金はできますか？</summary>
+            <div class="faq-answer">
+              講座開始前のキャンセルは、日程変更または返金で対応いたします。講座終了後は、24時間以内にお申し出いただいた場合に限り、内容を確認のうえ返金を検討します。通信環境のみの問題は対象外です。
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>1回50分で足りますか？延長はありますか？</summary>
+            <div class="faq-answer">
+              50分で全て解決しなくても大丈夫です。できたところまでで終了し、続きは次回に持ち越せます。「もう少しやりたい」という場合は、次回の予約をご案内します。押し売りの延長はしませんのでご安心ください。
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reservation -->
+    <section class="section reservation-section" id="reservation">
+      <div class="section-inner">
+        <span class="section-eyebrow" data-anim="fade-up">Reserve</span>
+        <h2 class="section-title" data-anim="fade-up" data-anim-delay="100">予約する</h2>
+        <p class="section-lead" data-anim="fade-up" data-anim-delay="200">
+          まずはオリエンテーション（30分・無料）からお申し込みください。<br>
+          カレンダーから希望日を選んで、フォームに入力してください。
+        </p>
+        <div class="reservation-container" data-anim="fade-up" data-anim-delay="300">
+          <!-- Calendar -->
+          <div class="calendar-wrapper">
+            <div class="calendar-header">
+              <button class="calendar-nav-btn" id="prevMonth" aria-label="前月">‹</button>
+              <span class="calendar-title" id="calendarTitle"></span>
+              <button class="calendar-nav-btn" id="nextMonth" aria-label="次月">›</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+              <div class="calendar-weekday">日</div>
+              <div class="calendar-weekday">月</div>
+              <div class="calendar-weekday">火</div>
+              <div class="calendar-weekday">水</div>
+              <div class="calendar-weekday">木</div>
+              <div class="calendar-weekday">金</div>
+              <div class="calendar-weekday">土</div>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <div class="form-wrapper">
+            <h3 class="form-title">予約フォーム</h3>
+            <p class="form-selected-date" id="selectedDateDisplay">日付を選択してください</p>
+            <form id="reservationForm">
+              <div class="form-group">
+                <label class="form-label">
+                  種別<span class="required">必須</span>
+                </label>
+                <select class="form-select" id="reservationType" required>
+                  <option value="">選択してください</option>
+                  <option value="orientation">オリエンテーション（30分・無料）</option>
+                  <option value="session">本講座（50分・1,500円）</option>
+                </select>
+                <p class="form-error" id="typeError">種別を選択してください</p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  希望時間<span class="required">必須</span>
+                </label>
+                <select class="form-select" id="reservationTime" required disabled>
+                  <option value="">選択してください</option>
+                </select>
+                <p class="form-error" id="timeError">希望時間を選択してください</p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="userName">
+                  お名前<span class="required">必須</span>
+                </label>
+                <input type="text" class="form-input" id="userName" placeholder="山田 太郎" required>
+                <p class="form-error" id="nameError">お名前を入力してください</p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="userEmail">
+                  メールアドレス<span class="required">必須</span>
+                </label>
+                <input type="email" class="form-input" id="userEmail" placeholder="example@email.com" required>
+                <p class="form-error" id="emailError">正しいメールアドレスを入力してください</p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="userGoal">
+                  相談内容・ご質問（任意）
+                </label>
+                <textarea class="form-textarea" id="userGoal" placeholder="やりたいこと、困っていることなどがあればご記入ください"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-checkbox">
+                  <input type="checkbox" id="agreeRemote" required>
+                  <span>遠隔操作について理解し、必要時の遠隔操作に同意します<span class="required">必須</span></span>
+                </label>
+                <p class="form-error" id="remoteError">同意が必要です</p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-checkbox">
+                  <input type="checkbox" id="agreeTerms" required>
+                  <span><a href="#terms" style="color: var(--color-primary);">利用規約</a>を確認し、同意します<span class="required">必須</span></span>
+                </label>
+                <p class="form-error" id="termsError">利用規約への同意が必要です</p>
+              </div>
+
+              <button type="submit" class="form-submit-btn" id="submitBtn" disabled>予約を申し込む・送信</button>
+              <p class="form-note">
+                ※ 予約後、管理者が確認して確定します。<br>
+                確定後にメールでご連絡いたします。
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Terms -->
+    <section class="section terms-section" id="terms">
+      <div class="section-inner">
+        <span class="section-eyebrow" data-anim="fade-up">Terms</span>
+        <h2 class="section-title" data-anim="fade-up" data-anim-delay="100">利用規約</h2>
+        <details class="terms-details">
+          <summary>利用規約を確認する（クリックで展開）</summary>
+          <div class="terms-content">
+            <h4>1. サービス内容</h4>
+            <p>本サービス「フクのオンライン寺子屋」は、Zoomを使用したオンラインPCサポートです。個人運営のため、対応範囲には限りがあります。すべての問題の解決を保証するものではありません。</p>
+
+            <h4>2. 遠隔操作について</h4>
+            <ul>
+              <li>遠隔操作は、受講者の事前許可を得た場合のみ行います</li>
+              <li>操作範囲は相談内容に必要な範囲に限定します</li>
+              <li>ネットバンキング、クレジットカード番号、パスワード等の金融情報・個人情報には一切触れません</li>
+              <li>サポート品質向上のため、画面の記録を取る場合があります</li>
+            </ul>
+
+            <h4>3. 料金とお支払い</h4>
+            <ul>
+              <li>本講座は1回50分 1,500円（税込）の完全前払い制です</li>
+              <li>オリエンテーション（30分）は無料です</li>
+              <li>入金確認後にZoomのURLをお送りします</li>
+            </ul>
+
+            <h4>4. キャンセル・返金</h4>
+            <ul>
+              <li>講座開始前のキャンセルは、日程変更または返金で対応します</li>
+              <li>講座終了後の返金は、24時間以内のお申し出に限り、内容確認のうえ検討します</li>
+              <li>通信環境のみに起因する問題は返金対象外です</li>
+              <li>返金の可否は運営側の判断となります</li>
+            </ul>
+
+            <h4>5. 通信環境</h4>
+            <p>安定したインターネット環境は受講者様にてご準備ください。通信環境に起因する問題については、当方では責任を負いかねます。</p>
+
+            <h4>6. 免責事項</h4>
+            <p>本サービスは個人運営であり、すべての問題解決を保証するものではありません。サポート内容に関連して生じた損害について、故意または重大な過失がある場合を除き、責任を負いかねます。</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Admin Panel -->
+    <section class="section admin-section" id="admin">
+      <div class="section-inner">
+        <h2 class="admin-title">🔧 管理者パネル（デモ用）</h2>
+        <div class="admin-table-wrapper">
+          <table class="admin-table" id="adminTable">
+            <thead>
+              <tr>
+                <th>日時</th>
+                <th>種別</th>
+                <th>お名前</th>
+                <th>メール</th>
+                <th>ステータス</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody">
+            </tbody>
+          </table>
+          <div class="admin-empty" id="adminEmpty">予約はまだありません</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2026 フクのオンライン寺子屋</p>
+    <p style="margin-top: 8px;">
+      <a href="#terms">利用規約</a>
+      <span style="margin: 0 8px; opacity: .4;">|</span>
+      <a href="/fuku_ai_terakoya_bosyuu_01.html">講師募集</a>
+    </p>
+  </footer>
+
+  <!-- Success Modal -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal" role="dialog" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">✅ 予約を受け付けました</h3>
+        <button class="modal-close" id="modalClose" aria-label="閉じる">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 16px; font-size: 0.9rem; color: var(--color-text-light);">
+          以下の内容をコピーして保存してください。確定後、メールでご連絡いたします。
+        </p>
+        <div class="modal-message" id="modalMessage"></div>
+        <button class="modal-copy-btn" id="modalCopyBtn">📋 内容をコピー</button>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-footer-btn" id="modalCloseBtn">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ========== Visual / Scroll Animations ========== -->
+  <script>
+    (function() {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Header scroll state
+      const header = document.getElementById('siteHeader');
+      const onScroll = () => {
+        if (window.scrollY > 40) header.classList.add('is-scrolled');
+        else header.classList.remove('is-scrolled');
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      // Hero title: sequential char reveal
+      const heroTitle = document.getElementById('heroTitle');
+      if (heroTitle && !reduce) {
+        heroTitle.querySelectorAll('.hero-title-line').forEach(line => {
+          const text = line.textContent;
+          line.textContent = '';
+          [...text].forEach((ch, i) => {
+            const span = document.createElement('span');
+            span.className = 'char';
+            span.textContent = ch === ' ' ? ' ' : ch;
+            span.style.transitionDelay = (0.4 + i * 0.05) + 's';
+            line.appendChild(span);
+          });
+        });
+        requestAnimationFrame(() => {
+          setTimeout(() => heroTitle.classList.add('is-revealed'), 80);
+        });
+      } else if (heroTitle) {
+        heroTitle.classList.add('is-revealed');
+      }
+
+      // IntersectionObserver: fade-in / slide-in
+      const animEls = document.querySelectorAll('[data-anim]');
+      if ('IntersectionObserver' in window && !reduce) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+        animEls.forEach(el => io.observe(el));
+      } else {
+        animEls.forEach(el => el.classList.add('is-visible'));
+      }
+
+      // Parallax (light)
+      const parallaxEls = document.querySelectorAll('[data-parallax]');
+      let ticking = false;
+      const updateParallax = () => {
+        const y = window.scrollY;
+        parallaxEls.forEach(el => {
+          const speed = parseFloat(el.dataset.parallax) || 0.2;
+          const rect = el.getBoundingClientRect();
+          const inView = rect.bottom > 0 && rect.top < window.innerHeight;
+          if (inView) {
+            const offset = (rect.top - window.innerHeight / 2) * speed;
+            el.style.transform = `translate3d(0, ${offset.toFixed(1)}px, 0)`;
+          }
+        });
+        ticking = false;
+      };
+      if (!reduce) {
+        window.addEventListener('scroll', () => {
+          if (!ticking) {
+            requestAnimationFrame(updateParallax);
+            ticking = true;
+          }
+        }, { passive: true });
+        updateParallax();
+      }
+    })();
+  </script>
+
+  <script>
+    // ========== State ==========
+    const STORAGE_KEY = 'terakoya_reservations';
+    let currentYear, currentMonth;
+    let selectedDate = null;
+
+    // ========== Utils ==========
+    function getReservations() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+
+    function saveReservations(reservations) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(reservations));
+    }
+
+    function formatDate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}/${m}/${d}`;
+    }
+
+    function formatDateTime(dateStr, time) {
+      return `${dateStr} ${time}`;
+    }
+
+    function isSlotBooked(dateStr, time) {
+      const reservations = getReservations();
+      return reservations.some(r => r.date === dateStr && r.time === time);
+    }
+
+    function getAvailableSlots(date) {
+      const day = date.getDay();
+      // 平日: 10:00, 13:00, 15:00 / 土日: 10:00, 13:00
+      if (day === 0 || day === 6) {
+        return ['10:00', '13:00'];
+      }
+      return ['10:00', '13:00', '15:00'];
+    }
+
+    function showToast(message, type = '') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + type + ' active';
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 3000);
+    }
+
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // ========== Calendar ==========
+    function initCalendar() {
+      const today = new Date();
+      currentYear = today.getFullYear();
+      currentMonth = today.getMonth();
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      const title = document.getElementById('calendarTitle');
+
+      // Clear previous days (keep weekday headers)
+      const days = grid.querySelectorAll('.calendar-day');
+      days.forEach(d => d.remove());
+
+      // Set title
+      title.textContent = `${currentYear}年${currentMonth + 1}月`;
+
+      // Get first day and days in month
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Empty cells for days before first day
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('button');
+        empty.className = 'calendar-day calendar-day-empty';
+        empty.disabled = true;
+        grid.appendChild(empty);
+      }
+
+      // Days
+      for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(currentYear, currentMonth, d);
+        const dayOfWeek = date.getDay();
+        const btn = document.createElement('button');
+        btn.className = 'calendar-day';
+        btn.textContent = d + '日';
+        btn.setAttribute('data-date', formatDate(date));
+
+        // Style based on day of week
+        if (dayOfWeek === 0) btn.classList.add('calendar-day-sunday');
+        if (dayOfWeek === 6) btn.classList.add('calendar-day-saturday');
+
+        // Past dates
+        if (date < today) {
+          btn.classList.add('calendar-day-past');
+          btn.disabled = true;
+        }
+
+        // Today
+        if (date.getTime() === today.getTime()) {
+          btn.classList.add('calendar-day-today');
+        }
+
+        // Selected
+        if (selectedDate && formatDate(date) === selectedDate) {
+          btn.classList.add('calendar-day-selected');
+        }
+
+        // Click handler
+        if (!btn.disabled) {
+          btn.addEventListener('click', () => selectDate(date));
+        }
+
+        grid.appendChild(btn);
+      }
+
+      // Update nav buttons
+      const prevBtn = document.getElementById('prevMonth');
+      const todayMonth = new Date();
+      if (currentYear === todayMonth.getFullYear() && currentMonth === todayMonth.getMonth()) {
+        prevBtn.disabled = true;
+      } else {
+        prevBtn.disabled = false;
+      }
+    }
+
+    function selectDate(date) {
+      selectedDate = formatDate(date);
+
+      // Update UI
+      document.querySelectorAll('.calendar-day').forEach(btn => {
+        btn.classList.remove('calendar-day-selected');
+        if (btn.getAttribute('data-date') === selectedDate) {
+          btn.classList.add('calendar-day-selected');
+        }
+      });
+
+      // Update display
+      const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+      document.getElementById('selectedDateDisplay').textContent =
+        `${selectedDate}（${dayNames[date.getDay()]}）`;
+
+      // Enable time select
+      updateTimeSlots(date);
+      updateSubmitButton();
+    }
+
+    function updateTimeSlots(date) {
+      const timeSelect = document.getElementById('reservationTime');
+      const dateStr = formatDate(date);
+      const slots = getAvailableSlots(date);
+      const type = document.getElementById('reservationType').value;
+      const duration = type === 'session' ? 50 : 30; // 本講座50分、オリエンテーション30分
+
+      timeSelect.innerHTML = '<option value="">選択してください</option>';
+
+      slots.forEach(slot => {
+        const option = document.createElement('option');
+        option.value = slot;
+
+        // 終了時間を計算
+        const [h, m] = slot.split(':').map(Number);
+        const endMinutes = h * 60 + m + duration;
+        const endH = Math.floor(endMinutes / 60);
+        const endM = endMinutes % 60;
+        const endTime = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+
+        if (isSlotBooked(dateStr, slot)) {
+          option.textContent = `${slot}〜${endTime}（予約済み）`;
+          option.disabled = true;
+        } else {
+          option.textContent = `${slot}〜${endTime}`;
+        }
+
+        timeSelect.appendChild(option);
+      });
+
+      timeSelect.disabled = false;
+    }
+
+    // ========== Form ==========
+    function updateSubmitButton() {
+      const form = document.getElementById('reservationForm');
+      const type = document.getElementById('reservationType').value;
+      const time = document.getElementById('reservationTime').value;
+      const name = document.getElementById('userName').value.trim();
+      const email = document.getElementById('userEmail').value.trim();
+      const agreeRemote = document.getElementById('agreeRemote').checked;
+      const agreeTerms = document.getElementById('agreeTerms').checked;
+      const submitBtn = document.getElementById('submitBtn');
+
+      const isValid = selectedDate && type && time && name && validateEmail(email) && agreeRemote && agreeTerms;
+      submitBtn.disabled = !isValid;
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.form-error').forEach(el => el.classList.remove('visible'));
+    }
+
+    function showError(id) {
+      document.getElementById(id).classList.add('visible');
+    }
+
+    function validateForm() {
+      clearErrors();
+      let valid = true;
+
+      if (!document.getElementById('reservationType').value) {
+        showError('typeError');
+        valid = false;
+      }
+      if (!document.getElementById('reservationTime').value) {
+        showError('timeError');
+        valid = false;
+      }
+      if (!document.getElementById('userName').value.trim()) {
+        showError('nameError');
+        valid = false;
+      }
+      if (!validateEmail(document.getElementById('userEmail').value)) {
+        showError('emailError');
+        valid = false;
+      }
+      if (!document.getElementById('agreeRemote').checked) {
+        showError('remoteError');
+        valid = false;
+      }
+      if (!document.getElementById('agreeTerms').checked) {
+        showError('termsError');
+        valid = false;
+      }
+
+      return valid;
+    }
+
+    const RESERVE_API = '/fuku_ai_terakoya/api/reserve.php';
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+
+      if (!validateForm()) {
+        showToast('入力内容をご確認ください', 'error');
+        return;
+      }
+
+      const type = document.getElementById('reservationType').value;
+      const time = document.getElementById('reservationTime').value;
+      const name = document.getElementById('userName').value.trim();
+      const email = document.getElementById('userEmail').value.trim();
+      const goal = document.getElementById('userGoal').value.trim();
+
+      // Check double booking (local cache check only)
+      if (isSlotBooked(selectedDate, time)) {
+        showToast('この時間帯は既に予約済みです', 'error');
+        updateTimeSlots(new Date(selectedDate.replace(/\//g, '-')));
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitBtn');
+      const originalLabel = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = '送信中...';
+
+      // Send to backend (DB save + email)
+      try {
+        const apiDate = selectedDate.replace(/\//g, '-'); // YYYY-MM-DD
+        const res = await fetch(RESERVE_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ date: apiDate, time, type, name, email, goal })
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.ok) {
+          throw new Error(json.error || ('HTTP ' + res.status));
+        }
+        const mailNote = (json.mail && json.mail.user)
+          ? '確認メールをお送りしました'
+          : '（確認メール送信に失敗しましたが、予約は受け付けました）';
+        showToast('予約を送信しました。' + mailNote, 'success');
+      } catch (err) {
+        submitBtn.textContent = originalLabel;
+        submitBtn.disabled = false;
+        showToast('送信エラー: ' + (err.message || err), 'error');
+        return;
+      }
+
+      // Save reservation (local cache for in-page admin demo)
+      const reservation = {
+        id: Date.now(),
+        date: selectedDate,
+        time: time,
+        type: type,
+        name: name,
+        email: email,
+        goal: goal,
+        status: 'confirmed',
+        createdAt: new Date().toISOString()
+      };
+
+      const reservations = getReservations();
+      reservations.push(reservation);
+      saveReservations(reservations);
+
+      // Show success modal
+      showSuccessModal(reservation);
+
+      // Reset form
+      document.getElementById('reservationForm').reset();
+      selectedDate = null;
+      document.getElementById('selectedDateDisplay').textContent = '日付を選択してください';
+      document.getElementById('reservationTime').innerHTML = '<option value="">選択してください</option>';
+      document.getElementById('reservationTime').disabled = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = originalLabel;
+      renderCalendar();
+      renderAdminTable();
+    }
+
+    function showSuccessModal(reservation) {
+      // 終了時間を計算
+      const duration = reservation.type === 'orientation' ? 30 : 50;
+      const [startH, startM] = reservation.time.split(':').map(Number);
+      const endMinutes = startH * 60 + startM + duration;
+      const endH = Math.floor(endMinutes / 60);
+      const endM = endMinutes % 60;
+      const endTime = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+
+      const typeLabel = reservation.type === 'orientation'
+        ? 'オリエンテーション'
+        : '本講座';
+
+      const typeName = reservation.type === 'orientation'
+        ? 'オリエンテーション（30分・無料）'
+        : '本講座（50分・1,500円）';
+
+      const message = `${typeLabel}（${reservation.time}〜${endTime}）で予約を受け付けました。
+
+【予約内容】
+━━━━━━━━━━━━━━━━━━━━
+■ 種別：${typeName}
+■ 日時：${reservation.date} ${reservation.time}〜${endTime}
+■ お名前：${reservation.name}
+━━━━━━━━━━━━━━━━━━━━
+
+【当日のご案内】
+・開始時刻の5分前にZoomにご入室ください
+・画面共有をお願いする場合があります
+・必要に応じて遠隔操作を行う場合があります
+
+【お支払いについて】
+${reservation.type === 'session'
+  ? '・本講座は前払い制です（1回50分 1,500円）\n・入金確認後にZoomのURLをお送りします'
+  : '・オリエンテーションは無料です\n・確定後にZoomのURLをお送りします'
+}
+
+【変更・キャンセル】
+日程変更・キャンセルは、お申込み時の返信先へご連絡ください。
+
+━━━━━━━━━━━━━━━━━━━━
+フクのオンライン寺子屋`;
+
+      document.getElementById('modalMessage').textContent = message;
+      document.getElementById('successModal').classList.add('active');
+    }
+
+    function copyToClipboard() {
+      const message = document.getElementById('modalMessage').textContent;
+      navigator.clipboard.writeText(message).then(() => {
+        const btn = document.getElementById('modalCopyBtn');
+        btn.textContent = '✓ コピーしました';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = '📋 内容をコピー';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(() => {
+        showToast('コピーに失敗しました', 'error');
+      });
+    }
+
+    function closeModal() {
+      document.getElementById('successModal').classList.remove('active');
+    }
+
+    // ========== Admin Panel ==========
+    function renderAdminTable() {
+      const tbody = document.getElementById('adminTableBody');
+      const emptyMsg = document.getElementById('adminEmpty');
+      const reservations = getReservations();
+
+      tbody.innerHTML = '';
+
+      if (reservations.length === 0) {
+        emptyMsg.style.display = 'block';
+        return;
+      }
+
+      emptyMsg.style.display = 'none';
+
+      // Sort by date
+      reservations.sort((a, b) => {
+        const dateA = new Date(a.date.replace(/\//g, '-') + 'T' + a.time);
+        const dateB = new Date(b.date.replace(/\//g, '-') + 'T' + b.time);
+        return dateA - dateB;
+      });
+
+      reservations.forEach(r => {
+        const tr = document.createElement('tr');
+        const typeName = r.type === 'orientation' ? 'オリエン' : '本講座';
+        const statusClass = r.status === 'confirmed' ? 'confirmed' : 'pending';
+        const statusText = r.status === 'confirmed' ? '確定' : '保留';
+
+        tr.innerHTML = `
+          <td>${r.date} ${r.time}</td>
+          <td>${typeName}</td>
+          <td>${escapeHtml(r.name)}</td>
+          <td>${escapeHtml(r.email)}</td>
+          <td><span class="admin-status ${statusClass}">${statusText}</span></td>
+          <td><button class="admin-delete-btn" onclick="deleteReservation(${r.id})">削除</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteReservation(id) {
+      if (!confirm('この予約を削除してもよろしいですか？')) return;
+
+      let reservations = getReservations();
+      reservations = reservations.filter(r => r.id !== id);
+      saveReservations(reservations);
+      renderAdminTable();
+      renderCalendar();
+      showToast('予約を削除しました');
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ========== Mobile Menu ==========
+    function toggleMobileMenu() {
+      document.getElementById('nav').classList.toggle('active');
+    }
+
+    // ========== Navigation ==========
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('nav').classList.remove('active');
+      });
+    });
+
+    // ========== Event Listeners ==========
+    document.getElementById('prevMonth').addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById('reservationForm').addEventListener('submit', handleSubmit);
+    document.getElementById('reservationType').addEventListener('change', () => {
+      updateSubmitButton();
+      // 日付が選択されていれば時間表示を更新
+      if (selectedDate) {
+        updateTimeSlots(new Date(selectedDate.replace(/\//g, '-')));
+      }
+    });
+    document.getElementById('reservationTime').addEventListener('change', updateSubmitButton);
+    document.getElementById('userName').addEventListener('input', updateSubmitButton);
+    document.getElementById('userEmail').addEventListener('input', updateSubmitButton);
+    document.getElementById('agreeRemote').addEventListener('change', updateSubmitButton);
+    document.getElementById('agreeTerms').addEventListener('change', updateSubmitButton);
+
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+    document.getElementById('modalCopyBtn').addEventListener('click', copyToClipboard);
+    document.getElementById('successModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeModal();
+    });
+
+    document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+
+    // ========== Init ==========
+    initCalendar();
+    renderAdminTable();
+  </script>
+</body>
+</html>

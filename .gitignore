@@ -1,0 +1,30 @@
+# 秘密情報を含む設定ファイルは公開しない
+config.php
+wp-config.php
+.env
+*.pem
+*.key
+
+# Google認証・トークン・各種クレデンシャル
+credentials.json
+token.json
+client_secret*.json
+*oauth*.json
+service*account*.json
+*.credentials
+
+# 依存・生成物
+node_modules/
+vendor/
+venv/
+.venv/
+__pycache__/
+
+# バックアップ・一時ファイル
+*.bak
+*.bak[0-9]
+*.bak_*
+*~
+*.orig
+*.old
+*.log

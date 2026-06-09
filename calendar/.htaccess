@@ -1,0 +1,5 @@
+# config.php と token.json を直接アクセス禁止
+<FilesMatch "^(config\.php|token\.json|gcal_helper\.php)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

@@ -1,0 +1,257 @@
+/* =====================================================================
+   顧客予約システム — lawyer_crm 同居版
+   配色: ネイビー #1a3a5c / ゴールド #c8a94a (lawyer_crm と整合)
+   ===================================================================== */
+
+:root {
+    --navy: #1a3a5c;
+    --navy-dark: #122a44;
+    --gold: #c8a94a;
+    --gold-dark: #a88c2f;
+    --bg: #f5f7fa;
+    --line: #d8dde3;
+    --muted: #6b7280;
+    --red: #c0392b;
+    --green: #1e8449;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+    background: var(--bg);
+    color: #222;
+    line-height: 1.6;
+}
+
+a { color: var(--navy); }
+a:hover { color: var(--gold-dark); }
+
+/* ===== 公開ページ ===== */
+.public-header {
+    background: var(--navy);
+    color: #fff;
+    padding: 1.5rem 1rem;
+    text-align: center;
+}
+.public-header h1 { margin: 0; font-size: 1.4rem; }
+.public-header .subtitle { margin: 0.25rem 0 0; color: var(--gold); }
+
+.public-main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+.public-footer {
+    text-align: center;
+    padding: 1rem;
+    color: var(--muted);
+}
+
+.notice {
+    background: #fff8e7;
+    border-left: 4px solid var(--gold);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* ===== カレンダー ===== */
+.cal-section { background: #fff; padding: 1rem; border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+.cal-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 0.75rem;
+}
+.cal-nav strong { font-size: 1.1rem; }
+
+.calendar { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.calendar th, .calendar td {
+    border: 1px solid var(--line);
+    text-align: center;
+    vertical-align: top;
+    padding: 0;
+    height: 64px;
+    width: 14.28%;
+}
+.calendar th { background: var(--navy); color: #fff; height: 36px; font-weight: normal; }
+.calendar th.dow-0 { background: #a94442; }
+.calendar th.dow-6 { background: #2e5a8a; }
+
+.calendar td a, .calendar td > .num {
+    display: block; width: 100%; height: 100%;
+    padding: 6px; text-decoration: none; color: inherit;
+}
+.calendar td a:hover { background: #eef2f7; }
+.calendar td .num { display: block; font-weight: bold; }
+.calendar td .state { display: block; font-size: 0.85rem; margin-top: 0.1rem; }
+
+.calendar td.empty { background: #f9f9f9; }
+.calendar td.cell-past, .calendar td.cell-out_of_range, .calendar td.cell-closed {
+    background: #f3f3f3; color: #aaa;
+}
+.calendar td.cell-available { background: #fff; }
+.calendar td.cell-available .state { color: var(--green); font-weight: bold; }
+.calendar td.cell-full { background: #fff; }
+.calendar td.cell-full .state { color: var(--red); }
+.calendar td.today { outline: 2px solid var(--gold); outline-offset: -2px; }
+.calendar td.selected { background: #fff4cc; }
+
+.legend { margin-top: 0.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap;
+    font-size: 0.85rem; color: var(--muted); }
+
+/* ===== スロット ===== */
+.slots-section { margin-top: 1.5rem; background: #fff; padding: 1rem;
+    border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.slots-section h2 { margin-top: 0; font-size: 1.1rem; color: var(--navy); }
+
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.5rem;
+}
+.slot {
+    display: block; text-align: center;
+    padding: 0.6rem 0.3rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: #fff;
+    text-decoration: none;
+    color: inherit;
+}
+.slot.free { border-color: var(--gold); background: #fff8e7; }
+.slot.free:hover { background: var(--gold); color: #fff; }
+.slot.booked { background: #f3f3f3; color: #aaa; cursor: not-allowed; }
+
+/* ===== 選択枠 ===== */
+.selected-slot {
+    padding: 0.75rem 1rem; background: var(--navy); color: #fff;
+    border-radius: 4px; margin-bottom: 1rem;
+}
+
+/* ===== フォーム ===== */
+.form-vert { display: flex; flex-direction: column; gap: 0.85rem; }
+.form-vert label { display: flex; flex-direction: column; font-size: 0.9rem;
+    color: #555; }
+.form-vert label.inline {
+    flex-direction: row; align-items: center; gap: 0.3rem; margin-right: 0.5rem;
+}
+.form-vert input[type="text"],
+.form-vert input[type="email"],
+.form-vert input[type="tel"],
+.form-vert input[type="time"],
+.form-vert input[type="date"],
+.form-vert input[type="number"],
+.form-vert input[type="password"],
+.form-vert select,
+.form-vert textarea {
+    font-size: 1rem; padding: 0.4rem 0.5rem; border: 1px solid var(--line);
+    border-radius: 4px; background: #fff;
+}
+.form-vert fieldset { border: 1px solid var(--line); border-radius: 4px;
+    padding: 0.5rem 0.75rem; }
+.form-vert .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.required { color: var(--red); font-size: 0.75rem; margin-left: 0.25rem; }
+
+.btn-primary {
+    background: var(--navy); color: #fff; border: none; padding: 0.55rem 1.1rem;
+    border-radius: 4px; font-size: 1rem; cursor: pointer;
+}
+.btn-primary:hover { background: var(--navy-dark); }
+.btn-large { padding: 0.8rem 1.4rem; font-size: 1.05rem; }
+.btn-mini {
+    background: #fff; color: var(--navy); border: 1px solid var(--navy);
+    padding: 0.25rem 0.6rem; border-radius: 3px; font-size: 0.85rem; cursor: pointer;
+    text-decoration: none;
+}
+.btn-mini:hover { background: var(--navy); color: #fff; }
+.btn-link { color: var(--gold); margin-left: 1rem; }
+.btn-danger { color: var(--red); border-color: var(--red); }
+.btn-danger:hover { background: var(--red); color: #fff; }
+
+/* ===== メッセージ ===== */
+.ok  { background: #d4edda; color: var(--green); padding: 0.6rem 1rem; border-radius: 4px; }
+.err { background: #f8d7da; color: var(--red);   padding: 0.6rem 1rem; border-radius: 4px; }
+.ok-box, .err-box { padding: 1rem 1.25rem; border-radius: 6px; background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.ok-box h2  { margin-top: 0; color: var(--green); }
+.err-box h2 { margin-top: 0; color: var(--red); }
+.muted { color: var(--muted); font-size: 0.9rem; }
+
+/* ===== 管理画面 ===== */
+.admin-body { background: var(--bg); }
+.admin-header {
+    background: var(--navy); color: #fff; padding: 0.75rem 1rem;
+    display: flex; align-items: center; flex-wrap: wrap; gap: 1rem;
+}
+.admin-brand { font-weight: bold; }
+.admin-brand .muted { color: var(--gold); }
+.admin-nav { flex: 1; }
+.admin-nav a {
+    color: #fff; margin-right: 0.75rem; text-decoration: none;
+    padding: 0.25rem 0.5rem; border-radius: 3px;
+}
+.admin-nav a.on { background: var(--gold); color: var(--navy); }
+.admin-nav a:hover { background: rgba(255,255,255,0.1); }
+.admin-user { color: #fff; font-size: 0.9rem; }
+
+.admin-main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
+.admin-main h2 { color: var(--navy); border-bottom: 2px solid var(--gold); padding-bottom: 0.3rem; }
+.admin-footer { text-align: center; padding: 1rem; color: var(--muted); }
+
+/* ===== グリッド表 ===== */
+.grid { width: 100%; border-collapse: collapse; background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.grid th, .grid td { border: 1px solid var(--line); padding: 0.4rem 0.6rem;
+    vertical-align: top; font-size: 0.92rem; }
+.grid th { background: var(--navy); color: #fff; text-align: left; }
+.grid tr:nth-child(even) td { background: #fafbfc; }
+
+/* ===== ステータスバッジ ===== */
+.status { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 3px;
+    font-size: 0.8rem; color: #fff; }
+.status-pending   { background: #b8860b; }
+.status-confirmed { background: var(--green); }
+.status-canceled  { background: #888; }
+.status-noshow    { background: var(--red); }
+
+.actions form { margin: 0; }
+.inline { display: inline-flex; align-items: center; gap: 0.3rem; }
+
+/* ===== フィルタ ===== */
+.filter { display: flex; gap: 0.5rem; align-items: end; flex-wrap: wrap;
+    margin-bottom: 1rem; }
+.filter label { display: flex; flex-direction: column; font-size: 0.85rem; color: #555; }
+
+/* ===== ログイン画面 ===== */
+.login-box {
+    max-width: 380px; margin: 8vh auto; background: #fff;
+    padding: 2rem; border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.login-box h1 { color: var(--navy); margin-top: 0; text-align: center; }
+.login-box h1 small { display: block; font-size: 0.85rem; color: var(--gold); font-weight: normal; }
+.login-box label { display: flex; flex-direction: column; margin-bottom: 0.85rem; font-size: 0.9rem; color: #555; }
+.login-box input {
+    font-size: 1rem; padding: 0.5rem; border: 1px solid var(--line); border-radius: 4px;
+}
+.login-box .btn-primary { width: 100%; padding: 0.6rem; }
+.login-box .note { color: var(--muted); font-size: 0.8rem; margin-top: 1rem; }
+.login-box code { background: #f3f3f3; padding: 0 0.25rem; border-radius: 2px; }
+
+/* ===== サマリ ===== */
+.summary { margin: 1rem 0; border-collapse: collapse; }
+.summary th, .summary td { padding: 0.4rem 0.8rem; border: 1px solid var(--line); }
+.summary th { background: #f3f3f3; text-align: left; width: 7rem; }
+
+/* ===== モバイル ===== */
+@media (max-width: 640px) {
+    .form-vert .row2 { grid-template-columns: 1fr; }
+    .calendar td, .calendar th { font-size: 0.85rem; }
+    .calendar td { height: 56px; }
+    .admin-header { flex-direction: column; align-items: stretch; }
+    .admin-user { text-align: right; }
+    .filter { flex-direction: column; align-items: stretch; }
+}

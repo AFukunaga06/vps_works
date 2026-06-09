@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ナレーション読み上げ</title>
+<style>
+  body {
+    font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #eaeaea;
+    margin: 0;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 36px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+  h1 {
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 16px;
+    margin-top: 0;
+    color: #f5d76e;
+  }
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.3);
+    color: #eaeaea;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 14px;
+    font-size: 15px;
+    line-height: 1.8;
+    font-family: inherit;
+    resize: vertical;
+  }
+  textarea:focus {
+    outline: none;
+    border-color: #f5d76e;
+  }
+  .controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+  }
+  button {
+    background: #f5d76e;
+    color: #1a1a2e;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  button:hover { opacity: 0.85; }
+  button:active { transform: translateY(1px); }
+  button:disabled {
+    background: #555;
+    color: #999;
+    cursor: not-allowed;
+  }
+  button.secondary {
+    background: transparent;
+    color: #f5d76e;
+    border: 1px solid #f5d76e;
+  }
+  .settings {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .setting {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  label {
+    font-size: 13px;
+    color: #b8b8b8;
+    letter-spacing: 0.05em;
+  }
+  select, input[type=range] {
+    background: rgba(0, 0, 0, 0.3);
+    color: #eaeaea;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 6px;
+    font-family: inherit;
+  }
+  .value {
+    font-size: 12px;
+    color: #f5d76e;
+    text-align: right;
+  }
+  .status {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #b8b8b8;
+    font-style: italic;
+    min-height: 20px;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>― ナレーション ―</h1>
+
+    <textarea id="text" rows="8">これは、静かな朝のことでした。
+
+窓の外では、小鳥たちがやさしく歌い、柔らかな光が部屋を満たしていきます。
+彼は深く息を吸い、ゆっくりと一日を始めるのでした。
+
+― フクのAI寺子屋へ、ようこそ。</textarea>
+
+    <div class="controls">
+      <button id="playBtn" onclick="speak()">▶ 朗読開始</button>
+      <button id="pauseBtn" class="secondary" onclick="togglePause()" disabled>‖ 一時停止</button>
+      <button id="stopBtn" class="secondary" onclick="stop()" disabled>■ 停止</button>
+    </div>
+
+    <div class="settings">
+      <div class="setting">
+        <label for="voice">声</label>
+        <select id="voice"></select>
+      </div>
+      <div class="setting">
+        <label for="rate">速度 <span class="value" id="rateVal">0.9</span></label>
+        <input type="range" id="rate" min="0.5" max="1.5" step="0.05" value="0.9">
+      </div>
+      <div class="setting">
+        <label for="pitch">声の高さ <span class="value" id="pitchVal">0.9</span></label>
+        <input type="range" id="pitch" min="0.5" max="1.5" step="0.05" value="0.9">
+      </div>
+      <div class="setting">
+        <label for="volume">音量 <span class="value" id="volumeVal">1.0</span></label>
+        <input type="range" id="volume" min="0" max="1" step="0.05" value="1.0">
+      </div>
+    </div>
+
+    <div class="status" id="status">― 準備完了 ―</div>
+  </div>
+
+<script>
+  const synth = window.speechSynthesis;
+  const voiceSelect = document.getElementById('voice');
+  const rate = document.getElementById('rate');
+  const pitch = document.getElementById('pitch');
+  const volume = document.getElementById('volume');
+  const playBtn = document.getElementById('playBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const status = document.getElementById('status');
+
+  let voices = [];
+
+  function loadVoices() {
+    voices = synth.getVoices();
+    const jaVoices = voices.filter(v => v.lang.startsWith('ja'));
+    const list = jaVoices.length ? jaVoices : voices;
+    voiceSelect.innerHTML = '';
+    list.forEach((v, i) => {
+      const opt = document.createElement('option');
+      opt.value = voices.indexOf(v);
+      opt.textContent = `${v.name} (${v.lang})`;
+      voiceSelect.appendChild(opt);
+    });
+  }
+  loadVoices();
+  if (synth.onvoiceschanged !== undefined) {
+    synth.onvoiceschanged = loadVoices;
+  }
+
+  ['rate', 'pitch', 'volume'].forEach(id => {
+    const el = document.getElementById(id);
+    const val = document.getElementById(id + 'Val');
+    el.addEventListener('input', () => val.textContent = parseFloat(el.value).toFixed(2));
+  });
+
+  function speak() {
+    if (synth.speaking) synth.cancel();
+    const text = document.getElementById('text').value.trim();
+    if (!text) return;
+
+    // 段落ごとに分割し、間（ま）を作る
+    const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim());
+
+    paragraphs.forEach((para, idx) => {
+      const utter = new SpeechSynthesisUtterance(para.trim());
+      utter.lang = 'ja-JP';
+      utter.rate = parseFloat(rate.value);
+      utter.pitch = parseFloat(pitch.value);
+      utter.volume = parseFloat(volume.value);
+      const vIdx = voiceSelect.value;
+      if (vIdx !== '' && voices[vIdx]) utter.voice = voices[vIdx];
+
+      if (idx === 0) {
+        utter.onstart = () => {
+          status.textContent = '― 朗読中 ―';
+          playBtn.disabled = true;
+          pauseBtn.disabled = false;
+          stopBtn.disabled = false;
+        };
+      }
+      if (idx === paragraphs.length - 1) {
+        utter.onend = () => {
+          status.textContent = '― 朗読終了 ―';
+          playBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = '‖ 一時停止';
+        };
+      }
+      synth.speak(utter);
+    });
+  }
+
+  function togglePause() {
+    if (synth.paused) {
+      synth.resume();
+      pauseBtn.textContent = '‖ 一時停止';
+      status.textContent = '― 朗読中 ―';
+    } else {
+      synth.pause();
+      pauseBtn.textContent = '▶ 再開';
+      status.textContent = '― 一時停止中 ―';
+    }
+  }
+
+  function stop() {
+    synth.cancel();
+    status.textContent = '― 停止 ―';
+    playBtn.disabled = false;
+    pauseBtn.disabled = true;
+    stopBtn.disabled = true;
+    pauseBtn.textContent = '‖ 一時停止';
+  }
+</script>
+</body>
+</html>

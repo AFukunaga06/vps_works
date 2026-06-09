@@ -1,0 +1,3 @@
+# LP・サインアップ等を非公開化
+# 必要に応じて Allow from <YourIP> を足してプレビュー可能にできる
+Require all denied

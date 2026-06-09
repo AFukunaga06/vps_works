@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>フクのオンライン寺子屋</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">📚 フクのオンライン寺子屋</div>
+    <nav class="nav">
+      <a href="#features">特徴</a>
+      <a href="#plan">プラン</a>
+      <a href="#faq">FAQ</a>
+      <a href="fuku_ai_terakoya_bosyuu_01.html">講師募集</a>
+      <a href="#reservation" class="cta">予約する</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <h1>「分からない」を一緒に解決</h1>
+  <p>Zoomで行うオンラインPCサポート</p>
+  <a href="#reservation" class="hero-btn">まずは無料で予約する</a>
+</section>
+
+<section id="features" class="section">
+  <h2>特徴</h2>
+  <ul>
+    <li>マンツーマン対応</li>
+    <li>目的別サポート</li>
+    <li>遠隔操作サポート（同意制）</li>
+  </ul>
+</section>
+
+<section id="plan" class="section">
+  <h2>料金</h2>
+  <div class="section-inner">
+    <div class="plan-card">
+      <div class="plan-label">オリエンテーション</div>
+      <div class="plan-price">無料</div>
+      <div class="plan-note">45分 / 初回限定</div>
+    </div>
+    <div class="plan-card highlight">
+      <div class="plan-label">本講座</div>
+      <div class="plan-price">1,500円</div>
+      <div class="plan-note">45分 / マンツーマン</div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="section">
+  <h2>よくある質問</h2>
+  <details>
+    <summary>どんな内容をサポートしてもらえますか？</summary>
+    <p>PC操作の基本からZoom・Word・Excel・PowerPoint、スマートフォンの使い方、インターネット検索、メールの設定など、幅広くサポートします。「こんなことも聞いていいの？」という内容でもお気軽にご相談ください。</p>
+  </details>
+  <details>
+    <summary>パソコンが苦手でも受講できますか？</summary>
+    <p>はい、まったく問題ありません。「電源の入れ方から教えてほしい」という方も歓迎します。お一人おひとりのペースに合わせて、丁寧にサポートします。</p>
+  </details>
+  <details>
+    <summary>Zoomを使ったことがないのですが大丈夫ですか？</summary>
+    <p>大丈夫です。Zoomのインストール・設定方法からご案内します。初回オリエンテーション（30分・無料）でZoomの使い方を一緒に確認してから本講座をスタートできます。</p>
+  </details>
+  <details>
+    <summary>遠隔操作とはどういうものですか？安全ですか？</summary>
+    <p>受講者の方の同意を得たうえで、講師がZoom等の機能を使ってパソコンの画面を共有・操作する補助のことです。必要最小限の操作のみ行い、パスワードや個人情報を取得・記録することは一切ありません。不安な場合は遠隔操作なしでもサポートできます。</p>
+  </details>
+  <details>
+    <summary>1回だけの受講は可能ですか？</summary>
+    <p>はい、1回からご利用いただけます。継続的なご受講も歓迎ですが、「この1点だけ解決したい」というスポット利用も大歓迎です。</p>
+  </details>
+  <details>
+    <summary>スマートフォンやタブレットからでも受講できますか？</summary>
+    <p>Zoomが使えるスマートフォン・タブレットであれば受講可能です。ただし、パソコン操作のサポートを受ける場合はパソコンからのご参加を推奨しています。</p>
+  </details>
+  <details>
+    <summary>予約のキャンセルや変更はできますか？</summary>
+    <p>はい、可能です。予約日の前日までにメール（afky5906@gmail.com）またはお電話（080-4788-2900）にてご連絡ください。当日のキャンセルはできる限りお早めにご連絡いただけますと助かります。</p>
+  </details>
+</section>
+
+<!-- ▼ 予約セクション ▼ -->
+<section id="reservation" class="section reservation">
+  <h2>予約フォーム</h2>
+
+  <div class="reservation-layout">
+    <!-- カレンダー -->
+    <div class="calendar-box">
+      <div class="calendar-header">
+        <button id="prevMonth">‹</button>
+        <span id="calendarTitle"></span>
+        <button id="nextMonth">›</button>
+      </div>
+      <div class="calendar-grid" id="calendarGrid">
+        <div>日</div><div>月</div><div>火</div><div>水</div>
+        <div>木</div><div>金</div><div>土</div>
+      </div>
+    </div>
+
+    <!-- フォーム -->
+    <form id="reservationForm" class="form-box">
+      <p id="selectedDate">日付を選択してください</p>
+
+      <label>種別 *</label>
+      <select id="courseType" required>
+        <option value="">選択してください</option>
+        <option value="orientation">オリエンテーション</option>
+        <option value="session">本講座</option>
+      </select>
+
+      <label>時間 *</label>
+      <select id="timeSlot" required disabled>
+        <option value="">日付と種別を選択</option>
+      </select>
+
+      <label>お名前 *</label>
+      <input id="name" required>
+
+      <label>メール *</label>
+      <input id="email" type="email" required>
+
+      <label>相談内容</label>
+      <textarea id="message"></textarea>
+
+      <p style="font-size:0.88rem;color:#e05555;margin:14px 0 4px;">＊は必ず書いてください。</p>
+      <button type="submit">予約を申し込む</button>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  © 2026 フクのオンライン寺子屋
+</footer>
+
+<script src="calendar.js"></script>
+<script src="reservation.js"></script>
+</body>
+</html>

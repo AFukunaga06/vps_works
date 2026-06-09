@@ -1,0 +1,7 @@
+# config.php への直アクセスを遮断 (lib/, sql/ はそれぞれの .htaccess で個別遮断)
+<FilesMatch "^config\.php$">
+    Require all denied
+</FilesMatch>
+
+Options -Indexes
+DirectoryIndex index.php index.html

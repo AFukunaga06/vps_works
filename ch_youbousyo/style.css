@@ -1,0 +1,274 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'メイリオ', sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    font-size: 15px;
+}
+
+.container {
+    max-width: 700px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 40px;
+}
+
+h1 {
+    font-size: 22px;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 30px;
+}
+
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.form-table th,
+.form-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+}
+
+.form-table th {
+    width: 170px;
+    font-weight: bold;
+    color: #555;
+    background: #f8f9fa;
+    white-space: nowrap;
+}
+
+.form-table .required::after {
+    content: ' ※';
+    color: #e74c3c;
+}
+
+.form-table input[type="text"],
+.form-table input[type="password"],
+.form-table input[type="email"],
+.form-table input[type="tel"],
+.form-table input[type="date"],
+.form-table select,
+.form-table textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.form-table textarea {
+    height: 80px;
+    resize: vertical;
+}
+
+.form-table input:focus,
+.form-table select:focus,
+.form-table textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52,152,219,0.2);
+}
+
+.form-table .hint {
+    font-size: 11px;
+    color: #999;
+    margin-top: 4px;
+}
+
+.consent-box {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.consent-box label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: inherit;
+}
+
+.btn-primary { background: #3498db; color: #fff; }
+.btn-primary:hover { background: #2980b9; }
+.btn-success { background: #27ae60; color: #fff; }
+.btn-success:hover { background: #219a52; }
+.btn-danger  { background: #e74c3c; color: #fff; }
+.btn-danger:hover  { background: #c0392b; }
+.btn-secondary { background: #95a5a6; color: #fff; }
+.btn-secondary:hover { background: #7f8c8d; }
+
+.btn-sm { padding: 5px 12px; font-size: 13px; }
+
+.submit-row {
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Login */
+.login-box {
+    max-width: 380px;
+    margin: 80px auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 40px;
+}
+
+.login-box h1 { font-size: 20px; text-align: center; margin-bottom: 30px; }
+
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 13px; color: #555; margin-bottom: 5px; }
+.form-group input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.alert {
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 18px;
+    font-size: 13px;
+}
+.alert-error   { background: #fdecea; color: #c0392b; border: 1px solid #e74c3c; }
+.alert-success { background: #eafaf1; color: #1e8449; border: 1px solid #27ae60; }
+
+/* Admin table */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.admin-table th {
+    background: #2c3e50;
+    color: #fff;
+    padding: 10px 8px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.admin-table td {
+    padding: 9px 8px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.admin-table tr:hover td { background: #f5f9ff; }
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-form { display: flex; gap: 8px; align-items: center; }
+.search-form input {
+    padding: 7px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    width: 200px;
+}
+
+/* ===== スマホ対応 ===== */
+@media (max-width: 600px) {
+    .container {
+        margin: 0;
+        padding: 20px 15px;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    h1 { font-size: 18px; }
+
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    /* テーブルを縦並びに */
+    .form-table,
+    .form-table tbody,
+    .form-table tr,
+    .form-table th,
+    .form-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .form-table th {
+        background: #f0f4f8;
+        padding: 8px 10px 4px;
+        border-bottom: none;
+        white-space: normal;
+        font-size: 13px;
+    }
+
+    .form-table td {
+        padding: 4px 10px 12px;
+    }
+
+    .form-table input[type="text"],
+    .form-table input[type="password"],
+    .form-table input[type="email"],
+    .form-table input[type="tel"],
+    .form-table input[type="date"],
+    .form-table select,
+    .form-table textarea {
+        font-size: 16px; /* iOSズーム防止 */
+    }
+
+    .form-table textarea { height: 100px; }
+
+    .submit-row { margin-top: 20px; }
+    .submit-row .btn { width: 100%; padding: 14px; font-size: 16px; }
+
+    /* ログイン */
+    .login-box {
+        margin: 20px auto;
+        padding: 30px 20px;
+    }
+
+    .form-group input { font-size: 16px; }
+
+    /* 管理画面テーブル横スクロール */
+    .admin-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}

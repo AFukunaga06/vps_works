@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ASTEROIDS｜回転＆慣性</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;color:#dff;font-family:system-ui,"Noto Sans JP",sans-serif;overflow:hidden}
+  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  canvas{background:#000;border:1px solid #2a2;box-shadow:0 0 30px #0f06 inset;touch-action:none}
+  .hud{position:fixed;top:8px;left:8px;font:14px/1.4 monospace;color:#9f9;text-shadow:0 0 4px #0f0}
+  .hint{position:fixed;bottom:8px;left:8px;font:12px/1.4 monospace;color:#7d7;opacity:.8}
+  .center{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:rgba(0,0,0,.65);text-align:center}
+  .center h1{font-size:42px;margin:0 0 8px;color:#9f9;text-shadow:0 0 10px #0f0;letter-spacing:6px}
+  .center button{margin-top:14px;padding:10px 22px;font-size:16px;background:#0a0;color:#000;border:0;border-radius:8px;cursor:pointer;font-weight:700}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="cv" width="720" height="540"></canvas></div>
+<div class="hud">
+  SCORE <span id="score">0</span> &nbsp; HI <span id="hi">0</span><br>
+  LIFE <span id="life">3</span> &nbsp; LV <span id="lv">1</span>
+</div>
+<div class="hint">↑ 推進 / ← → 回転 / Space 射撃 / H ハイパースペース</div>
+
+<div id="title" class="center">
+  <h1>ASTEROIDS</h1>
+  <div>↑ 推進 / ← → 回転 / Space 射撃 / H ワープ</div>
+  <button id="startBtn">START</button>
+</div>
+<div id="over" class="center hidden">
+  <h1>GAME OVER</h1>
+  <div>SCORE <span id="finalScore">0</span></div>
+  <button id="retryBtn">RETRY</button>
+</div>
+
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const W=cv.width,H=cv.height;
+const keys={};
+addEventListener('keydown',e=>{keys[e.code]=true;if(['Space','ArrowUp','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();});
+addEventListener('keyup',e=>{keys[e.code]=false});
+
+let ship,asteroids,bullets,particles,score,life,level,paused,gameState,respawnTimer;
+let hi=+localStorage.getItem('ast_hi')||0;
+document.getElementById('hi').textContent=hi;
+
+function wrap(o){
+  if(o.x<0)o.x+=W;if(o.x>W)o.x-=W;
+  if(o.y<0)o.y+=H;if(o.y>H)o.y-=H;
+}
+function makeAsteroid(x,y,size){
+  const verts=[],n=8+Math.floor(Math.random()*5);
+  for(let i=0;i<n;i++){
+    const a=(i/n)*Math.PI*2,r=size*(.7+Math.random()*.5);
+    verts.push({a,r});
+  }
+  return {x,y,vx:(Math.random()-.5)*(2.5-size*.02),vy:(Math.random()-.5)*(2.5-size*.02),rot:0,vr:(Math.random()-.5)*.04,size,verts};
+}
+function startLevel(){
+  asteroids=[];
+  const n=3+level;
+  for(let i=0;i<n;i++){
+    let x,y;do{x=Math.random()*W;y=Math.random()*H}while(ship&&Math.hypot(x-ship.x,y-ship.y)<150);
+    asteroids.push(makeAsteroid(x,y,40+Math.random()*20));
+  }
+}
+function reset(){
+  ship={x:W/2,y:H/2,vx:0,vy:0,a:-Math.PI/2,cool:0,inv:90,alive:true};
+  bullets=[];particles=[];score=0;life=3;level=1;paused=false;gameState='play';respawnTimer=0;
+  startLevel();updHUD();
+}
+function updHUD(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('life').textContent=life;
+  document.getElementById('lv').textContent=level;
+}
+function explode(x,y,n,color){
+  for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=Math.random()*3+.5;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:30+Math.random()*30,color});}
+}
+function hyperspace(){
+  ship.x=Math.random()*W;ship.y=Math.random()*H;ship.vx*=.3;ship.vy*=.3;ship.inv=30;
+}
+function update(){
+  if(paused||gameState!=='play')return;
+  // ship
+  if(ship.alive){
+    if(keys['ArrowLeft'])ship.a-=.07;
+    if(keys['ArrowRight'])ship.a+=.07;
+    if(keys['ArrowUp']){
+      ship.vx+=Math.cos(ship.a)*.12;ship.vy+=Math.sin(ship.a)*.12;
+      if(Math.random()<.7)particles.push({x:ship.x-Math.cos(ship.a)*12,y:ship.y-Math.sin(ship.a)*12,vx:-Math.cos(ship.a)*2+(Math.random()-.5),vy:-Math.sin(ship.a)*2+(Math.random()-.5),life:15,color:'#fb6'});
+    }
+    ship.vx*=.992;ship.vy*=.992;
+    const sp=Math.hypot(ship.vx,ship.vy);if(sp>6){ship.vx*=6/sp;ship.vy*=6/sp;}
+    ship.x+=ship.vx;ship.y+=ship.vy;wrap(ship);
+    if(ship.cool>0)ship.cool--;
+    if(ship.inv>0)ship.inv--;
+    if(keys['Space']&&ship.cool<=0){bullets.push({x:ship.x+Math.cos(ship.a)*14,y:ship.y+Math.sin(ship.a)*14,vx:Math.cos(ship.a)*8+ship.vx*.5,vy:Math.sin(ship.a)*8+ship.vy*.5,life:55});ship.cool=10;}
+    if(keys['KeyH']&&ship.cool<=0){hyperspace();ship.cool=30;}
+  }else{
+    respawnTimer--;
+    if(respawnTimer<=0&&life>0){ship.x=W/2;ship.y=H/2;ship.vx=0;ship.vy=0;ship.a=-Math.PI/2;ship.alive=true;ship.inv=120;}
+  }
+  // bullets
+  for(const b of bullets){b.x+=b.vx;b.y+=b.vy;b.life--;wrap(b);}
+  bullets=bullets.filter(b=>b.life>0);
+  // asteroids
+  for(const a of asteroids){a.x+=a.vx;a.y+=a.vy;a.rot+=a.vr;wrap(a);}
+  // bullet-asteroid
+  for(let i=bullets.length-1;i>=0;i--){
+    const b=bullets[i];
+    for(let j=asteroids.length-1;j>=0;j--){
+      const a=asteroids[j];
+      if(Math.hypot(a.x-b.x,a.y-b.y)<a.size){
+        bullets.splice(i,1);
+        explode(b.x,b.y,12,'#9f9');
+        const s=a.size;
+        asteroids.splice(j,1);
+        if(s>30){for(let k=0;k<2;k++)asteroids.push(makeAsteroid(a.x,a.y,s*.55));score+=20;}
+        else if(s>18){for(let k=0;k<2;k++)asteroids.push(makeAsteroid(a.x,a.y,s*.55));score+=50;}
+        else{score+=100;}
+        updHUD();
+        break;
+      }
+    }
+  }
+  // ship-asteroid
+  if(ship.alive&&ship.inv<=0){
+    for(const a of asteroids){
+      if(Math.hypot(a.x-ship.x,a.y-ship.y)<a.size+8){
+        ship.alive=false;life--;respawnTimer=90;explode(ship.x,ship.y,40,'#fc6');updHUD();
+        if(life<=0)gameOver();
+        break;
+      }
+    }
+  }
+  // particles
+  for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.life--}
+  particles=particles.filter(p=>p.life>0);
+  // next level
+  if(asteroids.length===0){level++;updHUD();startLevel();ship.inv=90;}
+}
+function gameOver(){
+  gameState='over';
+  if(score>hi){hi=score;localStorage.setItem('ast_hi',hi);document.getElementById('hi').textContent=hi;}
+  document.getElementById('finalScore').textContent=score;
+  document.getElementById('over').classList.remove('hidden');
+}
+function draw(){
+  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  // particles
+  for(const p of particles){ctx.fillStyle=p.color;ctx.globalAlpha=Math.min(1,p.life/30);ctx.fillRect(p.x-1,p.y-1,2,2);}
+  ctx.globalAlpha=1;
+  // asteroids
+  ctx.strokeStyle='#9c9';ctx.lineWidth=2;
+  for(const a of asteroids){
+    ctx.beginPath();
+    for(let i=0;i<a.verts.length;i++){
+      const v=a.verts[i],x=a.x+Math.cos(v.a+a.rot)*v.r,y=a.y+Math.sin(v.a+a.rot)*v.r;
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.closePath();ctx.stroke();
+  }
+  // bullets
+  ctx.fillStyle='#fff';
+  for(const b of bullets)ctx.fillRect(b.x-1.5,b.y-1.5,3,3);
+  // ship
+  if(ship.alive&&(ship.inv<=0||Math.floor(ship.inv/4)%2===0)){
+    ctx.save();ctx.translate(ship.x,ship.y);ctx.rotate(ship.a);
+    ctx.strokeStyle='#9f9';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(14,0);ctx.lineTo(-10,8);ctx.lineTo(-6,0);ctx.lineTo(-10,-8);ctx.closePath();ctx.stroke();
+    ctx.restore();
+  }
+  if(paused){ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.font='32px monospace';ctx.textAlign='center';ctx.fillText('PAUSED',W/2,H/2);}
+}
+function loop(){update();draw();requestAnimationFrame(loop);}
+addEventListener('keydown',e=>{if(e.code==='KeyP'&&gameState==='play')paused=!paused});
+document.getElementById('startBtn').onclick=()=>{document.getElementById('title').classList.add('hidden');reset();};
+document.getElementById('retryBtn').onclick=()=>{document.getElementById('over').classList.add('hidden');reset();};
+reset();gameState='title';
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

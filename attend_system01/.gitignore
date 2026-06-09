@@ -1,0 +1,8 @@
+  config.php
+  *_config.php
+  *.bak
+  *.sql
+  backup/
+  *.log
+  .DS_Store
+  Thumbs.db

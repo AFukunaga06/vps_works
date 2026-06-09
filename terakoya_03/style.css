@@ -1,0 +1,640 @@
+/* =========================
+   Base  ―  配色・変数定義
+   コントラスト比 WCAG AA 準拠
+========================= */
+:root{
+  /* オレンジ系 */
+  --orange:       #c2410c;   /* orange-700  見出し用 */
+  --orange-btn:   #ea580c;   /* orange-600  ボタン用 */
+  --orange-bg:    #ffedd5;   /* orange-50   背景 */
+  --orange-bd:    #fb923c;   /* orange-200  ボーダー */
+
+  /* 青系 */
+  --blue:         #1d4ed8;   /* blue-700    見出し用 */
+  --blue-btn:     #2563eb;   /* blue-600    ボタン用 */
+  --blue-bg:      #dbeafe;   /* blue-50     背景 */
+  --blue-bd:      #60a5fa;   /* blue-200    ボーダー */
+
+  /* 緑系 */
+  --green:        #15803d;   /* green-700   見出し用 */
+  --green-btn:    #16a34a;   /* green-600   ボタン用 */
+  --green-bg:     #bbf7d0;   /* green-50    背景 */
+  --green-bd:     #4ade80;   /* green-200   ボーダー */
+
+  /* 琥珀・黄色系 */
+  --amber:        #92400e;   /* amber-800   見出し用 */
+  --amber-btn:    #d97706;   /* amber-600   ボタン用 */
+  --amber-bg:     #fefce8;   /* amber-50    背景 */
+  --amber-bd:     #fde68a;   /* amber-200   ボーダー */
+
+  /* ティール（青緑）系 */
+  --teal:         #0f766e;   /* teal-700    見出し用 */
+  --teal-btn:     #0d9488;   /* teal-600    ボタン用 */
+  --teal-bg:      #99f6e4;   /* teal-50     背景 */
+  --teal-bd:      #2dd4bf;   /* teal-200    ボーダー */
+
+  /* テキスト */
+  --text:         #1e293b;   /* slate-800   本文：コントラスト比 14.7:1 */
+  --text-mid:     #374151;   /* gray-700 */
+  --text-light:   #4b5563;   /* gray-600 */
+  --muted:        #6b7280;   /* gray-500 */
+
+  /* 背景・ボーダー */
+  --bg:           #e0f2fe;
+  --white:        #ffffff;
+  --border:       #e2e8f0;
+
+  --radius-sm:    10px;
+  --radius-md:    16px;
+  --radius-lg:    22px;
+  --container:    980px;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+  font-size:1.05rem;
+  color:var(--text);
+  line-height:1.9;
+  background:linear-gradient(160deg, #bfdbfe 0%, #bbf7d0 50%, #ffedd5 100%);
+  min-height:100vh;
+}
+
+a{ color:var(--blue-btn); text-decoration:none; }
+a:hover{ text-decoration:underline; color:var(--blue); }
+
+/* =========================
+   Header / Nav
+========================= */
+.header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:linear-gradient(160deg, #fffbf0, #f0faff);
+  border-bottom:4px solid transparent;
+  border-image:linear-gradient(90deg, #ea580c, #d97706, #16a34a, #2563eb, #0d9488) 1;
+  box-shadow:0 2px 16px rgba(0,0,0,0.09);
+}
+.header-inner{
+  max-width:var(--container);
+  margin:0 auto;
+  padding:13px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.logo{
+  font-weight:900;
+  font-size:1.2rem;
+  letter-spacing:0.02em;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#1e293b;   /* 濃紺：読みやすさ最優先 */
+}
+.nav{
+  display:flex;
+  gap:6px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.nav a{
+  color:var(--text-mid);
+  padding:9px 16px;
+  border-radius:var(--radius-sm);
+  font-size:0.95rem;
+  font-weight:600;
+  transition:background .2s, color .2s, transform .15s;
+  border:1.5px solid transparent;
+}
+.nav a:nth-child(1):hover{
+  background:var(--blue-bg); border-color:#60a5fa; border-width:3px;
+  color:var(--blue); text-decoration:none; transform:translateY(-1px);
+}
+.nav a:nth-child(2):hover{
+  background:var(--green-bg); border-color:#4ade80; border-width:3px;
+  color:var(--green); text-decoration:none; transform:translateY(-1px);
+}
+.nav a:nth-child(3):hover{
+  background:var(--amber-bg); border-color:#facc15; border-width:3px;
+  color:var(--amber); text-decoration:none; transform:translateY(-1px);
+}
+.nav a:nth-child(4):hover{
+  background:var(--teal-bg); border-color:#2dd4bf; border-width:3px;
+  color:var(--teal); text-decoration:none; transform:translateY(-1px);
+}
+.nav a.cta{
+  background:var(--orange-btn);
+  color:#fff;
+  padding:10px 22px;
+  border-radius:var(--radius-md);
+  font-weight:800;
+  font-size:1rem;
+  box-shadow:0 4px 14px rgba(234,88,12,0.35);
+  border:none;
+}
+.nav a.cta:hover{
+  background:var(--orange);
+  transform:translateY(-2px);
+  color:#fff;
+  text-decoration:none;
+  box-shadow:0 6px 22px rgba(194,65,12,0.45);
+}
+
+/* =========================
+   Main Layout
+========================= */
+main{
+  max-width:var(--container);
+  margin:0 auto;
+  padding:0 18px;
+}
+
+/* =========================
+   Hero
+========================= */
+.hero{
+  margin:32px 0 22px;
+  padding:76px 28px;
+  border-radius:var(--radius-lg);
+  background:linear-gradient(160deg, #fffbf0, #f0faff);
+  border:3px solid #fb923c;
+  box-shadow:0 8px 40px rgba(234,88,12,0.22);
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:"";
+  position:absolute;
+  top:-70px; right:-70px;
+  width:300px; height:300px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(234,88,12,0.11), transparent 65%);
+  pointer-events:none;
+}
+.hero::after{
+  content:"";
+  position:absolute;
+  bottom:-60px; left:-60px;
+  width:260px; height:260px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(37,99,235,0.10), transparent 65%);
+  pointer-events:none;
+}
+.hero h1{
+  font-size:2.5rem;
+  font-weight:900;
+  line-height:1.3;
+  margin-bottom:14px;
+  color:#1e293b;   /* 濃紺：コントラスト最大 */
+}
+.hero h1 span{
+  color:var(--orange);   /* 濃いオレンジ（白背景でコントラスト比 7.0:1） */
+}
+.hero p{
+  margin:0 0 28px;
+  color:var(--text-mid);
+  font-size:1.15rem;
+}
+.hero-btn{
+  display:inline-block;
+  background:var(--orange-btn);
+  color:#fff;
+  padding:18px 46px;
+  border-radius:var(--radius-md);
+  font-weight:800;
+  font-size:1.1rem;
+  box-shadow:0 6px 24px rgba(234,88,12,0.42);
+  transition:transform .2s, box-shadow .2s, background .2s;
+  letter-spacing:0.02em;
+}
+.hero-btn:hover{
+  text-decoration:none;
+  transform:translateY(-3px);
+  box-shadow:0 10px 34px rgba(234,88,12,0.52);
+  background:var(--orange);
+  color:#fff;
+}
+
+/* =========================
+   Section  共通
+========================= */
+.section{
+  margin:22px 0;
+  padding:44px 32px;
+  background:linear-gradient(160deg, #fffbf0, #f0faff);
+  border:2px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:0 4px 20px rgba(0,0,0,0.06);
+}
+
+/* ── 特徴：水色系 ── */
+#features{
+  background:var(--blue-bg);
+  border-color:#60a5fa; border-width:3px;
+  box-shadow:0 6px 28px rgba(37,99,235,0.09);
+}
+#features h2{ color:var(--blue); }
+#features h2::after{ background:linear-gradient(90deg, #2563eb, #16a34a); }
+#features .section ul li{
+  background:linear-gradient(160deg, #fffbf0, #f0faff);
+  border-color:#60a5fa; border-width:3px;
+  box-shadow:0 3px 12px rgba(37,99,235,0.07);
+}
+#features .section ul li:hover{
+  border-color:#93c5fd;
+  box-shadow:0 8px 24px rgba(37,99,235,0.14);
+}
+#features .section ul li::before{ color:var(--green-btn); }
+
+/* ── 料金：緑系 ── */
+#plan{
+  background:var(--green-bg);
+  border-color:#4ade80; border-width:3px;
+  box-shadow:0 6px 28px rgba(22,163,74,0.09);
+}
+#plan h2{ color:var(--green); }
+#plan h2::after{ background:linear-gradient(90deg, #16a34a, #0d9488); }
+
+/* ── FAQ：黄色系 ── */
+#faq{
+  background:var(--amber-bg);
+  border-color:#facc15; border-width:3px;
+  box-shadow:0 6px 28px rgba(217,119,6,0.09);
+}
+#faq h2{ color:var(--amber); }
+#faq h2::after{ background:linear-gradient(90deg, #d97706, #ea580c); }
+
+.section h2{
+  margin:0 0 18px;
+  font-size:1.75rem;
+  font-weight:900;
+  text-align:center;
+}
+.section h2::after{
+  content:"";
+  display:block;
+  width:60px;
+  height:5px;
+  border-radius:5px;
+  margin:12px auto 0;
+  background:var(--orange-btn);
+}
+
+/* ── 特徴リスト ── */
+.section ul{
+  max-width:720px;
+  margin:20px auto 0;
+  padding-left:0;
+  list-style:none;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  gap:14px;
+}
+.section ul li{
+  background:linear-gradient(160deg, #fffbf0, #f0faff);
+  border:2px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:20px 22px;
+  font-weight:700;
+  font-size:1rem;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  box-shadow:0 3px 12px rgba(0,0,0,0.05);
+  transition:transform .2s, box-shadow .2s;
+}
+.section ul li:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.10);
+}
+.section ul li::before{
+  content:"✓";
+  color:var(--green-btn);
+  font-weight:900;
+  font-size:1.3rem;
+  flex-shrink:0;
+}
+
+/* ── 料金カード ── */
+#plan .section-inner{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  max-width:620px;
+  margin:24px auto 0;
+}
+.plan-card{
+  background:linear-gradient(160deg, #fffbf0, #f0faff);
+  border:2px solid var(--green-bd);
+  border-radius:var(--radius-md);
+  padding:32px 24px;
+  text-align:center;
+  box-shadow:0 4px 18px rgba(22,163,74,0.09);
+  transition:transform .2s, box-shadow .2s;
+}
+.plan-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 14px 40px rgba(22,163,74,0.16);
+}
+.plan-card .plan-label{
+  font-size:0.95rem;
+  color:var(--teal);
+  font-weight:800;
+  margin-bottom:12px;
+}
+.plan-card .plan-price{
+  font-size:2.2rem;
+  font-weight:900;
+  color:var(--text);
+}
+.plan-card .plan-note{
+  font-size:0.9rem;
+  color:var(--muted);
+  margin-top:8px;
+}
+.plan-card.highlight{
+  background:linear-gradient(160deg, var(--orange-bg), var(--green-bg));
+  border:3px solid var(--orange-bd);
+  box-shadow:0 6px 28px rgba(234,88,12,0.16);
+}
+.plan-card.highlight .plan-price{ color:var(--orange); }   /* 濃いオレンジ：コントラスト比 7.0:1 */
+.plan-card.highlight .plan-label{ color:var(--orange); }
+
+/* ── FAQ ── */
+.section details{
+  max-width:760px;
+  margin:12px auto 0;
+  background:linear-gradient(160deg, #fffbf0, #f0faff);
+  border:1.5px solid var(--amber-bd);
+  border-radius:var(--radius-md);
+  overflow:hidden;
+  transition:box-shadow .2s;
+}
+.section details summary{
+  cursor:pointer;
+  padding:20px 24px;
+  font-weight:700;
+  font-size:1rem;
+  list-style:none;
+  color:var(--text);
+  transition:background .2s;
+}
+.section details summary:hover{ background:rgba(217,119,6,0.06); }
+.section details summary::-webkit-details-marker{ display:none; }
+.section details p{
+  padding:0 24px 20px;
+  color:var(--text-light);
+  font-size:0.97rem;
+  line-height:1.9;
+  animation:faqOpen .25s ease;
+}
+@keyframes faqOpen{
+  from{ opacity:0; transform:translateY(-6px); }
+  to{   opacity:1; transform:translateY(0); }
+}
+.section details summary::after{
+  content:"▼";
+  float:right;
+  font-size:0.75rem;
+  color:var(--muted);
+  transition:transform .25s ease;
+  margin-top:4px;
+}
+.section details[open] summary::after{ transform:rotate(-180deg); }
+.section details[open]{
+  border-color:#f6b17a;
+  box-shadow:0 4px 20px rgba(234,88,12,0.11);
+}
+.section details[open] summary{
+  background:var(--orange-bg);
+  color:var(--amber);   /* 濃い茶色：コントラスト比 8.0:1 */
+  border-bottom:1.5px solid var(--amber-bd);
+}
+
+/* =========================
+   Reservation
+========================= */
+.reservation{
+  background:var(--teal-bg);
+  border-color:#2dd4bf; border-width:3px;
+  box-shadow:0 6px 28px rgba(13,148,136,0.09);
+}
+.reservation h2{ color:var(--teal); }
+.reservation h2::after{ background:linear-gradient(90deg, #0d9488, #2563eb); }
+
+.reservation-layout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-top:22px;
+  align-items:start;
+}
+
+/* =========================
+   Calendar
+========================= */
+.calendar-box{
+  background:linear-gradient(160deg, #fffbf0, #f0faff);
+  border:2px solid var(--teal-bd);
+  border-radius:var(--radius-lg);
+  padding:22px;
+  box-shadow:0 4px 18px rgba(13,148,136,0.09);
+}
+.calendar-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:14px;
+}
+.calendar-header button{
+  width:40px; height:38px;
+  border:1.5px solid var(--teal-bd);
+  border-radius:var(--radius-sm);
+  background:var(--teal-bg);
+  color:var(--teal);
+  cursor:pointer;
+  font-size:1.1rem;
+  font-weight:700;
+  transition:background .2s, border-color .2s, transform .15s;
+}
+.calendar-header button:hover{
+  background:var(--teal-btn);
+  border-color:var(--teal-btn);
+  color:#fff;
+  transform:translateY(-1px);
+}
+#calendarTitle{
+  font-weight:800;
+  font-size:1.05rem;
+  color:var(--teal);   /* ソリッドカラー：グラデーションなし → 読みやすい */
+}
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:5px;
+}
+.calendar-grid > div{
+  text-align:center;
+  padding:9px 2px;
+  font-size:0.85rem;
+  color:var(--muted);
+  font-weight:700;
+}
+.calendar-grid > div:nth-child(1){ color:#dc2626; }   /* 日：赤 */
+.calendar-grid > div:nth-child(7){ color:#2563eb; }   /* 土：青 */
+
+.day{
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  cursor:pointer;
+  background:transparent;
+  border:1px solid transparent;
+  transition:background .2s, border-color .2s, transform .15s;
+  color:var(--text);
+  font-size:0.92rem;
+}
+.day:hover{
+  background:var(--teal-bg);
+  border-color:#2dd4bf; border-width:3px;
+  transform:translateY(-1px);
+}
+.day.today{
+  background:#bfdbfe;
+  border-color:#60a5fa;
+  color:#1d4ed8;
+  font-weight:700;
+}
+.day.selected{
+  background:var(--teal-btn);
+  color:#fff;
+  border-color:var(--teal-btn);
+  box-shadow:0 3px 14px rgba(13,148,136,0.42);
+  font-weight:700;
+}
+
+/* =========================
+   Form
+========================= */
+.form-box{
+  background:linear-gradient(160deg, #fffbf0, #f0faff);
+  border:2px solid var(--blue-bd);
+  border-radius:var(--radius-lg);
+  padding:24px;
+  box-shadow:0 4px 18px rgba(37,99,235,0.08);
+}
+#selectedDate{
+  margin:0 0 16px;
+  padding:12px 16px;
+  border-radius:var(--radius-md);
+  background:var(--teal-bg);
+  color:var(--teal);   /* ソリッドカラー */
+  font-weight:700;
+  font-size:1rem;
+  border:1.5px solid var(--teal-bd);
+}
+.form-box label{
+  display:block;
+  margin-top:16px;
+  font-weight:700;
+  font-size:0.95rem;
+  color:var(--blue);   /* 濃い青：コントラスト比 8.6:1 */
+}
+.form-box input,
+.form-box select,
+.form-box textarea{
+  width:100%;
+  margin-top:6px;
+  padding:13px 16px;
+  border-radius:var(--radius-sm);
+  border:1.5px solid #d1d5db;
+  background:#f9fafb;
+  color:var(--text);
+  font-size:1rem;
+  font-family:inherit;
+  transition:border-color .2s, box-shadow .2s;
+}
+.form-box textarea{ min-height:90px; resize:vertical; }
+.form-box input:focus,
+.form-box select:focus,
+.form-box textarea:focus{
+  outline:none;
+  border-color:var(--blue-btn);
+  box-shadow:0 0 0 3px rgba(37,99,235,0.14);
+  background:linear-gradient(160deg, #fffbf0, #f0faff);
+}
+.form-box select:disabled{ opacity:0.45; cursor:not-allowed; }
+
+.checkbox{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin-top:16px;
+  font-weight:600;
+  color:var(--text-light);
+  font-size:0.95rem;
+}
+.checkbox input{
+  width:18px; height:18px;
+  margin-top:3px;
+  accent-color:var(--orange-btn);
+}
+
+.form-box button[type="submit"]{
+  margin-top:20px;
+  width:100%;
+  border:none;
+  border-radius:var(--radius-md);
+  padding:17px;
+  background:var(--orange-btn);
+  color:#fff;
+  font-weight:800;
+  font-size:1.05rem;
+  cursor:pointer;
+  box-shadow:0 6px 20px rgba(234,88,12,0.38);
+  transition:transform .2s, box-shadow .2s, background .2s;
+  letter-spacing:0.02em;
+}
+.form-box button[type="submit"]:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 28px rgba(234,88,12,0.48);
+  background:var(--orange);
+}
+.form-box button[type="submit"]:active{ transform:translateY(0); }
+
+/* =========================
+   Footer
+========================= */
+.footer{
+  margin:30px 0 40px;
+  text-align:center;
+  font-size:0.92rem;
+  color:var(--text-light);   /* ソリッドカラー：読みやすい */
+  font-weight:600;
+  padding:22px 0;
+  background:linear-gradient(160deg, #bfdbfe 0%, #bbf7d0 50%, #ffedd5 100%);
+  border-top:4px solid transparent;
+  border-image:linear-gradient(90deg, #ea580c, #d97706, #16a34a, #2563eb, #0d9488) 1;
+}
+
+/* =========================
+   Responsive
+========================= */
+@media (max-width:900px){
+  .reservation-layout{ grid-template-columns:1fr; }
+  .hero h1{ font-size:1.9rem; }
+  #plan .section-inner{ grid-template-columns:1fr; }
+}
+@media (max-width:640px){
+  .nav a:not(.cta){ display:none; }
+  .hero{ padding:54px 18px; }
+  .section{ padding:32px 18px; }
+}

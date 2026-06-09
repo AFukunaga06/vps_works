@@ -1,0 +1,15 @@
+# config.php への直接アクセスを禁止
+<Files "config.php">
+    Require all denied
+</Files>
+
+# setup.sql への直接アクセスを禁止
+<Files "setup.sql">
+    Require all denied
+</Files>
+
+# vendor/ ディレクトリを公開しない
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^vendor/ - [F,L]
+</IfModule>

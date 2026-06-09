@@ -1,0 +1,7 @@
+Options -Indexes
+<Files "config.php">
+    Require all denied
+</Files>
+<Files "token_gmail.json">
+    Require all denied
+</Files>

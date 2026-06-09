@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>つかいかたの説明 - 杉田教会 出席管理システム</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+  background: #e6f4e8; color: #0b1f12; padding: 24px 16px;
+  font-size: 1rem; line-height: 1.9;
+}
+.container {
+  max-width: 860px; margin: 0 auto; background: #fff;
+  border-radius: 20px; padding: 32px 28px 48px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.09);
+}
+h1 {
+  font-size: 1.5rem; font-weight: 900; color: #2d6a3f;
+  border-bottom: 4px solid #a5d6a7; padding-bottom: 12px; margin-bottom: 28px;
+  text-align: center;
+}
+h2 {
+  font-size: 1.1rem; font-weight: 900; color: #fff;
+  background: linear-gradient(90deg, #2d6a3f, #43a05f);
+  border-radius: 10px; padding: 10px 16px; margin: 36px 0 14px;
+}
+h3 {
+  font-size: 1rem; font-weight: 800; color: #2d6a3f;
+  border-left: 5px solid #81c784; padding-left: 12px;
+  margin: 22px 0 10px;
+}
+p { margin-bottom: 10px; }
+ul, ol { padding-left: 24px; margin-bottom: 10px; }
+li { margin-bottom: 6px; }
+.note {
+  background: #fffde7; border: 1px solid #fff176;
+  border-radius: 10px; padding: 12px 16px; margin: 12px 0;
+  font-size: .95rem; color: #5a4000;
+}
+.warn {
+  background: #ffebee; border: 1px solid #ef9a9a;
+  border-radius: 10px; padding: 12px 16px; margin: 12px 0;
+  font-size: .95rem; color: #7a0000;
+}
+.info {
+  background: #e3f2fd; border: 1px solid #90caf9;
+  border-radius: 10px; padding: 12px 16px; margin: 12px 0;
+  font-size: .95rem; color: #0d3b6e;
+}
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: .93rem; }
+th { background: #e8f5e9; color: #2d6a3f; padding: 10px 14px; text-align: left; border: 1px solid #c8e6c9; font-weight: 800; }
+td { padding: 10px 14px; border: 1px solid #e0e0e0; vertical-align: top; }
+tr:nth-child(even) td { background: #fafff9; }
+.tag {
+  display: inline-block; padding: 2px 10px; border-radius: 999px;
+  font-size: .8rem; font-weight: 800; margin-right: 4px;
+}
+.tag-green { background: #c8e6c9; color: #1b5e20; }
+.tag-blue  { background: #bbdefb; color: #0d3b6e; }
+.tag-orange{ background: #ffe0b2; color: #7a3500; }
+.tag-pink  { background: #fce4ec; color: #7a0040; }
+.step {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: #f9fffe; border: 1px solid #c8e6c9;
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 12px;
+}
+.step-num {
+  background: #2d6a3f; color: #fff; border-radius: 50%;
+  width: 32px; height: 32px; display: flex; align-items: center;
+  justify-content: center; font-weight: 900; font-size: 1rem;
+  flex-shrink: 0; margin-top: 2px;
+}
+.step-body { flex: 1; }
+.back-btn {
+  display: inline-block; margin-top: 36px;
+  padding: 12px 32px; background: #2d6a3f; color: #fff;
+  text-decoration: none; border-radius: 999px; font-weight: 900; font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,.12);
+}
+.back-btn:hover { background: #1e4e2c; }
+.meeting-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin: 14px 0;
+}
+@media (max-width: 560px) { .meeting-grid { grid-template-columns: 1fr; } }
+.meeting-card {
+  border-radius: 12px; padding: 14px 16px;
+  border: 2px solid #c8e6c9;
+}
+.meeting-card h4 { font-size: .95rem; font-weight: 800; margin-bottom: 6px; }
+.meeting-card p  { font-size: .88rem; color: #444; margin: 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>📖 つかいかたの説明<br><span style="font-size:.75rem;font-weight:normal;color:#555;">杉田教会 出席管理システム</span></h1>
+
+  <!-- 集会の説明 -->
+  <h2>🏠 この教会の集会（あつまり）について</h2>
+  <p>この出席管理システムは、杉田教会で行われているいろいろな集会の出席をきろくするためのシステムです。</p>
+  <p>どんな集会があるか、しょうかいします👇</p>
+
+  <h3>🙏 礼拝会（れいはいかい）</h3>
+  <p>「礼拝」は、みんなで神様をほめてお祈りしたり、聖書のみことばを聞いたりする大切な時間です。毎週日曜日に行われます。</p>
+  <div class="meeting-grid">
+    <div class="meeting-card" style="background:#e3f2fd; border-color:#90caf9;">
+      <h4>☀️ 早朝礼拝（そうちょうれいはい）</h4>
+      <p>日曜日の朝7時から行われる礼拝です。早起きして参加します。</p>
+    </div>
+    <div class="meeting-card" style="background:#e8f5e9; border-color:#a5d6a7;">
+      <h4>⛪ 通常礼拝（つうじょうれいはい）</h4>
+      <p>日曜日の朝11時から行われるメインの礼拝です。</p>
+    </div>
+    <div class="meeting-card" style="background:#fce4ec; border-color:#f48fb1;">
+      <h4>📺 ライブ日曜礼拝</h4>
+      <p>インターネット配信で参加できる日曜礼拝です。遠くにいてもさんかできます。</p>
+    </div>
+  </div>
+
+  <h3>🙌 祈祷会（きとうかい）</h3>
+  <p>「祈祷会」は、みんなで集まって一緒にお祈りする集会です。毎週水曜日に行われます。</p>
+  <div class="meeting-grid">
+    <div class="meeting-card" style="background:#fff8e1; border-color:#ffe082;">
+      <h4>🌅 午前祈祷会（ごぜんきとうかい）</h4>
+      <p>水曜日の午前中に行われるお祈りの集会です。</p>
+    </div>
+    <div class="meeting-card" style="background:#f3e5f5; border-color:#ce93d8;">
+      <h4>🌇 午後祈祷会（ごごきとうかい）</h4>
+      <p>水曜日の午後に行われるお祈りの集会です。</p>
+    </div>
+    <div class="meeting-card" style="background:#e0f7fa; border-color:#80deea;">
+      <h4>📡 ライブ祈祷会</h4>
+      <p>インターネット配信で参加できる水曜日のお祈りの集会です。</p>
+    </div>
+  </div>
+
+  <h3>🌸 朝祈会（ちょうとうかい）</h3>
+  <p>毎週土曜日に行われる朝のお祈りの集会です。一週間の終わりに神様に感謝してお祈りします。</p>
+
+  <h3>✨ その他集会（そのたしゅうかい）</h3>
+  <p>上記以外の特別な集会や行事の出席をきろくするためのページです。</p>
+
+  <!-- ログイン -->
+  <h2>1. ログインのしかた</h2>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      ブラウザ（インターネット）で<br>
+      <strong>https://sugitach02.afuku5906.com/login.php</strong><br>
+      を開きます。
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">ユーザーIDとパスワードを入力します。わからないときは管理者の方に聞いてください。</div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">「ログイン」ボタンを押すと、メニュー画面が表示されます。</div>
+  </div>
+  <div class="note">⏱ 30分間なにも操作しないと、自動的にログアウトされます。大切なデータを入力したら早めに「保存」しましょう！</div>
+
+  <!-- メニュー -->
+  <h2>2. メニュー画面のボタンの説明</h2>
+  <p>ログインすると下のようなメニュー画面が出てきます。</p>
+  <table>
+    <tr><th>ボタン</th><th>なにができるの？</th></tr>
+    <tr><td><span class="tag tag-blue">早朝礼拝</span></td><td>日曜日の朝7時から始まる礼拝の出席を入力します。</td></tr>
+    <tr><td><span class="tag tag-green">通常礼拝</span></td><td>日曜日の朝11時から始まる礼拝の出席を入力します。</td></tr>
+    <tr><td><span class="tag tag-pink">ライブ日曜礼拝</span></td><td>ネット配信の礼拝の出席を入力します。</td></tr>
+    <tr><td><span class="tag tag-orange">礼拝合計人数</span></td><td>3つの礼拝の合計を日計・月計・年計・グラフで確認できます。</td></tr>
+    <tr><td><span class="tag tag-blue">午前祈祷会</span></td><td>水曜日の午前のお祈り集会の出席を入力します。</td></tr>
+    <tr><td><span class="tag tag-green">午後祈祷会</span></td><td>水曜日の午後のお祈り集会の出席を入力します。</td></tr>
+    <tr><td><span class="tag tag-pink">ライブ祈祷会</span></td><td>ネット配信のお祈り集会の出席を入力します。</td></tr>
+    <tr><td><span class="tag tag-orange">祈祷会合計人数</span></td><td>3つの祈祷会の合計を確認できます。</td></tr>
+    <tr><td><span class="tag tag-blue">朝祈会</span></td><td>土曜日の朝のお祈り集会の出席を入力します。</td></tr>
+    <tr><td><span class="tag tag-orange">朝祈会合計人数</span></td><td>朝祈会の合計を確認できます。</td></tr>
+    <tr><td><span class="tag tag-green">その他集会</span></td><td>その他の集会の出席を入力します。</td></tr>
+    <tr><td><span class="tag tag-orange">各集会総合計</span></td><td>すべての集会を合わせた合計を確認できます。</td></tr>
+    <tr><td><span class="tag tag-blue">取扱説明書</span></td><td>この説明書を開きます。</td></tr>
+    <tr><td><span class="tag tag-pink">ログアウト</span></td><td>ログアウトしてログイン画面にもどります。</td></tr>
+  </table>
+
+  <!-- 出席入力 -->
+  <h2>3. 出席の入力のしかた</h2>
+
+  <h3>📅 日付を選ぶ</h3>
+  <ul>
+    <li>日付を入力するところで、集会の日を選びます。</li>
+    <li>「◀ 前日」「翌日 ▶」ボタンで1日ずつ動かせます。</li>
+    <li>「今日」ボタンを押すと、今日の日付にすぐ戻れます。</li>
+  </ul>
+  <div class="note">
+    📌 集会の種類によって、入力できる曜日が決まっています。<br>
+    ・礼拝会（早朝・通常・ライブ）→ <strong>日曜日</strong>だけ入力できます<br>
+    ・祈祷会（午前・午後・ライブ）→ <strong>水曜日</strong>だけ入力できます<br>
+    ・朝祈会 → <strong>土曜日</strong>だけ入力できます<br>
+    ちがう曜日を選ぶと「〇曜日が選ばれてません」と表示されて保存できません。
+  </div>
+
+  <h3>✅ 出席・欠席を入力する</h3>
+  <ul>
+    <li>名前の左にある <strong>□ チェックボックス</strong> をクリックすると「出席」になります。</li>
+    <li>チェックなし（□）は「欠席」としてきろくされます。</li>
+    <li>「クリア」ボタンを押すと、そのグループ全員が欠席になります。</li>
+  </ul>
+
+  <h3>💾 保存・確定のしかた</h3>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body"><strong>保存する</strong>ボタンを押すと出席がきろくされます。後からでも変更できます。</div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body"><strong>✔ 確定する</strong>ボタンを押すと「確定済み」になり、まちがえて変えてしまうことを防ぎます。</div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">確定後に変更したいときは <strong>🔓 確定を解除</strong> ボタンを押すと、また編集できるようになります。</div>
+  </div>
+  <div class="note">✅ 確定済みの日付は黄色いバーで表示されます。</div>
+
+  <!-- 会員管理 -->
+  <h2>4. 会員の管理</h2>
+
+  <h3>👤 新しい会員を追加する</h3>
+  <ul>
+    <li>出席入力画面の「<strong>＋ 新規追加</strong>」ボタンを押します。</li>
+    <li>氏名・読みがな・性別を入力して「登録」を押します。</li>
+  </ul>
+
+  <h3>🗑 会員を削除する</h3>
+  <ul>
+    <li>削除するには、削除パスワードが必要です。</li>
+    <li>パスワードは管理者の方に確認してください。</li>
+    <li>削除すると、その人の出席データもすべて消えます。</li>
+  </ul>
+  <div class="warn">⚠️ いちど削除したデータは基本的にもとに戻せません！大切なデータはCSVで保存してから削除しましょう。修正するばあいは管理者におたずねください。</div>
+
+  <!-- レポート -->
+  <h2>5. 合計人数の確認（レポート）</h2>
+  <p>各集会の合計ページや「各集会総合計」では、タブを切り替えて集計を確認できます。</p>
+  <table>
+    <tr><th>タブ</th><th>なにが見られるの？</th></tr>
+    <tr><td>📅 日計</td><td>選んだ日の出席人数が分かります。</td></tr>
+    <tr><td>📆 月計</td><td>選んだ月の合計出席人数が分かります。</td></tr>
+    <tr><td>📊 年計</td><td>選んだ年の月ごとの出席人数が表で分かります。</td></tr>
+    <tr><td>📈 グラフ</td><td>出席の変化をぼうグラフで見ることができます。</td></tr>
+  </table>
+
+  <!-- バックアップ -->
+  <h2>6. バックアップ（データの保存）</h2>
+  <p>「バックアップ」は、万が一データが消えてしまったときのための「データのひかえ」です。</p>
+  <ul>
+    <li>「<strong>今すぐバックアップ</strong>」ボタンを押すと、サーバーにデータが保存されます。</li>
+    <li>バックアップは毎日深夜0時に自動的に行われます（30日分とっておかれます）。</li>
+    <li>バックアップ一覧から、むかしのデータにもどすことができます。</li>
+  </ul>
+  <div class="warn">⚠️ もとに戻す（復元）と、今のデータが上書きされます。作業前にかならずバックアップをとりましょう！</div>
+
+  <!-- よくある質問 -->
+  <h2>7. こまったときは？</h2>
+  <table>
+    <tr><th>こんなとき</th><th>こうしよう</th></tr>
+    <tr><td>保存ボタンがグレーで押せない</td><td>正しい曜日を選んでいるか確認しましょう（礼拝→日曜・祈祷会→水曜・朝祈会→土曜）</td></tr>
+    <tr><td>自動的にログアウトされた</td><td>もう一度ログインしてください。30分操作しないとログアウトされます。</td></tr>
+    <tr><td>確定を解除したい</td><td>「🔓 確定を解除」ボタンを押してください。</td></tr>
+    <tr><td>会員が消えてしまった</td><td>バックアップから復元してください。管理者に連絡してください。</td></tr>
+    <tr><td>パスワードを忘れた</td><td>管理者の方に連絡してください。</td></tr>
+  </table>
+
+  <div class="info">💡 分からないことがあれば、管理者の方に気軽に聞いてください！</div>
+
+  <div style="text-align:center">
+    <a href="main02.php" class="back-btn">← メニューへ戻る</a>
+  </div>
+
+</div>
+</body>
+</html>

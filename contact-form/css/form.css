@@ -1,0 +1,240 @@
+/* ===========================
+   Reset & Base
+=========================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+/* ===========================
+   Layout
+=========================== */
+.form-wrap {
+  max-width: 680px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 40px 48px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+@media (max-width: 720px) {
+  .form-wrap {
+    margin: 0;
+    padding: 24px 20px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* ===========================
+   Heading
+=========================== */
+.form-title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.form-lead {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 28px;
+}
+
+/* ===========================
+   Form Groups
+=========================== */
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+.required-mark {
+  color: #e03;
+  margin-left: 4px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="date"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  background: #fafafa;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #4a90d9;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(74,144,217,0.15);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+/* ===========================
+   Radio / Checkbox
+=========================== */
+.radio-group,
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.radio-label,
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+/* ===========================
+   Error
+=========================== */
+.has-error input,
+.has-error select,
+.has-error textarea {
+  border-color: #e03;
+}
+
+.error-msg {
+  color: #e03;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+}
+
+.alert-error {
+  background: #fff0f0;
+  border: 1px solid #fcc;
+  color: #c00;
+}
+
+/* ===========================
+   Honeypot（非表示）
+=========================== */
+.honeypot {
+  display: none;
+}
+
+/* ===========================
+   Confirm Table
+=========================== */
+.confirm-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 32px;
+}
+
+.confirm-table th,
+.confirm-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.95rem;
+}
+
+.confirm-table th {
+  width: 35%;
+  color: #555;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* ===========================
+   Buttons
+=========================== */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 36px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.btn-primary {
+  background: #4a90d9;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #357abd;
+}
+
+.btn-back {
+  background: #eee;
+  color: #555;
+}
+
+.btn-back:hover {
+  background: #ddd;
+}
+
+/* ===========================
+   Complete Page
+=========================== */
+.complete-wrap {
+  text-align: center;
+  padding: 60px 48px;
+}
+
+.complete-icon {
+  width: 72px;
+  height: 72px;
+  background: #4caf50;
+  color: #fff;
+  font-size: 2.4rem;
+  line-height: 72px;
+  border-radius: 50%;
+  margin: 0 auto 24px;
+}

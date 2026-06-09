@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube 連続再生プレイリスト</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    margin: 0;
+    background: #f5f5f5;
+    color: #222;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin: 0 0 12px;
+  }
+  .panel {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+  button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    background: #1976d2;
+    color: #fff;
+    cursor: pointer;
+    margin-right: 4px;
+  }
+  button:hover { background: #1565c0; }
+  button.secondary { background: #757575; }
+  button.secondary:hover { background: #616161; }
+  button.danger { background: #d32f2f; }
+  button.danger:hover { background: #c62828; }
+  button.success { background: #388e3c; font-size: 16px; padding: 10px 24px; }
+  button.success:hover { background: #2e7d32; }
+  button.save { background: #ff9800; font-size: 15px; padding: 9px 20px; }
+  button.save:hover { background: #f57c00; }
+  button.save.dirty { background: #d32f2f; animation: pulse 1.5s infinite; }
+  button.save.dirty:hover { background: #b71c1c; }
+  .btn-link {
+    display: inline-block;
+    padding: 9px 20px;
+    font-size: 15px;
+    background: #607d8b;
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-right: 4px;
+  }
+  .btn-link:hover { background: #455a64; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.75; } }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .toolbar { margin: 8px 0; }
+  ul.list { list-style: none; padding: 0; margin: 0; }
+  ul.list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 4px;
+    border-bottom: 1px solid #eee;
+  }
+  ul.list li:last-child { border-bottom: none; }
+  ul.list li.playing { background: #fff8e1; }
+  .title-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    padding: 4px;
+  }
+  .title-input:focus { background: #f0f7ff; outline: 1px solid #1976d2; }
+  .title-input.dirty { background: #fff3e0; }
+  .vid {
+    color: #777;
+    font-family: monospace;
+    font-size: 12px;
+    min-width: 110px;
+  }
+  .player-wrap {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  #player { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  .now-playing { margin-top: 8px; font-size: 14px; color: #555; }
+  .player-error {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #ffebee;
+    color: #c62828;
+    border-radius: 4px;
+    font-size: 13px;
+    display: none;
+  }
+  .player-error a { color: #1976d2; font-weight: bold; }
+  .empty { color: #999; padding: 12px; text-align: center; }
+  .small { font-size: 12px; color: #666; }
+  #status { font-size: 12px; color: #666; margin-left: 8px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>YouTube 連続再生プレイリスト</h1>
+
+  <div class="panel">
+    <div class="small">YouTubeのURLまたは動画IDを1行に1つずつ貼り付けてください（複数まとめてOK）</div>
+    <textarea id="urlInput" placeholder="例：
+https://www.youtube.com/watch?v=dQw4w9WgXcQ
+https://youtu.be/9bZkp7q19f0
+jNQXAC9IVRw"></textarea>
+    <div class="toolbar row">
+      <button onclick="addVideos()">リストに追加</button>
+      <button class="secondary" onclick="clearInput()">入力欄クリア</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="row" style="justify-content: space-between;">
+      <strong>動画リスト（<span id="count">0</span>件）<span id="status"></span></strong>
+      <div>
+        <button class="secondary" onclick="selectAll(true)">全選択</button>
+        <button class="secondary" onclick="selectAll(false)">全解除</button>
+        <button class="danger" onclick="clearAll()">全削除</button>
+      </div>
+    </div>
+    <ul class="list" id="list"></ul>
+    <div id="empty" class="empty">まだ動画がありません</div>
+    <div class="toolbar row">
+      <button class="success" onclick="playSelected()">▶ 選択した動画を連続再生</button>
+      <button class="secondary" onclick="shufflePlay()">🔀 シャッフル再生</button>
+      <button class="save" id="saveBtn" onclick="saveAll()">💾 保存</button>
+      <a href="db.php" class="btn-link">📊 DB一覧</a>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="player-wrap"><div id="player"></div></div>
+    <div class="now-playing" id="nowPlaying">再生中の動画はありません</div>
+    <div class="player-error" id="playerError"></div>
+    <div class="toolbar">
+      <button class="secondary" onclick="prevVideo()">⏮ 前へ</button>
+      <button class="secondary" onclick="nextVideo()">⏭ 次へ</button>
+      <button class="secondary" onclick="stopPlay()">⏹ 停止</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let videos = [];
+let queue = [];
+let queueIndex = 0;
+let player = null;
+let playerReady = false;
+let pendingId = null;
+let dirty = false;
+
+async function api(action, data) {
+  const opts = { method: data ? 'POST' : 'GET' };
+  if (data) {
+    opts.headers = { 'Content-Type': 'application/json' };
+    opts.body = JSON.stringify(data);
+  }
+  const r = await fetch('api.php?action=' + action, opts);
+  const j = await r.json();
+  if (j.error) throw new Error(j.error);
+  return j;
+}
+
+function setDirty(d) {
+  dirty = d;
+  const btn = document.getElementById('saveBtn');
+  if (d) {
+    btn.classList.add('dirty');
+    btn.textContent = '💾 保存 (未保存)';
+    document.getElementById('status').textContent = '※ 未保存の変更があります';
+  } else {
+    btn.classList.remove('dirty');
+    btn.textContent = '💾 保存';
+    document.getElementById('status').textContent = '';
+  }
+}
+
+async function load() {
+  try {
+    videos = await api('list');
+    videos.forEach(v => {
+      v.is_checked = !!v.is_checked;
+      v._origTitle = v.title;
+      v._origChecked = v.is_checked;
+    });
+    setDirty(false);
+    render();
+  } catch (e) {
+    alert('読み込みに失敗: ' + e.message);
+  }
+}
+
+async function addVideos() {
+  const text = document.getElementById('urlInput').value;
+  if (!text.trim()) return;
+  try {
+    const r = await api('add', { text });
+    document.getElementById('urlInput').value = '';
+    if (r.added === 0 && r.skipped > 0) {
+      alert('追加できる動画がありませんでした（無効なURLまたは重複）');
+    }
+    await load();
+  } catch (e) {
+    alert('追加に失敗: ' + e.message);
+  }
+}
+
+function clearInput() {
+  document.getElementById('urlInput').value = '';
+}
+
+function render() {
+  const list = document.getElementById('list');
+  const empty = document.getElementById('empty');
+  list.innerHTML = '';
+  document.getElementById('count').textContent = videos.length;
+  if (videos.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  videos.forEach((v, idx) => {
+    const li = document.createElement('li');
+    if (queue.length > 0 && queue[queueIndex] === v.video_id) li.classList.add('playing');
+    const titleDirty = v.title !== v._origTitle;
+    li.innerHTML = `
+      <input type="checkbox" ${v.is_checked ? 'checked' : ''} onchange="toggleCheck(${idx})">
+      <span class="vid">${v.video_id}</span>
+      <input type="text" class="title-input ${titleDirty ? 'dirty' : ''}" value="${escapeHtml(v.title)}" placeholder="タイトル（任意）" oninput="updateTitle(${idx}, this.value); this.classList.add('dirty')">
+      <button class="secondary" onclick="playOne(${idx})">▶</button>
+      <button class="secondary" onclick="moveUp(${idx})">↑</button>
+      <button class="secondary" onclick="moveDown(${idx})">↓</button>
+      <button class="danger" onclick="removeVideo(${idx})">×</button>
+    `;
+    list.appendChild(li);
+  });
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function toggleCheck(idx) {
+  videos[idx].is_checked = !videos[idx].is_checked;
+  setDirty(true);
+}
+
+function updateTitle(idx, value) {
+  videos[idx].title = value;
+  setDirty(true);
+}
+
+async function removeVideo(idx) {
+  if (!confirm('この動画を削除しますか？')) return;
+  try {
+    await api('delete', { id: videos[idx].id });
+    await load();
+  } catch (e) {
+    alert('削除に失敗: ' + e.message);
+  }
+}
+
+async function moveUp(idx) {
+  if (idx === 0) return;
+  [videos[idx-1], videos[idx]] = [videos[idx], videos[idx-1]];
+  await persistOrder();
+  render();
+}
+
+async function moveDown(idx) {
+  if (idx === videos.length - 1) return;
+  [videos[idx+1], videos[idx]] = [videos[idx], videos[idx+1]];
+  await persistOrder();
+  render();
+}
+
+async function persistOrder() {
+  try {
+    await api('reorder', { ids: videos.map(v => v.id) });
+  } catch (e) {
+    alert('並び替え保存に失敗: ' + e.message);
+  }
+}
+
+async function selectAll(state) {
+  videos.forEach(v => v.is_checked = state);
+  setDirty(true);
+  render();
+}
+
+async function clearAll() {
+  if (!confirm('リストを全削除しますか？（DBからも削除されます）')) return;
+  try {
+    await api('clear');
+    await load();
+  } catch (e) {
+    alert('全削除に失敗: ' + e.message);
+  }
+}
+
+async function saveAll() {
+  try {
+    const tasks = [];
+    for (const v of videos) {
+      if (v.title !== v._origTitle || v.is_checked !== v._origChecked) {
+        tasks.push(api('update', { id: v.id, title: v.title, is_checked: v.is_checked }));
+      }
+    }
+    if (tasks.length === 0) {
+      alert('変更はありません');
+      return;
+    }
+    await Promise.all(tasks);
+    videos.forEach(v => { v._origTitle = v.title; v._origChecked = v.is_checked; });
+    setDirty(false);
+    render();
+    const status = document.getElementById('status');
+    status.textContent = '✓ 保存しました';
+    status.style.color = '#388e3c';
+    setTimeout(() => { status.style.color = '#666'; if (!dirty) status.textContent = ''; }, 2000);
+  } catch (e) {
+    alert('保存に失敗: ' + e.message);
+  }
+}
+
+function playSelected() {
+  const selected = videos.filter(v => v.is_checked).map(v => v.video_id);
+  if (selected.length === 0) { alert('選択された動画がありません'); return; }
+  startQueue(selected);
+}
+
+function shufflePlay() {
+  const selected = videos.filter(v => v.is_checked).map(v => v.video_id);
+  if (selected.length === 0) { alert('選択された動画がありません'); return; }
+  for (let i = selected.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [selected[i], selected[j]] = [selected[j], selected[i]];
+  }
+  startQueue(selected);
+}
+
+function playOne(idx) {
+  startQueue([videos[idx].video_id]);
+}
+
+function startQueue(ids) {
+  queue = ids;
+  queueIndex = 0;
+  loadCurrent();
+}
+
+function loadCurrent() {
+  if (queue.length === 0) return;
+  const id = queue[queueIndex];
+  document.getElementById('playerError').style.display = 'none';
+  updateNowPlaying();
+  render();
+  if (playerReady && player && player.loadVideoById) {
+    player.loadVideoById(id);
+  } else {
+    pendingId = id;
+  }
+}
+
+function showPlayerError(errorCode) {
+  const id = queue[queueIndex];
+  const messages = {
+    2: '無効な動画IDです',
+    5: 'プレーヤーのエラーが発生しました',
+    100: '動画が見つかりません（削除済み・非公開）',
+    101: 'この動画は埋め込み再生が禁止されています',
+    150: 'この動画は埋め込み再生が禁止されています',
+  };
+  const msg = messages[errorCode] || 'エラーが発生しました (code: ' + errorCode + ')';
+  const errDiv = document.getElementById('playerError');
+  errDiv.innerHTML = `⚠ ${msg} <a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">▶ YouTubeで直接見る</a>`;
+  errDiv.style.display = 'block';
+  if (queueIndex < queue.length - 1) {
+    setTimeout(() => {
+      if (errDiv.style.display !== 'none') {
+        queueIndex++;
+        loadCurrent();
+      }
+    }, 3000);
+  }
+}
+
+function updateNowPlaying() {
+  const np = document.getElementById('nowPlaying');
+  if (queue.length === 0) {
+    np.textContent = '再生中の動画はありません';
+    return;
+  }
+  const id = queue[queueIndex];
+  const v = videos.find(x => x.video_id === id);
+  const title = v && v.title ? v.title : id;
+  np.textContent = `再生中 (${queueIndex + 1}/${queue.length}): ${title}`;
+}
+
+function nextVideo() {
+  if (queue.length === 0) return;
+  if (queueIndex < queue.length - 1) {
+    queueIndex++;
+    loadCurrent();
+  } else {
+    alert('プレイリストの最後です');
+  }
+}
+
+function prevVideo() {
+  if (queue.length === 0) return;
+  if (queueIndex > 0) {
+    queueIndex--;
+    loadCurrent();
+  }
+}
+
+function stopPlay() {
+  queue = [];
+  queueIndex = 0;
+  if (player && player.stopVideo) player.stopVideo();
+  updateNowPlaying();
+  render();
+}
+
+window.addEventListener('beforeunload', (e) => {
+  if (dirty) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
+    height: '100%',
+    width: '100%',
+    playerVars: { 'playsinline': 1 },
+    events: {
+      'onReady': () => {
+        playerReady = true;
+        if (pendingId) { player.loadVideoById(pendingId); pendingId = null; }
+      },
+      'onStateChange': (event) => {
+        if (event.data === YT.PlayerState.ENDED) {
+          if (queueIndex < queue.length - 1) {
+            queueIndex++;
+            loadCurrent();
+          } else {
+            updateNowPlaying();
+          }
+        }
+      },
+      'onError': (event) => {
+        showPlayerError(event.data);
+      }
+    }
+  });
+}
+
+const tag = document.createElement('script');
+tag.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(tag);
+
+load();
+</script>
+</body>
+</html>

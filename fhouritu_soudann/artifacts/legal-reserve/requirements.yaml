@@ -1,0 +1,18 @@
+packages:
+  "date-fns": "For comprehensive calendar and date formatting logic"
+  "framer-motion": "For premium smooth page entry animations and interactions"
+  "react-hook-form": "For robust booking form state management"
+  "@hookform/resolvers": "For Zod schema validation integration"
+  "lucide-react": "For beautiful consistent icons"
+
+images:
+  - path: "artifacts/legal-reserve/public/images/hero-bg.png"
+    description: "A calm, professional, and abstract Japanese style minimal background featuring very soft natural light, subtle frosted glass texture, and deep forest green gradient meshes. Highly elegant and soothing."
+    aspect_ratio: "16:9"
+  - path: "artifacts/legal-reserve/public/images/consultation.png"
+    description: "A clean, modern illustration or abstract photo representing organization and legal advice. Neat desk, elegant paperwork, very soft warm lighting with green and beige tones. Minimalist and trustworthy."
+    aspect_ratio: "4:3"
+
+notes:
+  - React Query hooks are imported from @workspace/api-client-react per instructions.
+  - The API structure assumes endpoints for bookings and availability exist as specified in the schema.

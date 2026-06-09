@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>聖歌等スライド作成ツール</title>
+<base href="/">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f0f1a;color:#e0e0ff;font-family:"Meiryo","Yu Gothic","Noto Sans JP",sans-serif;font-size:14px;padding:16px;min-height:100vh}
+h1{font-size:18px;margin-bottom:14px;color:#aaaaff;border-bottom:1px solid #333366;padding-bottom:8px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:flex-start}
+.panel{background:#1a1a2e;border:1px solid #333366;border-radius:6px;padding:10px}
+.panel-title{font-size:11px;color:#8888cc;margin-bottom:8px;font-weight:bold;letter-spacing:.5px}
+.tog-btn{display:block;width:100%;margin:4px 0;padding:7px 10px;background:#1a1a2e;color:#e0e0ff;border:1px solid #444488;border-radius:4px;cursor:pointer;font-size:13px;font-family:inherit;text-align:center}
+.tog-btn.active{background:#4444aa;border-color:#6666cc;color:#fff;font-weight:bold}
+.tog-btn:hover{background:#2a2a5e}
+.type-btn{display:inline-block;padding:5px 12px;background:#1a1a2e;color:#e0e0ff;border:1px solid #444488;border-radius:4px;cursor:pointer;font-size:13px;font-family:inherit;margin-right:4px;margin-bottom:4px}
+.type-btn.active{background:#4444aa;border-color:#6666cc;color:#fff}
+.type-btn:hover{background:#2a2a5e}
+input[type=text],input[type=number]{background:#111130;border:1px solid #444488;color:#e0e0ff;padding:6px 10px;border-radius:4px;font-size:14px;font-family:inherit}
+input[type=text]:focus,input[type=number]:focus{outline:none;border-color:#6666cc}
+.btn{padding:6px 14px;border:none;border-radius:4px;cursor:pointer;font-size:13px;font-family:inherit;transition:background .15s}
+.btn-primary{background:#4444aa;color:#fff}.btn-primary:hover{background:#5555cc}
+.btn-danger{background:#8b0000;color:#fff}.btn-danger:hover{background:#aa0000}
+.btn-secondary{background:#252545;color:#e0e0ff;border:1px solid #444488}.btn-secondary:hover{background:#333365}
+.btn-success{background:#004400;color:#aaffaa;border:1px solid #006600;font-size:15px;font-weight:bold;padding:9px 22px}.btn-success:hover{background:#006600}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+#songList{list-style:none;min-height:50px;max-height:220px;overflow-y:auto;background:#111130;border:1px solid #444488;border-radius:4px;padding:4px}
+#songList li{padding:5px 8px;cursor:pointer;border-radius:3px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+#songList li:hover{background:#2a2a5e}
+#songList li.selected{background:#4444aa}
+#songList li .rm{color:#ff6666;cursor:pointer;font-size:17px;line-height:1;padding:0 4px;flex-shrink:0}
+/* 検索ボックス */
+#searchWrap{position:relative;margin-bottom:4px}
+#searchInput{width:100%;padding-right:30px}
+#searchClear{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:#888;cursor:pointer;font-size:16px;line-height:1;display:none}
+/* リストボックス */
+#santabiSel{width:100%;background:#111130;color:#e0e0ff;border:1px solid #444488;border-radius:4px;font-size:13px;font-family:inherit;padding:2px}
+#santabiSel option{background:#111130;color:#e0e0ff;padding:2px 6px}
+#santabiSel optgroup{color:#7777bb;font-size:11px;font-style:normal}
+#santabiSel:focus{outline:none;border-color:#6666cc}
+#matchCount{font-size:11px;color:#666699;margin-top:2px}
+#logArea{background:#111;color:#aaffaa;font-family:"Consolas",monospace;font-size:12px;padding:8px;height:160px;overflow-y:auto;border:1px solid #333;border-radius:4px;white-space:pre-wrap}
+hr{border:none;border-top:1px solid #333366;margin:12px 0}
+label.lbl{font-size:12px;color:#aaaacc;margin-bottom:3px;display:block}
+.flex{display:flex;gap:8px;align-items:center}
+.hint{font-size:11px;color:#555588}
+</style>
+</head>
+<body>
+
+
+<div class="row">
+  <!-- お願い：トグルボタン -->
+  <div class="panel" style="min-width:100px">
+    <div class="panel-title">お願い</div>
+    <button class="tog-btn active" id="btnNashi" onclick="setOnegai('nashi')">証なし</button>
+    <button class="tog-btn"        id="btnAri"   onclick="setOnegai('ari')">証あり</button>
+    <input type="hidden" id="onegaiVal" value="nashi">
+  </div>
+
+  <!-- 曲追加 -->
+  <div class="panel" style="flex:1;min-width:300px">
+    <div class="panel-title">曲を追加</div>
+    <div style="margin-bottom:8px">
+      <button class="type-btn active" id="btnSeika"   onclick="selType('seika')">聖歌</button>
+      <button class="type-btn"        id="btnKyusan"  onclick="selType('kyusan')">旧賛美集</button>
+      <button class="type-btn"        id="btnSantabi" onclick="selType('santabi')">賛美集にない賛美</button>
+    </div>
+
+    <!-- 番号入力 -->
+    <div id="numArea">
+      <label class="lbl" id="numLabel">番号 (1〜899):</label>
+      <div class="flex">
+        <input type="number" id="numInput" min="1" max="899" placeholder="例: 1" style="width:100px"
+               onkeydown="if(event.key==='Enter')addByNum()">
+        <button class="btn btn-primary" onclick="addByNum()">追加 ＋</button>
+      </div>
+    </div>
+
+    <!-- 賛美集外：検索 + リストボックス -->
+    <div id="santabiArea" style="display:none">
+      <label class="lbl">検索して選択:</label>
+      <div id="searchWrap">
+        <input type="text" id="searchInput" placeholder="曲名を入力して絞り込み..."
+               oninput="filterSantabi()" onkeydown="onSearchKey(event)">
+        <button id="searchClear" onclick="clearSearch()" title="クリア">×</button>
+      </div>
+      <select id="santabiSel" size="7" ondblclick="addSantabi()"></select>
+      <div class="flex" style="margin-top:6px;gap:6px">
+        <span id="matchCount"></span>
+        <button class="btn btn-primary" style="margin-left:auto" onclick="addSantabi()">選択曲を追加 ＋</button>
+      </div>
+      <div class="hint" style="margin-top:3px">リストをダブルクリックでも追加できます</div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- 曲リスト -->
+<div class="panel" style="margin-bottom:12px">
+  <div class="panel-title">曲リスト &nbsp;<span class="hint">（順番通りに出力。曲と曲の間に黒スライドが挿入されます）</span></div>
+  <ul id="songList"></ul>
+  <div class="row" style="margin-top:8px;gap:6px">
+    <button class="btn btn-secondary" onclick="moveUp()">↑ 上へ</button>
+    <button class="btn btn-secondary" onclick="moveDown()">↓ 下へ</button>
+    <button class="btn btn-danger"    onclick="delSel()">✕ 1曲削除</button>
+    <button class="btn btn-secondary" onclick="clearAll()">全クリア</button>
+  </div>
+</div>
+
+<hr>
+
+<!-- 保存ファイル名 + 実行 -->
+<div class="row" style="align-items:flex-end;margin-bottom:12px">
+  <div>
+    <label class="lbl">保存ファイル名:</label>
+    <div class="flex">
+      <input type="text" id="outFilename" style="width:200px">
+      <button class="btn btn-secondary" onclick="refreshFname()">更新</button>
+      <span class="hint">（例: 20260502_01.pptx）</span>
+    </div>
+  </div>
+  <button class="btn btn-success" id="buildBtn" onclick="buildPPT()" style="margin-top:4px">▶&nbsp; PPTX 作成 &amp; ダウンロード</button>
+</div>
+
+<!-- ダウンロードリンク -->
+<div id="dlArea" style="display:none;margin-bottom:12px">
+  <a id="dlLink" class="btn btn-success" style="display:inline-block;text-decoration:none;font-size:16px;padding:10px 24px">
+    ⬇&nbsp; ダウンロード
+  </a>
+</div>
+
+<!-- ログ -->
+<div class="panel">
+  <div class="panel-title">ログ</div>
+  <div id="logArea"></div>
+</div>
+
+<script>
+let curType = 'seika';
+let allSantabi = [];
+let selIdx = -1;
+const songs = [];
+
+(async()=>{ await loadSantabi(); await refreshFname(); })();
+
+/* ── お願いトグル ── */
+function setOnegai(v){
+  document.getElementById('onegaiVal').value = v;
+  document.getElementById('btnNashi').classList.toggle('active', v==='nashi');
+  document.getElementById('btnAri').classList.toggle('active',   v==='ari');
+}
+
+/* ── 種類切替 ── */
+function selType(t){
+  curType = t;
+  ['Seika','Kyusan','Santabi'].forEach(n=>{
+    document.getElementById('btn'+n).classList.toggle('active', n.toLowerCase()===t);
+  });
+  document.getElementById('numArea').style.display     = t!=='santabi' ? '' : 'none';
+  document.getElementById('santabiArea').style.display = t==='santabi' ? '' : 'none';
+  if(t==='seika'){
+    document.getElementById('numLabel').textContent = '番号 (1〜899):';
+    document.getElementById('numInput').max = 899;
+  } else if(t==='kyusan'){
+    document.getElementById('numLabel').textContent = '番号 (1〜158):';
+    document.getElementById('numInput').max = 158;
+  }
+  setTimeout(()=>(t==='santabi'
+    ? document.getElementById('searchInput')
+    : document.getElementById('numInput')).focus(), 0);
+}
+
+/* ── 聖歌・旧賛美集 番号追加 ── */
+function addByNum(){
+  const n = parseInt(document.getElementById('numInput').value);
+  if(isNaN(n)){alert('番号を入力してください。');return;}
+  if(curType==='seika'  &&(n<1||n>899)){alert('聖歌番号は 1〜899 で入力してください。');return;}
+  if(curType==='kyusan' &&(n<1||n>158)){alert('旧賛美集番号は 1〜158 で入力してください。');return;}
+  songs.push({type:curType, id:n, label:curType==='seika'?`聖歌 ${n}番`:`旧賛美 ${n}番`});
+  render();
+  document.getElementById('numInput').value='';
+  document.getElementById('numInput').focus();
+}
+
+/* ── 賛美集外 読み込み ── */
+async function loadSantabi(){
+  const r = await fetch('api/santabi');
+  allSantabi = await r.json();
+  filterSantabi();
+}
+
+/* ── 賛美集外 検索＆リストボックス更新 ── */
+function filterSantabi(){
+  const q   = document.getElementById('searchInput').value.trim().toLowerCase();
+  const sel = document.getElementById('santabiSel');
+  sel.innerHTML = '';
+
+  // クリアボタン表示切替
+  document.getElementById('searchClear').style.display = q ? 'block' : 'none';
+
+  const filtered = q
+    ? allSantabi.filter(i => i.title.toLowerCase().includes(q) || i.prefix.toLowerCase().includes(q))
+    : allSantabi;
+
+  const english  = filtered.filter(i =>  i.prefix && /^[A-Za-z]/.test(i.prefix));
+  const japanese = filtered.filter(i => !i.prefix || !/^[A-Za-z]/.test(i.prefix));
+
+  function addOptgroup(label, items){
+    if(!items.length) return;
+    const og = document.createElement('optgroup');
+    og.label = label;
+    items.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.title;
+      opt.textContent = item.prefix ? `${item.prefix}_${item.title}` : item.title;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
+  }
+
+  addOptgroup('─── 英語 ───', english);
+  addOptgroup('─── 日本語（あいうえお順）───', japanese);
+
+  // 先頭を自動選択
+  if(sel.options.length > 0) sel.selectedIndex = 0;
+
+  // 件数表示
+  const total = filtered.length;
+  document.getElementById('matchCount').textContent =
+    q ? `${total} 件ヒット` : `全 ${total} 件`;
+}
+
+/* ── 検索クリア ── */
+function clearSearch(){
+  document.getElementById('searchInput').value = '';
+  filterSantabi();
+  document.getElementById('searchInput').focus();
+}
+
+/* ── 検索キー操作 ── */
+function onSearchKey(e){
+  const sel = document.getElementById('santabiSel');
+  if(e.key === 'Enter'){
+    addSantabi();
+  } else if(e.key === 'ArrowDown'){
+    // ↓キーでリストボックスにフォーカス移動
+    e.preventDefault();
+    sel.focus();
+    if(sel.selectedIndex < 0 && sel.options.length > 0) sel.selectedIndex = 0;
+  }
+}
+
+/* ── 賛美集外 追加 ── */
+function addSantabi(){
+  const sel   = document.getElementById('santabiSel');
+  const title = sel.value || document.getElementById('searchInput').value.trim();
+  if(!title){alert('曲名を選択するか入力してください。');return;}
+  songs.push({type:'santabi', id:title, label:`賛美集外「${title}」`});
+  render();
+  clearSearch();
+}
+
+/* ── 曲リスト描画 ── */
+function render(){
+  const ul = document.getElementById('songList');
+  ul.innerHTML = '';
+  songs.forEach((s,i)=>{
+    const li = document.createElement('li');
+    li.classList.toggle('selected', i===selIdx);
+    li.innerHTML = `<span>${s.label}</span><span class="rm" onclick="rmAt(${i},event)">×</span>`;
+    li.onclick = ()=>{ selIdx=i; render(); };
+    ul.appendChild(li);
+  });
+}
+
+function rmAt(i,e){e.stopPropagation();songs.splice(i,1);if(selIdx>=songs.length)selIdx=songs.length-1;render();}
+function delSel(){if(selIdx<0||selIdx>=songs.length)return;songs.splice(selIdx,1);if(selIdx>=songs.length)selIdx=songs.length-1;render();}
+function moveUp(){if(selIdx<=0)return;[songs[selIdx-1],songs[selIdx]]=[songs[selIdx],songs[selIdx-1]];selIdx--;render();}
+function moveDown(){if(selIdx<0||selIdx>=songs.length-1)return;[songs[selIdx],songs[selIdx+1]]=[songs[selIdx+1],songs[selIdx]];selIdx++;render();}
+function clearAll(){if(songs.length>0&&confirm('リストをすべてクリアしますか？')){songs.length=0;selIdx=-1;render();}}
+
+async function refreshFname(){
+  const d = await (await fetch('api/next_filename')).json();
+  document.getElementById('outFilename').value = d.filename;
+}
+
+function addLog(msg){
+  const el = document.getElementById('logArea');
+  el.textContent += msg+'\n';
+  el.scrollTop = el.scrollHeight;
+}
+
+async function buildPPT(){
+  if(!songs.length){alert('リストに曲を追加してください。');return;}
+  const outName = document.getElementById('outFilename').value.trim();
+  if(!outName){alert('保存ファイル名が空です。');return;}
+  const onegai = document.getElementById('onegaiVal').value;
+  document.getElementById('logArea').textContent = '';
+  document.getElementById('buildBtn').disabled = true;
+  addLog('PPTX作成を開始します...');
+  try{
+    const res  = await fetch('api/build',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({hymn_list:songs.map(s=>({type:s.type,id:s.id})),onegai,filename:outName})
+    });
+    const data = await res.json();
+    if(data.logs) data.logs.forEach(l=>addLog(l));
+    if(data.ok){
+      addLog('');
+      addLog(`✔ ${data.filename} を作成しました！ダウンロード中...`);
+      // blobで取得してダウンロード（Chromeのブロック回避）
+      try{
+        const dlRes  = await fetch(`api/download/${data.filename}`);
+        const blob   = await dlRes.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = data.filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(()=>URL.revokeObjectURL(blobUrl), 1000);
+        addLog(`✔ ダウンロード開始: ${data.filename}`);
+      } catch(dlErr){
+        // blobが失敗した場合はリンク表示にフォールバック
+        addLog('自動DL失敗。下のボタンをクリックしてください。');
+        const link = document.getElementById('dlLink');
+        link.href = `api/download/${data.filename}`;
+        link.textContent = `⬇  ${data.filename} をダウンロード`;
+        document.getElementById('dlArea').style.display = 'block';
+        link.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+      await refreshFname();
+    } else {
+      addLog(`エラー: ${data.error}`);
+      alert(`エラー: ${data.error}`);
+    }
+  } catch(e){
+    addLog(`通信エラー: ${e.message}`);
+    alert(`通信エラー: ${e.message}`);
+  } finally {
+    document.getElementById('buildBtn').disabled = false;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 16px;
+  color: #222;
+}
+
+body {
+  background-color: #f8f9fa;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px 0;
+  border-bottom: 2px solid #ddd;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* Control Panel */
+.control-panel {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+
+.control-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.input-field,
+.select-field {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.input-field {
+  min-width: 200px;
+}
+
+.select-field {
+  min-width: 100px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Buttons */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-blue {
+  background-color: #0066cc;
+  color: white;
+}
+
+.btn-blue:hover {
+  background-color: #0052a3;
+}
+
+.btn-green {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-green:hover {
+  background-color: #218838;
+}
+
+.btn-purple {
+  background-color: #6f42c1;
+  color: white;
+}
+
+.btn-purple:hover {
+  background-color: #5a32a3;
+}
+
+.btn-yellow {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.btn-yellow:hover {
+  background-color: #e0a800;
+}
+
+.btn-orange {
+  background-color: #fd7e14;
+  color: white;
+}
+
+.btn-orange:hover {
+  background-color: #e36a0a;
+}
+
+.btn-gray {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-gray:hover {
+  background-color: #5a6268;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Grid Container */
+.grid-container {
+  overflow-x: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.checklist-grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.checklist-grid thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #ddd;
+}
+
+.checklist-grid th {
+  padding: 12px 8px;
+  text-align: center;
+  font-weight: 600;
+  color: #666;
+  border-right: 1px solid #ddd;
+}
+
+.checklist-grid th:last-child {
+  border-right: none;
+}
+
+.checklist-grid td {
+  padding: 10px 8px;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+
+.checklist-grid td:last-child {
+  border-right: none;
+}
+
+.checklist-grid tbody tr:hover {
+  background-color: #e0f2fe;
+}
+
+.checklist-grid tbody tr:hover td {
+  background-color: #e0f2fe;
+}
+
+.col-item {
+  text-align: left;
+  min-width: 150px;
+  width: 150px;
+}
+
+.checklist-grid td.col-item {
+  text-align: left;
+}
+
+.col-date {
+  min-width: 60px;
+  width: 60px;
+}
+
+.col-operation {
+  min-width: 120px;
+  width: 120px;
+}
+
+/* Item Row */
+.item-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-checkbox {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+/* Select/Dropdown */
+.status-select {
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: white;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Status colors */
+.status-symbol {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.status-symbol-◎ {
+  color: #28a745;
+}
+
+.status-symbol-〇 {
+  color: #0066cc;
+}
+
+.status-symbol-△ {
+  color: #fd7e14;
+}
+
+.status-symbol-ー {
+  color: #ccc;
+}
+
+/* Item name input */
+.item-name-input {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: 14px;
+  width: 100%;
+  min-width: 0;
+}
+
+.item-name-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+/* Save Button */
+.btn-save {
+  background-color: #28a745;
+  color: white;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+  margin-right: 4px;
+}
+
+.btn-save:hover {
+  background-color: #218838;
+}
+
+/* Delete Button */
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .control-panel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .action-buttons {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 24px;
+  }
+
+  .checklist-grid {
+    font-size: 12px;
+  }
+
+  .checklist-grid th,
+  .checklist-grid td {
+    padding: 8px 6px;
+  }
+
+  .col-item {
+    min-width: 120px;
+    width: 120px;
+  }
+}

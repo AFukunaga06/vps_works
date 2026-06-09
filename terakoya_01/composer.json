@@ -1,0 +1,8 @@
+{
+    "name": "local/terakoya_01",
+    "description": "terakoya_01",
+    "type": "project",
+    "require": {
+        "square/square": "^45.0"
+    }
+}

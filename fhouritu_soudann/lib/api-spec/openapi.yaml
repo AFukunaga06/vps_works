@@ -1,0 +1,202 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: API specification for legal consultation booking
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: bookings
+    description: Booking operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /bookings:
+    get:
+      operationId: getBookings
+      tags: [bookings]
+      summary: Get all bookings
+      description: Returns bookings with availability info per date
+      parameters:
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BookingSlot"
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create a new booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookingRequest"
+      responses:
+        "201":
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /bookings/availability:
+    get:
+      operationId: getAvailability
+      tags: [bookings]
+      summary: Get availability for a date
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Availability info for a date
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DateAvailability"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    BookingSlot:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        legalSlots:
+          type: integer
+          description: Number of available legal consultation slots
+        legalBooked:
+          type: integer
+          description: Number of booked legal consultation slots
+      required:
+        - date
+        - legalSlots
+        - legalBooked
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - date
+        - time
+        - name
+        - email
+        - createdAt
+    CreateBookingRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        notes:
+          type: string
+      required:
+        - date
+        - time
+        - name
+        - email
+    DateAvailability:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        slots:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeSlot"
+      required:
+        - date
+        - slots
+    TimeSlot:
+      type: object
+      properties:
+        time:
+          type: string
+        available:
+          type: boolean
+        booked:
+          type: boolean
+      required:
+        - time
+        - available
+        - booked
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRコード生成ツール | afuku5906.com</title>
+  <meta name="description" content="URL・vCard・WiFi・メールアドレスのQRコードを無料で生成。カラーカスタマイズ・ロゴ挿入対応。完全無料・登録不要。">
+  <!-- OGP -->
+  <meta property="og:title" content="QRコード生成ツール">
+  <meta property="og:description" content="URL・vCard・WiFi・メールアドレスのQRコードを無料で生成。カラーカスタマイズ・ロゴ挿入対応。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://qr.afuku5906.com/">
+  <meta property="og:site_name" content="afuku5906.com">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="QRコード生成ツール">
+  <meta name="twitter:description" content="URL・vCard・WiFi・メールのQRコードを無料生成。カラー・ロゴ対応。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <h1>QRコード生成ツール</h1>
+      <p>URL・vCard・WiFi・メールアドレスに対応 | 完全無料・登録不要・サーバー送信なし</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <!-- ===== 左パネル: 入力 ===== -->
+      <section class="panel input-panel">
+
+        <!-- タブ -->
+        <div class="tabs" role="tablist" aria-label="入力モード">
+          <button class="tab active" role="tab" data-tab="url" aria-selected="true">URL/テキスト</button>
+          <button class="tab" role="tab" data-tab="vcard" aria-selected="false">vCard</button>
+          <button class="tab" role="tab" data-tab="wifi" aria-selected="false">WiFi</button>
+          <button class="tab" role="tab" data-tab="email" aria-selected="false">メール</button>
+        </div>
+
+        <!-- URL/テキスト -->
+        <div class="tab-content active" id="tab-url" role="tabpanel">
+          <div class="field">
+            <label for="url-text">URL またはテキスト</label>
+            <textarea id="url-text" rows="5"
+              placeholder="https://example.com&#10;または任意のテキスト（日本語OK）"></textarea>
+          </div>
+        </div>
+
+        <!-- vCard -->
+        <div class="tab-content" id="tab-vcard" role="tabpanel">
+          <div class="fields-two">
+            <div class="field">
+              <label for="vcard-name">氏名</label>
+              <input type="text" id="vcard-name" placeholder="山田 太郎">
+            </div>
+            <div class="field">
+              <label for="vcard-tel">電話番号</label>
+              <input type="tel" id="vcard-tel" placeholder="090-0000-0000">
+            </div>
+            <div class="field">
+              <label for="vcard-email">メールアドレス</label>
+              <input type="email" id="vcard-email" placeholder="taro@example.com">
+            </div>
+            <div class="field">
+              <label for="vcard-org">会社名</label>
+              <input type="text" id="vcard-org" placeholder="株式会社サンプル">
+            </div>
+          </div>
+          <div class="field">
+            <label for="vcard-addr">住所</label>
+            <input type="text" id="vcard-addr" placeholder="東京都渋谷区1-2-3">
+          </div>
+        </div>
+
+        <!-- WiFi -->
+        <div class="tab-content" id="tab-wifi" role="tabpanel">
+          <div class="field">
+            <label for="wifi-ssid">SSID（ネットワーク名）</label>
+            <input type="text" id="wifi-ssid" placeholder="MyWiFiNetwork">
+          </div>
+          <div class="field">
+            <label for="wifi-password">パスワード</label>
+            <input type="text" id="wifi-password" placeholder="パスワード">
+          </div>
+          <div class="field">
+            <label for="wifi-security">暗号化方式</label>
+            <select id="wifi-security">
+              <option value="WPA">WPA / WPA2</option>
+              <option value="WEP">WEP</option>
+              <option value="">なし（オープン）</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- メール -->
+        <div class="tab-content" id="tab-email" role="tabpanel">
+          <div class="field">
+            <label for="email-addr">メールアドレス</label>
+            <input type="email" id="email-addr" placeholder="taro@example.com">
+          </div>
+          <div class="field">
+            <label for="email-subject">件名</label>
+            <input type="text" id="email-subject" placeholder="お問い合わせ">
+          </div>
+          <div class="field">
+            <label for="email-body">本文</label>
+            <textarea id="email-body" rows="3" placeholder="本文を入力"></textarea>
+          </div>
+        </div>
+
+        <!-- カスタマイズ -->
+        <div class="options-section">
+          <h2 class="options-title">カスタマイズ</h2>
+          <div class="options-grid">
+            <div class="field">
+              <label for="fg-color">前景色</label>
+              <div class="color-wrap">
+                <input type="color" id="fg-color" value="#000000" aria-label="前景色ピッカー">
+                <span id="fg-color-text" class="color-hex">#000000</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="bg-color">背景色</label>
+              <div class="color-wrap">
+                <input type="color" id="bg-color" value="#ffffff" aria-label="背景色ピッカー">
+                <span id="bg-color-text" class="color-hex">#ffffff</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="qr-size">出力サイズ</label>
+              <select id="qr-size">
+                <option value="200">200px（小）</option>
+                <option value="400" selected>400px（中）</option>
+                <option value="800">800px（大・高解像度）</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="error-level">誤り訂正レベル</label>
+              <select id="error-level">
+                <option value="L">L — 低（7%）</option>
+                <option value="M" selected>M — 中（15%）</option>
+                <option value="Q">Q — 高（25%）</option>
+                <option value="H">H — 最高（30%）</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="logo-file">
+              中央ロゴ画像
+              <span class="hint">ロゴ使用時は誤り訂正レベル H を推奨</span>
+            </label>
+            <div class="logo-controls">
+              <input type="file" id="logo-file" accept="image/*" aria-label="ロゴ画像ファイル">
+              <button id="clear-logo" class="btn-sm" type="button">クリア</button>
+            </div>
+            <p id="logo-name" class="logo-name" hidden></p>
+          </div>
+        </div>
+
+        <button id="generate-btn" class="btn-primary" type="button">
+          QRコードを生成
+        </button>
+      </section>
+
+      <!-- ===== 右パネル: プレビュー ===== -->
+      <section class="panel preview-panel">
+        <h2>プレビュー</h2>
+        <div class="preview-box" id="preview-box">
+          <div id="qr-preview"></div>
+          <p class="placeholder-text" id="placeholder-text">
+            左のフォームに入力して「生成」ボタンを押してください
+          </p>
+        </div>
+        <div class="download-buttons" id="download-buttons" hidden>
+          <button id="dl-png" class="btn-download" type="button">⬇ PNG ダウンロード</button>
+          <button id="dl-svg" class="btn-download" type="button">⬇ SVG ダウンロード</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>Powered by <a href="https://afuku5906.com" target="_blank" rel="noopener noreferrer">afuku5906.com</a></p>
+  </footer>
+
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
