@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // ===== 予約通知メール送信（失敗しても予約は確定） =========
                 require_once __DIR__ . '/../includes/mailer.php';
                 $bizName   = trim((string)$settings['business_name']) ?: 'ご相談予約';
-                $adminTo   = defined('RESV_ADMIN_EMAIL') ? RESV_ADMIN_EMAIL : 'afky5906@gmail.com';
+                $adminTo   = defined('RESV_ADMIN_EMAIL') ? RESV_ADMIN_EMAIL : 'REDACTED_EMAIL';
                 $dowJp     = dow_label((int)date('w', strtotime($postDate)));
                 $dateLine  = "{$postDate}（{$dowJp}） "
                            . substr($postStart,0,5) . '〜' . substr($postEnd,0,5);

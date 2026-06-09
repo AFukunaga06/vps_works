@@ -2,5 +2,5 @@
 USE fuku_ai_terakoya;
 
 INSERT INTO admins (username, password_hash, name, email)
-VALUES ('admin', '__ADMIN_HASH__', '管理者', 'afky5906@gmail.com')
+VALUES ('admin', '__ADMIN_HASH__', '管理者', 'REDACTED_EMAIL')
 ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash);

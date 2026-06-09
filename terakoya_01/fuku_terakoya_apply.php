@@ -3,7 +3,7 @@
  * フクのAI寺子屋 講師応募フォーム 送信ハンドラ
  *  - fuku_ai_terakoya_bosyuu_01.html の応募フォームから AJAX(POST) で呼ばれる
  *  - 既存 contact_form の SMTP 設定（Gmail）と PHPMailer をそのまま流用
- *  - 受信先: afky5906@gmail.com（指定）＋ 応募者への自動返信
+ *  - 受信先: REDACTED_EMAIL（指定）＋ 応募者への自動返信
  */
 header('Content-Type: application/json; charset=utf-8');
 
@@ -12,16 +12,16 @@ require_once '/var/www/html/contact_form/vendor/autoload.php'; // PHPMailer ラ�
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as MailException;
 
-const RECIPIENT = 'afky5906@gmail.com'; // 受信先（指定）
+const RECIPIENT = 'REDACTED_EMAIL'; // 受信先（指定）
 
 // ===== Gmail SMTP 設定 =====
 // 認証情報の出所: /var/www/html/fuku_ai_terakoya/config.php の GMAIL_PASS（現役・認証OK確認済み）
 // ※Gmailアプリパスワードを再発行したら、ここも合わせて更新すること
 const SMTP_HOST = 'smtp.gmail.com';
 const SMTP_PORT = 587;
-const SMTP_USER = 'afky5906@gmail.com';
+const SMTP_USER = 'REDACTED_EMAIL';
 const SMTP_PASS = 'znawtdbppvorvahm';
-const FROM_EMAIL = 'afky5906@gmail.com';
+const FROM_EMAIL = 'REDACTED_EMAIL';
 
 function out(bool $ok, string $error = ''): void {
     echo json_encode(['ok' => $ok, 'error' => $error], JSON_UNESCAPED_UNICODE);
@@ -155,7 +155,7 @@ try {
     $reply->send();
 } catch (MailException $e) {
     error_log('terakoya apply mail error: ' . $e->getMessage());
-    out(false, 'メール送信に失敗しました。お手数ですが afky5906@gmail.com まで直接ご連絡ください。');
+    out(false, 'メール送信に失敗しました。お手数ですが REDACTED_EMAIL まで直接ご連絡ください。');
 }
 
 out(true);

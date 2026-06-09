@@ -5,9 +5,9 @@ use PHPMailer\PHPMailer\Exception;
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // ===== Gmail SMTP 設定 =====
-define('MAIL_FROM',     'afky5906@gmail.com');
+define('MAIL_FROM',     'REDACTED_EMAIL');
 define('MAIL_FROM_NAME','ABC○○法律事務所相談窓口');
-define('MAIL_TO',       'afky5906@gmail.com');
+define('MAIL_TO',       'REDACTED_EMAIL');
 define('GMAIL_APP_PASS', 'REDACTED_FOR_PUBLIC');
 
 /**
@@ -134,7 +134,7 @@ function send_auto_reply_mail(array $data, int $reserve_id): bool {
 ─────────────────────
 ABC○○法律事務所相談窓口
 TEL：080-4788-2900
-MAIL：afky5906@gmail.com
+MAIL：REDACTED_EMAIL
 営業時間：月〜土 10:00〜18:00
 ─────────────────────
 
@@ -198,7 +198,7 @@ function send_confirmed_mail(array $r): bool {
 ─────────────────────
 ABC○○法律事務所相談窓口
 TEL：080-4788-2900
-MAIL：afky5906@gmail.com
+MAIL：REDACTED_EMAIL
 営業時間：月〜土 10:00〜18:00
 ─────────────────────
 TEXT;

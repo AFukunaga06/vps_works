@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
 
                 // Notify admin (best-effort; ignore failure)
-                $admin = 'afky5906@gmail.com';
+                $admin = 'REDACTED_EMAIL';
                 $subj_label = $is_demo ? '【無料デモ申込】' : ($plan_pref ? "【{$plan_pref}プラン問合せ】" : '【お問合せ】');
                 $body = "■LegalDesk LPからのお問合せが届きました\n\n"
                       . "種別: " . ($is_demo ? 'デモ申込' : ($plan_pref ?: 'その他')) . "\n"

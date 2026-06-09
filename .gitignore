@@ -25,6 +25,18 @@ __pycache__/
 職務経歴書.pdf
 __tmp_pdf.html
 
+# 個人情報を含むDBダンプ・データ・バックアップ（公開しない）
+backup/
+backups/
+*.csv
+*dump*.sql
+*backup*.sql
+attendance_db.sql
+church_attendance_*.sql
+*.sqlite
+*.sqlite3
+*.db
+
 # バックアップ・一時ファイル
 *.bak
 *.bak[0-9]

@@ -6,9 +6,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require_once '/var/www/html/fuku_soudan/vendor/autoload.php';
 
-define('NOTIFY_FROM',      'afky5906@gmail.com');
+define('NOTIFY_FROM',      'REDACTED_EMAIL');
 define('NOTIFY_FROM_NAME', '教会牧会支援');
-define('NOTIFY_TO',        'afky5906@gmail.com');
+define('NOTIFY_TO',        'REDACTED_EMAIL');
 define('NOTIFY_APP_PASS',  'REDACTED_FOR_PUBLIC');
 
 function send_contact_mail(array $p, int $id): void {

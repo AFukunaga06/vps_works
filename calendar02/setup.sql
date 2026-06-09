@@ -32,5 +32,5 @@ INSERT IGNORE INTO users (username, password_hash, email)
 VALUES (
     'admin',
     'REDACTED_PASSWORD_HASH',
-    'afky5906s@gmail.com'
+    'REDACTED_EMAIL'
 );

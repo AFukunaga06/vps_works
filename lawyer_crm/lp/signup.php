@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     "From: no-reply@legaldesk.example.com\r\n"
                 );
                 @mb_send_mail(
-                    'afky5906@gmail.com',
+                    'REDACTED_EMAIL',
                     '【LegalDesk】新規テナント登録',
                     "新規登録通知\n事務所名: {$form['office_name']}\n代表者: {$form['contact_name']}\nEmail: {$form['email']}\nプラン: {$form['plan']}/{$form['billing_cycle']}\n",
                     "From: no-reply@legaldesk.example.com\r\n"

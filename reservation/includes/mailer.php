@@ -3,11 +3,11 @@
 // 予約通知メール送信モジュール（PHPMailer + SMTP）
 // SMTP認証情報は includes/mail_config.php（サーバー側のみ・git管理外）に定義。
 //   define('RESV_SMTP_HOST', 'smtp.gmail.com');
-//   define('RESV_SMTP_USER', 'afky5906@gmail.com');
+//   define('RESV_SMTP_USER', 'REDACTED_EMAIL');
 //   define('RESV_SMTP_PASS', 'REDACTED_FOR_PUBLIC');
 //   define('RESV_SMTP_PORT', 587);
-//   define('RESV_FROM_EMAIL', 'afky5906@gmail.com');
-//   define('RESV_ADMIN_EMAIL', 'afky5906@gmail.com');
+//   define('RESV_FROM_EMAIL', 'REDACTED_EMAIL');
+//   define('RESV_ADMIN_EMAIL', 'REDACTED_EMAIL');
 // 設定ファイル・PHPMailer のいずれかが無い場合は送信せず false を返す（予約処理は止めない）。
 // =====================================================================
 

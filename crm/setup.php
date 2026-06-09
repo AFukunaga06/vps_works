@@ -15,7 +15,7 @@ echo "テーブル作成完了<br>";
 
 // 初期管理者アカウント
 $name  = '管理者';
-$email = 'afky5906@gmail.com';
+$email = 'REDACTED_EMAIL';
 $pass  = 'REDACTED_FOR_PUBLIC'; // ログイン後に変更してください
 $hash  = password_hash($pass, PASSWORD_DEFAULT);
 
