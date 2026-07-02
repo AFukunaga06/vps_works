@@ -86,6 +86,8 @@ $csrf = $_SESSION['csrf_token'];
       border-radius: 14px;
       padding: 16px;
     }
+    /* ─── 交通費集計ボックスは赤枠 ─── */
+    .stat-box.transit-box { border: 2px solid #c0392b !important; }
     .stat-label { font-size: 13px; color: #555; margin-bottom: 8px; font-weight: bold; }
     .stat-value { font-size: 24px; font-weight: bold; color: #1e293b; }
     .full { grid-column: 1 / -1; }
@@ -255,11 +257,18 @@ $csrf = $_SESSION['csrf_token'];
     #toast.show { opacity: 1; }
     #toast.error { background: linear-gradient(135deg, #b91c1c, #991b1b); }
 
-    /* ─── Amazon行の強調 ─── */
-    .amazon-row td { color: #c0392b; font-weight: bold; }
+    /* ─── Amazon行の強調（日付・分類・購入先のみ黄色） ─── */
+    .amazon-row td:nth-child(1),
+    .amazon-row td:nth-child(2),
+    .amazon-row td:nth-child(3) { color: #e6b800; font-weight: bold; }
 
     /* ─── 医療費行の強調 ─── */
     .medical-row td { color: #1d4ed8; font-weight: bold; }
+
+    /* ─── 交通費行の強調（日付・分類・購入先のみ） ─── */
+    .transit-row td:nth-child(1),
+    .transit-row td:nth-child(2),
+    .transit-row td:nth-child(3) { color: #c0392b; font-weight: bold; }
 
     /* ─── 入力フォーム 左右分割レイアウト ─── */
     .form-split {
@@ -502,8 +511,13 @@ $csrf = $_SESSION['csrf_token'];
         <div class="stat-label">月の残高増減</div>
         <div class="stat-value" id="monthlyBalance">－</div>
       </div>
+      <div class="stat-box transit-box">
+        <div class="stat-label">月の交通費合計</div>
+        <div class="stat-value" id="monthlyTransit">－</div>
+      </div>
     </div>
     <div class="small" style="margin-top:10px;">残高増減 = 入金額 + チャージ額 − 出金額</div>
+    <div class="small">交通費合計 = 分類または内容に「交通費」を含む出金の合計</div>
   </div>
 
   <!-- ─── 全体集計 ─── -->
@@ -526,8 +540,13 @@ $csrf = $_SESSION['csrf_token'];
         <div class="stat-label">現在残高増減</div>
         <div class="stat-value" id="totalBalance">－</div>
       </div>
+      <div class="stat-box transit-box">
+        <div class="stat-label">総交通費</div>
+        <div class="stat-value" id="totalTransit">－</div>
+      </div>
     </div>
     <div class="small" style="margin-top:10px;">現在残高増減 = 総入金額 + 総チャージ額 − 総出金額</div>
+    <div class="small">総交通費 = 分類または内容に「交通費」を含む出金の合計（全期間）</div>
   </div>
 
 
@@ -672,6 +691,19 @@ async function updateSummary() {
   $('monthlyCharge').textContent     = formatYen(m.charge);
   $('monthlyDeposit').textContent    = formatYen(m.deposit);
   $('monthlyBalance').textContent    = formatYen((+m.deposit||0) - (+m.withdrawal||0) - (+m.charge||0));
+
+  // 月の交通費合計（分類または内容に「交通費」を含む出金の合計）
+  const transitTotal = (cachedEntries || [])
+    .filter(e => (e.date || '').startsWith(month)
+      && ((e.category || '').includes('交通費') || (e.content || '').includes('交通費')))
+    .reduce((sum, e) => sum + (+e.withdrawal || 0), 0);
+  $('monthlyTransit').textContent = formatYen(transitTotal);
+
+  // 総交通費（全期間・分類または内容に「交通費」を含む出金の合計）
+  const totalTransit = (cachedEntries || [])
+    .filter(e => (e.category || '').includes('交通費') || (e.content || '').includes('交通費'))
+    .reduce((sum, e) => sum + (+e.withdrawal || 0), 0);
+  $('totalTransit').textContent = formatYen(totalTransit);
 }
 
 // =====================================================
@@ -702,6 +734,10 @@ async function renderTable() {
       const medicalCategories = ['医療費', '医療費（病院等）', '医療費（薬局等）'];
       if (medicalCategories.includes(e.category || '')) {
         tr.classList.add('medical-row');
+      }
+      // 交通費は日付・分類・購入先を赤太文字
+      if ((e.category || '').includes('交通費') || (e.content || '').includes('交通費')) {
+        tr.classList.add('transit-row');
       }
       tr.innerHTML = `
         <td>${escapeHtml(e.date)}</td>
