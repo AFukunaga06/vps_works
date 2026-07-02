@@ -1,6 +1,6 @@
 # ポートフォリオ — Webアプリケーション開発実績
 
-PHP / MySQL を中心に、**実運用される業務Webアプリを約55件**自作・本番公開してきました。
+PHP / MySQL を中心に、**実運用される業務Webアプリを約57件**自作・本番公開してきました。
 CRM・予約管理・決済・AI連携・外部API連携まで、企画から実装・デプロイ・運用までを一人で担当しています。
 
 - **GitHub**: https://github.com/AFukunaga06/vps_works （全制作物を公開中）
@@ -12,7 +12,7 @@ CRM・予約管理・決済・AI連携・外部API連携まで、企画から実
 
 | 指標 | 数値 |
 |---|---|
-| 制作したWebアプリ | **約55件**（すべて自作・本番稼働 or 公開） |
+| 制作したWebアプリ | **約57件**（すべて自作・本番稼働 or 公開） |
 | 総コード行数 | **約 159,000 行**（PHP / Python / JavaScript） |
 | PHPファイル数 | 641 |
 | SQLスキーマ/マイグレーション | 102 |
@@ -86,7 +86,15 @@ CRM・予約管理・決済・AI連携・外部API連携まで、企画から実
 - フロント（chessboard.js）とPHPバックエンド（`chess_api.php`）を連携
 - 難易度調整・対戦成績の保存（`history.php`）
 
-### 5. 実用ツール群（軽量・単機能を多数）
+### 5. fuguAIチェス＆オセロ（`chess_fugu` / `othello_fugu`）— LLM対戦×探索アルゴリズム
+
+**Sakana AI のLLM（fugu）を対戦相手に組み込んだ**姉妹ゲームアプリ。SSL化した独自サブドメインで本番公開中。
+
+- 難易度3段階: ランダム / **LLM（盤面をプロンプト化して着手選択・失敗時フォールバック）** / **ミニマックス探索（αβ枝刈り・評価関数自作）**
+- オセロは**ルールエンジンをPHPで自作**しサーバー側で全検証、チェスはchess.jsを活用と、要件に応じて設計を使い分け
+- 「対局途中に誤って勝敗表示される」バグを**共有状態の破壊と非同期競合**まで切り分けて修正。25局/1120手の自動シミュレーションで再発ゼロを検証（調査記録を [chess_fugu/DEBUG_対戦結果誤判定.md](chess_fugu/DEBUG_対戦結果誤判定.md) として公開）
+
+### 6. 実用ツール群（軽量・単機能を多数）
 `ssl_checker`（SSL証明書 期限監視）, `urlshort`（URL短縮）, `qr_generator`, `password_generator`,
 `bookmark`, `visitor_counter` など、**「あったら便利」をすぐ形にする瞬発力**も実績。
 
@@ -102,6 +110,10 @@ CRM・予約管理・決済・AI連携・外部API連携まで、企画から実
 |---|---|
 | ![fuku_sample_01](screenshots/fuku_sample_01.png) | ![fuku_ai_terakoya](screenshots/fuku_ai_terakoya.png) |
 
+| fuguAIチェス（LLM対戦） | fuguAIオセロ（LLM対戦） |
+|---|---|
+| ![chess_fugu](screenshots/chess_fugu.png) | ![othello_fugu](screenshots/othello_fugu.png) |
+
 ---
 
 ## 📂 全制作物カテゴリ一覧
@@ -113,7 +125,7 @@ CRM・予約管理・決済・AI連携・外部API連携まで、企画から実
 | **名簿・出欠管理** | tubasa_meibo, sugitach / sugitach02, church_attendance, attend_system01, tokyoch01 |
 | **家計簿** | My_kakeibo（複数バージョン） |
 | **ツール・ユーティリティ** | ssl_checker, urlshort, qr_generator, password_generator, calendar, line_gcal |
-| **エンタメ** | chess_app（AI対戦）, shooting_games, youtube_playlist, bbs |
+| **エンタメ** | chess_app（AI対戦）, chess_fugu / othello_fugu（LLM対戦）, shooting_games, youtube_playlist, bbs |
 | **ポートフォリオ** | fuku_sample_01, sakuhinnsyuu |
 
 ※ 詳細・ソースコードは [GitHub リポジトリ](https://github.com/AFukunaga06/vps_works) でご覧いただけます。

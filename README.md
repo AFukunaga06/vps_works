@@ -1,6 +1,6 @@
 # 🗂 vps_works — Webアプリ制作実績まとめ
 
-PHP / MySQL を中心に、**実運用される業務Webアプリを約55件**自作・本番公開してきました。
+PHP / MySQL を中心に、**実運用される業務Webアプリを約57件**自作・本番公開してきました。
 企画 → 設計 → 実装 → デプロイ → 運用までを一人で担当しています。
 
 ![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white)
@@ -18,7 +18,7 @@ PHP / MySQL を中心に、**実運用される業務Webアプリを約55件**�
 
 | 指標 | 数値 |
 |---|---|
-| 制作したWebアプリ | **約 55 件**（本番稼働 / 公開中） |
+| 制作したWebアプリ | **約 57 件**（本番稼働 / 公開中） |
 | 総コード行数 | **約 159,000 行** |
 | PHPファイル数 | 641 |
 | 主な実装 | CRM・予約・決済・外部API連携・AI連携 |
@@ -51,6 +51,11 @@ PHP / MySQL を中心に、**実運用される業務Webアプリを約55件**�
 ### ♟ chess_app — Claude AIと対戦するチェス
 **Anthropic Claude API**を対戦相手に。フロント(chessboard.js)×PHPバックエンドで対戦成績も保存。
 
+### 🐡 chess_fugu / othello_fugu — fugu(LLM)と対戦するチェス＆オセロ
+**Sakana AI のLLM(fugu)** を対戦相手に組み込んだ姉妹アプリ（[chessfugu.afuku5906.com](https://chessfugu.afuku5906.com) / [othellofugu.afuku5906.com](https://othellofugu.afuku5906.com)）。
+難易度3段階＝ランダム / LLM / **ミニマックス探索（αβ枝刈り・評価関数自作）**。
+非同期競合による誤判定バグの調査・修正記録も同梱（[chess_fugu/DEBUG_対戦結果誤判定.md](chess_fugu/DEBUG_対戦結果誤判定.md)）。
+
 ### 🧰 実用ツール群
 `ssl_checker`（SSL期限監視）/ `urlshort`（URL短縮）/ `qr_generator` / `password_generator` ほか多数。
 
@@ -65,7 +70,7 @@ PHP / MySQL を中心に、**実運用される業務Webアプリを約55件**�
 | **名簿・出欠管理** | sugitach, sugitach02, tubasa_meibo, church_attendance, Church_Pastoral_Support, tokyoch01, attend_system01, kojinnjyouho |
 | **家計簿** | My_kakeibo, My_kakeibo_01 / _02 / _05 |
 | **ツール・ユーティリティ** | checklist01, ssl_checker, bookmark, urlshort, qr_generator, password_generator, color-palette, visitor_counter, calendar, calendar02, line_gcal, nippo-form |
-| **エンタメ** | chess_app, chess0430, shooting_games, youtube_playlist, bbs |
+| **エンタメ** | chess_app, chess_fugu, othello_fugu, chess0430, shooting_games, youtube_playlist, bbs |
 | **ポートフォリオ・他** | fuku_sample_01, sakuhinnsyuu, sakuhinnsyuu01, seikanado_01, Amazon_cyuusyutu, reminder |
 
 ---
